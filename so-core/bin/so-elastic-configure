@@ -1,0 +1,48 @@
+#!/bin/bash
+
+. /opt/so/bin/so-elastic-common
+
+for FILE in /opt/so/conf/securityonion.conf /opt/so/conf/sensortab; do
+	if [ ! -f $FILE ]; then
+		echo "$FILE not found!  Exiting!"
+		exit 1
+	fi
+done
+
+# Configure Elastic network
+. /opt/so/bin/so-elastic-configure-network
+
+# Configure initial Elastic components
+. /opt/so/bin/so-elastic-configure-stack
+
+# Configure Apache
+. /opt/so/bin/so-elastic-configure-apache
+
+# Disable ELSA
+# . /opt/so/bin/so-elastic-configure-disable-elsa
+
+# Configure syslog-ng
+# . /opt/so/bin/so-elastic-configure-syslog-ng
+
+# Configure OSSEC rules
+. /opt/so/bin/so-elastic-configure-ossec-rules
+
+cd $ELASTICDIR
+
+# Configure Kibana
+# so-elastic-start should have already run so-elastic-configure-kibana
+# to load Kibana config and dashboards.
+# However, it appears the config isn't loading properly, so let's run it again.
+. /opt/so/bin/so-elastic-configure-kibana-config
+
+# Configure Curator
+. /opt/so/bin/so-elastic-configure-curator
+
+# Configure Elastalert
+. /opt/so/bin/so-elastic-configure-elastalert
+
+# Configure cron jobs
+. /opt/so/bin/so-elastic-configure-cron
+
+echo
+echo "All Done!"
