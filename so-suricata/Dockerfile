@@ -10,7 +10,7 @@ RUN yum update -y && \
 # Install epel
 RUN yum -y install epel-release bash libpcap iproute
 
-RUN yum -y install GeoIP luajit libnet jansson libyaml && \
+RUN yum -y install GeoIP luajit libnet jansson libyaml cargo rustc && \
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the Suricata package
