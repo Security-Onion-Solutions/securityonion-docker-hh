@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. /opt/so/bin/so-common
+
+. /opt/so/conf/securityonion.conf
+
+sudo docker network inspect $DOCKERNET
