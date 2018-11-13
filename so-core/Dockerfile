@@ -28,7 +28,7 @@ RUN mkdir -p /opt/socore/html
 
 #COPY bin/* /opt/socore/bin/
 
-#COPY files/startso.sh /opt/socore/
+COPY files/startso.sh /opt/socore/
 COPY files/html/* /opt/socore/html/
 
 RUN chmod +x /opt/socore/startso.sh
