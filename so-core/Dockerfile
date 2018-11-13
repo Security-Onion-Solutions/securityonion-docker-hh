@@ -32,7 +32,7 @@ COPY files/startso.sh /opt/socore/
 COPY files/html/* /opt/socore/html/
 
 RUN chmod +x /opt/socore/startso.sh
-RUN chmod +x /opt/socore/bin/*
+#RUN chmod +x /opt/socore/bin/*
 
 # Create socore user.
 RUN groupadd --gid 939 socore && \
