@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -qq -y tar libfontconfig curl ca-certifica
 EXPOSE 3000
 
 COPY ./run.sh /run.sh
+RUN chmod +x /run.sh
 
 USER grafana
 WORKDIR /
