@@ -1,8 +1,8 @@
 FROM debian:stretch-slim
 
 ARG GRAFANA_URL="https://s3-us-west-2.amazonaws.com/grafana-releases/master/grafana-latest.linux-x64.tar.gz"
-ARG GF_UID="472"
-ARG GF_GID="472"
+ARG GF_UID="939"
+ARG GF_GID="939"
 
 ENV PATH=/usr/share/grafana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     GF_PATHS_CONFIG="/etc/grafana/grafana.ini" \
@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -qq -y tar libfontconfig curl ca-certifica
     curl "$GRAFANA_URL" | tar xfvz - --strip-components=1 -C "$GF_PATHS_HOME" && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* && \
-    groupadd -r -g $GF_GID grafana && \
-    useradd -r -u $GF_UID -g grafana grafana && \
+    groupadd -r -g $GF_GID socore && \
+    useradd -r -u $GF_UID -g socore socore && \
     mkdir -p "$GF_PATHS_PROVISIONING/datasources" \
              "$GF_PATHS_PROVISIONING/dashboards" \
              "$GF_PATHS_LOGS" \
@@ -34,6 +34,6 @@ EXPOSE 3000
 COPY ./run.sh /run.sh
 RUN chmod +x /run.sh
 
-USER grafana
+USER socore
 WORKDIR /
 ENTRYPOINT [ "/run.sh" ]
