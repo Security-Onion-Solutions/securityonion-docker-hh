@@ -19,8 +19,8 @@ LABEL maintainer "Security Onion Solutions, LLC"
 LABEL version="SO Core 0.0.2"
 LABEL description="Security Onion Core Functions"
 
-RUN yum update -y && yum -y install rsync epel-release &&\
-    yum -y install nginx python36u python36u-pip &&\
+RUN yum update -y && yum -y install rsync epel-release
+RUN yum -y install nginx python36u python36u-pip &&\
     pip3.6 install flask && \
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
