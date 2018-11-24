@@ -20,7 +20,8 @@ LABEL version="SO Core 0.0.2"
 LABEL description="Security Onion Core Functions"
 
 RUN yum update -y && yum -y install rsync epel-release
-RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm &&\
+    rpm --import /etc/pki/rpm-gpg/IUS-COMMUNITY-GPG-KEY
 RUN yum -y install nginx python36u python36u-pip python36u-ssl
 RUN pip3.6 install --upgrade pip
 RUN pip3.6 install flask && \
