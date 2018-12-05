@@ -201,7 +201,7 @@ socket=${SOCKET}
 password=healthcheckpass
 EOF
 	touch /mysql-init-complete
-	chown -R 939:939 "$DATADIR"
+	#chown -R 939:939 "$DATADIR"
 	echo "[Entrypoint] Starting MySQL 5.7.24-1.1.8"
 fi
 
