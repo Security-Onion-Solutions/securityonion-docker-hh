@@ -30,7 +30,7 @@ wait_step=0
 # Apply Kibana config
 echo
 echo "Applying Kibana config..."
-curl -s -XPOST http://localhost:5601/api/saved_objects/config/$KIBANA_VERSION \
+curl -s -XPOST http://localhost:5601/api/saved_objects/config/$KIBANA_VERSION?overwrite=true  \
     -H "Content-Type: application/json" \
     -H "kbn-xsrf: $KIBANA_VERSION" \
     -d@/usr/share/kibana/config/config.json
