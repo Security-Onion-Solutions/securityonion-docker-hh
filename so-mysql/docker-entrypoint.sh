@@ -82,10 +82,12 @@ if [ "$1" = 'mysqld' ]; then
 
 		# To avoid using password on commandline, put it in a temporary file.
 		# The file is only populated when and if the root password is set.
+    echo " Creating PASSFILE"
 		PASSFILE=$(mktemp -u /var/lib/mysql-files/XXXXXXXXXX)
 		install /dev/null -m0600 -osocore -gsocore "$PASSFILE"
 		# Define the client command used throughout the script
 		# "SET @@SESSION.SQL_LOG_BIN=0;" is required for products like group replication to work properly
+    echo "This is PASSFILE $PASSFILE"
 		mysql=( mysql --defaults-extra-file="$PASSFILE" --protocol=socket -uroot -hlocalhost --socket="$SOCKET" --init-command="SET @@SESSION.SQL_LOG_BIN=0;")
 
 		if [ ! -z "" ];
@@ -117,6 +119,7 @@ if [ "$1" = 'mysqld' ]; then
 			GRANT ALL ON *.* TO 'root'@'${MYSQL_ROOT_HOST}' WITH GRANT OPTION ; \
 			GRANT PROXY ON ''@'' TO 'root'@'${MYSQL_ROOT_HOST}' WITH GRANT OPTION ;"
 		fi
+    echo "This is what I want to enter for rootcreate: $ROOTCREATE"
 		"${mysql[@]}" <<-EOSQL
 			DELETE FROM mysql.user WHERE user NOT IN ('mysql.infoschema', 'mysql.session', 'mysql.sys', 'root') OR host NOT IN ('localhost');
 			CREATE USER 'healthchecker'@'localhost' IDENTIFIED BY 'healthcheckpass';
@@ -126,6 +129,7 @@ if [ "$1" = 'mysqld' ]; then
 		if [ ! -z "$MYSQL_ROOT_PASSWORD" ]; then
 			# Put the password into the temporary config file
 			cat >"$PASSFILE" <<EOF
+      echo "stupid cat thing is trying $PASSFILE"
 [client]
 password="${MYSQL_ROOT_PASSWORD}"
 EOF
