@@ -83,7 +83,7 @@ if [ "$1" = 'mysqld' ]; then
 		# To avoid using password on commandline, put it in a temporary file.
 		# The file is only populated when and if the root password is set.
 		PASSFILE=$(mktemp -u /var/lib/mysql-files/XXXXXXXXXX)
-		install /dev/null -m0600 -omysql -gmysql "$PASSFILE"
+		install /dev/null -m0600 -osocore -gsocore "$PASSFILE"
 		# Define the client command used throughout the script
 		# "SET @@SESSION.SQL_LOG_BIN=0;" is required for products like group replication to work properly
 		mysql=( mysql --defaults-extra-file="$PASSFILE" --protocol=socket -uroot -hlocalhost --socket="$SOCKET" --init-command="SET @@SESSION.SQL_LOG_BIN=0;")
@@ -171,7 +171,7 @@ EOF
 			else
 				echo "[Entrypoint] Setting root user as expired. Password will need to be changed before database can be used."
 				SQL=$(mktemp -u /var/lib/mysql-files/XXXXXXXXXX)
-				install /dev/null -m0600 -omysql -gmysql "$SQL"
+				install /dev/null -m0600 -osocore -gsocore "$SQL"
 				if [ ! -z "$MYSQL_ROOT_HOST" ]; then
 					cat << EOF > "$SQL"
 ALTER USER 'root'@'${MYSQL_ROOT_HOST}' PASSWORD EXPIRE;
