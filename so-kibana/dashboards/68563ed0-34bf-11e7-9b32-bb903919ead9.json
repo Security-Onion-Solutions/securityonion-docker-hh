@@ -419,7 +419,7 @@
         "title": "NIDS - Alerts",
         "version": 1,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"filter\":[],\"query\":{\"query_string\":{\"query\":\"event_type:snort\",\"analyze_wildcard\":true}}}"
+          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"filter\":[],\"query\":{\"query_string\":{\"query\":\"event_type:ids\",\"analyze_wildcard\":true}}}"
         },
         "columns": [
           "source_ip",
