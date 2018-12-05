@@ -38,6 +38,7 @@ VOLUME /var/lib/mysql
 COPY docker-entrypoint.sh /entrypoint.sh
 COPY healthcheck.sh /healthcheck.sh
 RUN chmod +x /entrypoint.sh && chmod +x /healthcheck.sh
+RUN chown -R 939:939 /var/lib/mysql && chown 939:939 -R /var/run/mysqld
 ENTRYPOINT ["/entrypoint.sh"]
 HEALTHCHECK CMD /healthcheck.sh
 EXPOSE 3306 33060
