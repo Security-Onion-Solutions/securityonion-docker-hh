@@ -12,4 +12,5 @@ RUN mkdir -p /tmp/fleet && cd /tmp/fleet \
 COPY startfleet.sh /startfleet.sh
 RUN chmod +x /startfleet.sh
 
-ENTRYPOINT ["/startfleet.sh"]
+ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["/startfleet.sh"]
