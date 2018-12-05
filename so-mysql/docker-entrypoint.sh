@@ -45,6 +45,7 @@ if [ "$1" = 'mysqld' ]; then
 	# Get config
 	DATADIR="$(_get_config 'datadir' "$@")"
 	SOCKET="$(_get_config 'socket' "$@")"
+  echo "This from command line $MYSQL_ROOT_PASSWORD"
 
 	if [ -n "$MYSQL_LOG_CONSOLE" ] || [ -n "" ]; then
 		# Don't touch bind-mounted config files
@@ -58,6 +59,7 @@ if [ "$1" = 'mysqld' ]; then
 		# read this first to make sure that a proper error is generated for empty files.
 		if [ -f "$MYSQL_ROOT_PASSWORD" ]; then
 			MYSQL_ROOT_PASSWORD="$(cat $MYSQL_ROOT_PASSWORD)"
+      echo $MYSQL_ROOT_PASSWORD
 			if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
 				echo >&2 '[Entrypoint] Empty MYSQL_ROOT_PASSWORD file specified.'
 				exit 1
