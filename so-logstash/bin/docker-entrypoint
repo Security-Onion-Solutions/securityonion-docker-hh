@@ -4,6 +4,10 @@ for confs in $(grep -v '#' /usr/share/logstash/conf.enabled.txt); do
   ln -fs $confs /usr/share/logstash/pipeline.enabled/$(basename $confs)
 done
 
+for custom in $(ls /usr/share/logstash/pipeline.custom/parsers/*.conf); do
+  ln -fs $custom /usr/share/logstash/pipeline.enabled/$(basename $custom)
+done
+
 if [[ -z $1 ]] || [[ ${1:0:1} == '-' ]] ; then
   exec logstash $@
 else
