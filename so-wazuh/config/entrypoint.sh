@@ -119,4 +119,4 @@ chmod -R g+rw ${DATA_PATH}
 /bin/node /var/ossec/api/app.js &
 
 # Go to shell
-/bin/bash
+/bin/bash sleep infinity
