@@ -118,5 +118,5 @@ chmod -R g+rw ${DATA_PATH}
 # Start wazuh-api
 /bin/node /var/ossec/api/app.js &
 
-# Go to shell
-/bin/bash sleep infinity
+# Tail to stay running
+/usr/bin/tail -f /dev/null
