@@ -3,10 +3,10 @@ MAINTAINER Kolide Developers <engineering@kolide.co>
 
 RUN apk --update add ca-certificates unzip curl
 RUN mkdir -p /tmp/fleet && cd /tmp/fleet \
-&& curl -O https://dl.kolide.co/bin/fleet_latest.zip \
-&& unzip fleet_latest.zip 'linux/*' -d fleet \
-&& cp fleet/linux/fleet /usr/bin/fleet \
-&& cp fleet/linux/fleetctl /usr/bin/fleetctl \
+&& curl -O https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/Fleet1.0.5/sos_fleet_latest.zip \
+&& unzip sos_fleet_latest.zip '*' -d fleet \
+&& cp fleet/fleet /usr/bin/fleet \
+&& cp fleet/fleetctl /usr/bin/fleetctl \
 && cd /tmp && rm -rf /tmp/fleet
 
 COPY startfleet.sh /startfleet.sh
