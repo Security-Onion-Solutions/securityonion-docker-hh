@@ -4,7 +4,7 @@ MAINTAINER Security Onion Solutions
 
 RUN yum update -y && yum install -y curl && yum clean all
 
-RUN curl -Lso - https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-6.4.1-linux-x86_64.tar.gz | \
+RUN curl -Lso - https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-6.5.2-linux-x86_64.tar.gz | \
       tar zxf - -C /tmp && \
     mv /tmp/filebeat-6.4.1-linux-x86_64 /usr/share/filebeat
 
