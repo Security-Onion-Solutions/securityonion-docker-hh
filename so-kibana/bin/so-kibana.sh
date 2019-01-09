@@ -26,7 +26,8 @@ wait_step=0
 #else
 #    echo "Kibana Index is there... Next."
 #fi
-
+# Let's sleep some more and let Kibana come all the way up.
+sleep 30
 # Apply Kibana config
 echo
 echo "Applying Kibana config..."
