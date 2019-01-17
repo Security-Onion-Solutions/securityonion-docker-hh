@@ -18,16 +18,36 @@
       }
     },
     {
-      "id": "84116380-14e1-11e9-82f7-0da02d93a48b",
+      "id": "71538370-18d5-11e9-932c-d12d2cf4ee95",
+      "type": "visualization",
+      "updated_at": "2019-01-17T14:27:44.326Z",
+      "version": 2,
+      "attributes": {
+        "title": "osquery -  Chrome Extensions - Change Stats",
+        "visState": "{\n  \"title\": \"osquery -  ChromeExt - Change Stats\",\n  \"type\": \"metric\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"type\": \"metric\",\n    \"metric\": {\n      \"percentageMode\": false,\n      \"useRanges\": false,\n      \"colorSchema\": \"Green to Red\",\n      \"metricColorMode\": \"None\",\n      \"colorsRange\": [\n        {\n          \"from\": 0,\n          \"to\": 10000\n        }\n      ],\n      \"labels\": {\n        \"show\": true\n      },\n      \"invertColors\": false,\n      \"style\": {\n        \"bgFill\": \"#000\",\n        \"bgColor\": false,\n        \"labelColor\": false,\n        \"subText\": \"\",\n        \"fontSize\": 70\n      }\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"customLabel\": \"Changes\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"osquery.hostIdentifier.keyword\",\n        \"customLabel\": \"Endpoints\"\n      }\n    }\n  ]\n}",
+        "uiStateJSON": "{}",
+        "description": "",
+        "savedSearchId": "0eee4360-18d4-11e9-932c-d12d2cf4ee95",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
+        }
+      }
+    },
+    {
+      "id": "0eee4360-18d4-11e9-932c-d12d2cf4ee95",
       "type": "search",
-      "updated_at": "2019-01-16T20:00:44.719Z",
+      "updated_at": "2019-01-17T13:07:47.689Z",
       "version": 1,
       "attributes": {
-        "title": "osquery - Logs",
+        "title": "osquery - Chrome Extensions",
         "description": "",
         "hits": 0,
         "columns": [
-          "_source"
+          "osquery.hostname",
+          "osquery.columns.username",
+          "osquery.LiveQuery",
+          "osquery.columns.name"
         ],
         "sort": [
           "@timestamp",
@@ -35,38 +55,21 @@
         ],
         "version": 1,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"event_type: osquery\",\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"event_type: osquery AND osquery.name:*chrome*\",\"language\":\"lucene\"},\"filter\":[]}"
         }
       }
     },
     {
-      "id": "2f556c90-14e3-11e9-82f7-0da02d93a48b",
+      "id": "78cf8bf0-1a59-11e9-ac0b-cb0ba10141ab",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:00:44.719Z",
+      "updated_at": "2019-01-17T13:11:59.279Z",
       "version": 1,
       "attributes": {
-        "title": "osquery - Change Stats",
-        "visState": "{\"title\":\"osquery - Change Stats\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Changes\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"osquery.hostIdentifier.keyword\",\"customLabel\":\"Endpoints\"}}]}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "savedSearchId": "84116380-14e1-11e9-82f7-0da02d93a48b",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
-        }
-      }
-    },
-    {
-      "id": "369e16e0-14e4-11e9-82f7-0da02d93a48b",
-      "type": "visualization",
-      "updated_at": "2019-01-16T20:00:44.719Z",
-      "version": 1,
-      "attributes": {
-        "title": "osquery - Changes by Type",
-        "visState": "{\"title\":\"osquery - Changes by Type\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"osquery.name.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Change Type\"}}]}",
+        "title": "osquery - Chrome Extensions - Sensitive Permissions",
+        "visState": "{\"title\":\"osquery - Chrome Extensions - Sensitive Permissions\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"osquery.columns.name.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Extension Name\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"osquery.columns.permissions.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Permissions\"}}]}",
         "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
         "description": "",
-        "savedSearchId": "84116380-14e1-11e9-82f7-0da02d93a48b",
+        "savedSearchId": "040dda10-18d8-11e9-932c-d12d2cf4ee95",
         "version": 1,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
@@ -74,19 +77,19 @@
       }
     },
     {
-      "id": "05a5ed10-14e4-11e9-82f7-0da02d93a48b",
+      "id": "04f86530-1a59-11e9-ac0b-cb0ba10141ab",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:00:44.719Z",
-      "version": 1,
+      "updated_at": "2019-01-17T13:09:35.686Z",
+      "version": 2,
       "attributes": {
-        "title": "osquery - Changes by Hostname",
-        "visState": "{\"title\":\"osquery - Changes by Hostname\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Changes\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"osquery.hostname.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Hostname\"}}]}",
-        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "title": "osquery - Chrome Extensions - Changes by Hostname",
+        "visState": "{\n  \"title\": \"osquery - Chrome Extensions - Changes by Hostname\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMetricsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"customLabel\": \"Changes\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"osquery.hostname.keyword\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"customLabel\": \"Hostname\"\n      }\n    }\n  ]\n}",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
         "description": "",
-        "savedSearchId": "84116380-14e1-11e9-82f7-0da02d93a48b",
+        "savedSearchId": "0eee4360-18d4-11e9-932c-d12d2cf4ee95",
         "version": 1,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
         }
       }
     },
@@ -104,20 +107,43 @@
       }
     },
     {
-      "id": "9d0e2da0-14e1-11e9-82f7-0da02d93a48b",
-      "type": "dashboard",
-      "updated_at": "2019-01-17T14:12:56.961Z",
-      "version": 4,
+      "id": "040dda10-18d8-11e9-932c-d12d2cf4ee95",
+      "type": "search",
+      "updated_at": "2019-01-17T14:28:08.282Z",
+      "version": 2,
       "attributes": {
-        "title": "osquery - Overview",
+        "title": "osquery - Chrome Extensions - Sensitive Permissions",
+        "description": "",
+        "hits": 0,
+        "columns": [
+          "osquery.columns.permissions",
+          "osquery.columns.name"
+        ],
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"*:logstash-*\",\n  \"highlightAll\": true,\n  \"version\": true,\n  \"query\": {\n    \"query\": \"event_type: osquery AND osquery.name:*chrome* AND osquery.columns.permissions:('all_urls','privacy')\",\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
+        }
+      }
+    },
+    {
+      "id": "af0ea750-18d3-11e9-932c-d12d2cf4ee95",
+      "type": "dashboard",
+      "updated_at": "2019-01-17T14:15:21.993Z",
+      "version": 3,
+      "attributes": {
+        "title": "osquery - Chrome Extensions",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":8,\"h\":64,\"i\":\"9\"},\"id\":\"b3b449d0-3429-11e7-9d52-4f090484f59e\",\"panelIndex\":\"9\",\"type\":\"visualization\",\"version\":\"6.4.2\"},{\"embeddableConfig\":{\"columns\":[\"osquery.hostname\",\"osquery.name\",\"osquery.LiveQuery\",\"osquery.EndpointIP1\",\"osquery.EndpointIP2\"]},\"gridData\":{\"x\":8,\"y\":27,\"w\":40,\"h\":21,\"i\":\"11\"},\"id\":\"84116380-14e1-11e9-82f7-0da02d93a48b\",\"panelIndex\":\"11\",\"type\":\"search\",\"version\":\"6.4.2\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":8,\"y\":0,\"w\":17,\"h\":13,\"i\":\"12\"},\"id\":\"2f556c90-14e3-11e9-82f7-0da02d93a48b\",\"panelIndex\":\"12\",\"title\":\"\",\"type\":\"visualization\",\"version\":\"6.4.2\"},{\"gridData\":{\"x\":8,\"y\":13,\"w\":40,\"h\":14,\"i\":\"13\"},\"version\":\"6.4.2\",\"panelIndex\":\"13\",\"type\":\"visualization\",\"id\":\"369e16e0-14e4-11e9-82f7-0da02d93a48b\",\"embeddableConfig\":{},\"title\":\"Changes by Type\"},{\"gridData\":{\"x\":25,\"y\":0,\"w\":23,\"h\":13,\"i\":\"14\"},\"version\":\"6.4.2\",\"panelIndex\":\"14\",\"type\":\"visualization\",\"id\":\"05a5ed10-14e4-11e9-82f7-0da02d93a48b\",\"embeddableConfig\":{},\"title\":\"Changes by Hostname\"}]",
+        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":8,\"h\":64,\"i\":\"9\"},\"id\":\"b3b449d0-3429-11e7-9d52-4f090484f59e\",\"panelIndex\":\"9\",\"type\":\"visualization\",\"version\":\"6.4.2\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":8,\"y\":0,\"w\":17,\"h\":11,\"i\":\"16\"},\"id\":\"71538370-18d5-11e9-932c-d12d2cf4ee95\",\"panelIndex\":\"16\",\"title\":\"\",\"type\":\"visualization\",\"version\":\"6.5.2\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":8,\"y\":29,\"w\":40,\"h\":20,\"i\":\"18\"},\"id\":\"0eee4360-18d4-11e9-932c-d12d2cf4ee95\",\"panelIndex\":\"18\",\"title\":\"Chrome Extensions - Logs\",\"type\":\"search\",\"version\":\"6.5.2\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":8,\"y\":11,\"w\":40,\"h\":18,\"i\":\"19\"},\"id\":\"78cf8bf0-1a59-11e9-ac0b-cb0ba10141ab\",\"panelIndex\":\"19\",\"title\":\"Chrome Extensions - Sensitive Permissions\",\"type\":\"visualization\",\"version\":\"6.5.2\"},{\"gridData\":{\"x\":25,\"y\":0,\"w\":23,\"h\":11,\"i\":\"20\"},\"version\":\"6.5.2\",\"panelIndex\":\"20\",\"type\":\"visualization\",\"id\":\"04f86530-1a59-11e9-ac0b-cb0ba10141ab\",\"embeddableConfig\":{},\"title\":\"Chrome Extensions - Changes by Hostname\"}]",
         "optionsJSON": "{\"darkTheme\":true,\"useMargins\":true}",
         "version": 1,
         "timeRestore": false,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"*:logstash-*\",\"negate\":true,\"disabled\":true,\"alias\":\"Initial Systems/Queries\",\"type\":\"phrase\",\"key\":\"osquery.counter\",\"value\":\"0\",\"params\":{\"query\":0,\"type\":\"phrase\"}},\"query\":{\"match\":{\"osquery.counter\":{\"query\":0,\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"*:logstash-*\",\"type\":\"phrases\",\"key\":\"osquery.codename\",\"value\":\"server\",\"params\":[\"server\"],\"negate\":false,\"disabled\":true,\"alias\":\"Servers Only\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"osquery.codename\":\"server\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
+          "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"Initial Systems/Queries\",\"disabled\":true,\"index\":\"*:logstash-*\",\"key\":\"osquery.counter\",\"negate\":true,\"params\":{\"query\":0,\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"0\"},\"query\":{\"match\":{\"osquery.counter\":{\"query\":0,\"type\":\"phrase\"}}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"Servers Only\",\"disabled\":true,\"index\":\"*:logstash-*\",\"key\":\"osquery.codename\",\"negate\":false,\"params\":{\"query\":\"server\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"server\"},\"query\":{\"match\":{\"osquery.codename\":{\"query\":\"server\",\"type\":\"phrase\"}}}}],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"}}"
         }
       }
     }
