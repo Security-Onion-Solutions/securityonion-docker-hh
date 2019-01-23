@@ -18,128 +18,75 @@
       }
     },
     {
-      "id": "9cffd160-363f-11e7-a6f7-4f44d7bf1c33",
-      "type": "visualization",
-      "updated_at": "2019-01-23T14:04:30.907Z",
-      "version": 2,
-      "attributes": {
-        "visState": "{\"title\":\"PE - Log Count Over Time\",\"type\":\"line\",\"params\":{\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp per 12 hours\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"lineWidth\":2,\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
-        "description": "",
-        "title": "PE - Log Count Over Time",
-        "uiStateJSON": "{}",
-        "version": 1,
-        "savedSearchId": "66288140-342e-11e7-9e93-53b62e1857b2",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
-        }
-      }
-    },
-    {
-      "id": "45c4ae10-380c-11e7-a1cc-ebc6a7e70e84",
-      "type": "visualization",
-      "updated_at": "2019-01-23T14:04:30.907Z",
-      "version": 2,
-      "attributes": {
-        "title": "PE - OS (Pie Chart)",
-        "visState": "{\"title\":\"PE - OS (Pie Chart)\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"os.keyword\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "savedSearchId": "66288140-342e-11e7-9e93-53b62e1857b2",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
-        }
-      }
-    },
-    {
-      "id": "807da390-380c-11e7-a1cc-ebc6a7e70e84",
-      "type": "visualization",
-      "updated_at": "2019-01-23T14:04:30.907Z",
-      "version": 2,
-      "attributes": {
-        "title": "PE - Subsystem (Pie Chart)",
-        "visState": "{\"title\":\"PE - Subsystem (Pie Chart)\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"subsystem.keyword\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "savedSearchId": "66288140-342e-11e7-9e93-53b62e1857b2",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
-        }
-      }
-    },
-    {
-      "id": "66288140-342e-11e7-9e93-53b62e1857b2",
+      "id": "84116380-14e1-11e9-82f7-0da02d93a48b",
       "type": "search",
-      "updated_at": "2019-01-23T14:04:30.907Z",
+      "updated_at": "2019-01-23T14:04:30.939Z",
       "version": 2,
       "attributes": {
+        "title": "osquery - Logs",
+        "description": "",
+        "hits": 0,
+        "columns": [
+          "_source"
+        ],
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "hits": 0,
-        "description": "",
-        "title": "PE - Logs",
         "version": 1,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"filter\":[],\"query\":{\"query_string\":{\"query\":\"event_type:bro_pe\",\"analyze_wildcard\":true}}}"
-        },
-        "columns": [
-          "message",
-          "fuid",
-          "_id"
-        ]
-      }
-    },
-    {
-      "id": "4e56b4d0-416f-11e7-9850-b78558d0ac17",
-      "type": "visualization",
-      "updated_at": "2019-01-23T14:04:30.907Z",
-      "version": 2,
-      "attributes": {
-        "visState": "{\"title\":\"PE - Section Name\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"section_names.keyword\",\"size\":100,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-        "description": "",
-        "title": "PE - Section Name",
-        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-        "version": 1,
-        "savedSearchId": "66288140-342e-11e7-9e93-53b62e1857b2",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"event_type: osquery\",\"language\":\"lucene\"},\"filter\":[]}"
         }
       }
     },
     {
-      "id": "7de76e10-6e1f-11e7-b553-7f80727663c1",
+      "id": "2f556c90-14e3-11e9-82f7-0da02d93a48b",
       "type": "visualization",
-      "updated_at": "2019-01-23T14:04:30.907Z",
+      "updated_at": "2019-01-23T14:04:30.939Z",
       "version": 2,
       "attributes": {
-        "visState": "{\"title\":\"PE - Machine\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"machine.keyword\",\"size\":100,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Machine\"}}],\"listeners\":{}}",
+        "title": "osquery - Change Stats",
+        "visState": "{\"title\":\"osquery - Change Stats\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Changes\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"osquery.hostIdentifier.keyword\",\"customLabel\":\"Endpoints\"}}]}",
+        "uiStateJSON": "{}",
         "description": "",
-        "title": "PE - Machine",
-        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "savedSearchId": "84116380-14e1-11e9-82f7-0da02d93a48b",
         "version": 1,
-        "savedSearchId": "66288140-342e-11e7-9e93-53b62e1857b2",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
         }
       }
     },
     {
-      "id": "AWDHCUeZxQT5EBNmq4Xy",
+      "id": "369e16e0-14e4-11e9-82f7-0da02d93a48b",
       "type": "visualization",
-      "updated_at": "2019-01-23T14:04:30.907Z",
+      "updated_at": "2019-01-23T14:04:30.939Z",
       "version": 2,
       "attributes": {
-        "title": "PE - Log Count",
-        "visState": "{\"title\":\"PE - Log Count\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":\"30\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"bgFill\":\"#FB9E00\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
-        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "title": "osquery - Changes by Type",
+        "visState": "{\"title\":\"osquery - Changes by Type\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"osquery.name.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Change Type\"}}]}",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
         "description": "",
-        "savedSearchId": "66288140-342e-11e7-9e93-53b62e1857b2",
+        "savedSearchId": "84116380-14e1-11e9-82f7-0da02d93a48b",
         "version": 1,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "05a5ed10-14e4-11e9-82f7-0da02d93a48b",
+      "type": "visualization",
+      "updated_at": "2019-01-23T14:04:30.939Z",
+      "version": 2,
+      "attributes": {
+        "title": "osquery - Changes by Hostname",
+        "visState": "{\"title\":\"osquery - Changes by Hostname\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Changes\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"osquery.hostname.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Hostname\"}}]}",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "description": "",
+        "savedSearchId": "84116380-14e1-11e9-82f7-0da02d93a48b",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
         }
       }
     },
@@ -157,20 +104,20 @@
       }
     },
     {
-      "id": "8a10e380-3583-11e7-a588-05992195c551",
+      "id": "9d0e2da0-14e1-11e9-82f7-0da02d93a48b",
       "type": "dashboard",
-      "updated_at": "2019-01-23T14:04:30.907Z",
+      "updated_at": "2019-01-23T14:04:30.939Z",
       "version": 2,
       "attributes": {
-        "title": "Bro - PE",
+        "title": "osquery - Overview",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"gridData\":{\"h\":12,\"i\":\"2\",\"w\":2,\"x\":0,\"y\":0},\"id\":\"b3b449d0-3429-11e7-9d52-4f090484f59e\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"6.1.1\"},{\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"gridData\":{\"h\":2,\"i\":\"3\",\"w\":8,\"x\":4,\"y\":0},\"id\":\"9cffd160-363f-11e7-a6f7-4f44d7bf1c33\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"6.1.1\"},{\"gridData\":{\"h\":4,\"i\":\"5\",\"w\":5,\"x\":7,\"y\":2},\"id\":\"45c4ae10-380c-11e7-a1cc-ebc6a7e70e84\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"6.1.1\"},{\"gridData\":{\"h\":4,\"i\":\"7\",\"w\":5,\"x\":2,\"y\":2},\"id\":\"807da390-380c-11e7-a1cc-ebc6a7e70e84\",\"panelIndex\":\"7\",\"type\":\"visualization\",\"version\":\"6.1.1\"},{\"columns\":[\"fuid\",\"machine\",\"is_exe\",\"is_64bit\",\"subsystem\",\"_id\"],\"gridData\":{\"h\":7,\"i\":\"8\",\"w\":12,\"x\":0,\"y\":12},\"id\":\"66288140-342e-11e7-9e93-53b62e1857b2\",\"panelIndex\":\"8\",\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\",\"version\":\"6.1.1\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":6,\"i\":\"9\",\"w\":5,\"x\":7,\"y\":6},\"id\":\"4e56b4d0-416f-11e7-9850-b78558d0ac17\",\"panelIndex\":\"9\",\"type\":\"visualization\",\"version\":\"6.1.1\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":6,\"i\":\"10\",\"w\":5,\"x\":2,\"y\":6},\"id\":\"7de76e10-6e1f-11e7-b553-7f80727663c1\",\"panelIndex\":\"10\",\"type\":\"visualization\",\"version\":\"6.1.1\"},{\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"gridData\":{\"h\":2,\"i\":\"11\",\"w\":2,\"x\":2,\"y\":0},\"id\":\"AWDHCUeZxQT5EBNmq4Xy\",\"panelIndex\":\"11\",\"type\":\"visualization\",\"version\":\"6.1.1\"}]",
-        "optionsJSON": "{\"darkTheme\":true,\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":8,\"h\":64,\"i\":\"9\"},\"id\":\"b3b449d0-3429-11e7-9d52-4f090484f59e\",\"panelIndex\":\"9\",\"type\":\"visualization\",\"version\":\"6.4.2\"},{\"embeddableConfig\":{\"columns\":[\"osquery.hostname\",\"osquery.name\",\"osquery.LiveQuery\",\"osquery.EndpointIP1\",\"osquery.EndpointIP2\"]},\"gridData\":{\"x\":8,\"y\":27,\"w\":40,\"h\":21,\"i\":\"11\"},\"id\":\"84116380-14e1-11e9-82f7-0da02d93a48b\",\"panelIndex\":\"11\",\"type\":\"search\",\"version\":\"6.4.2\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":8,\"y\":0,\"w\":17,\"h\":13,\"i\":\"12\"},\"id\":\"2f556c90-14e3-11e9-82f7-0da02d93a48b\",\"panelIndex\":\"12\",\"title\":\"\",\"type\":\"visualization\",\"version\":\"6.4.2\"},{\"gridData\":{\"x\":8,\"y\":13,\"w\":40,\"h\":14,\"i\":\"13\"},\"version\":\"6.4.2\",\"panelIndex\":\"13\",\"type\":\"visualization\",\"id\":\"369e16e0-14e4-11e9-82f7-0da02d93a48b\",\"embeddableConfig\":{},\"title\":\"Changes by Type\"},{\"gridData\":{\"x\":25,\"y\":0,\"w\":23,\"h\":13,\"i\":\"14\"},\"version\":\"6.4.2\",\"panelIndex\":\"14\",\"type\":\"visualization\",\"id\":\"05a5ed10-14e4-11e9-82f7-0da02d93a48b\",\"embeddableConfig\":{},\"title\":\"Changes by Hostname\"}]",
+        "optionsJSON": "{\"darkTheme\":true,\"useMargins\":true}",
         "version": 1,
         "timeRestore": false,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
+          "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"*:logstash-*\",\"negate\":true,\"disabled\":true,\"alias\":\"Initial Systems/Queries\",\"type\":\"phrase\",\"key\":\"osquery.counter\",\"value\":\"0\",\"params\":{\"query\":0,\"type\":\"phrase\"}},\"query\":{\"match\":{\"osquery.counter\":{\"query\":0,\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"*:logstash-*\",\"type\":\"phrases\",\"key\":\"osquery.codename\",\"value\":\"server\",\"params\":[\"server\"],\"negate\":false,\"disabled\":true,\"alias\":\"Servers Only\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"osquery.codename\":\"server\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
         }
       }
     }
