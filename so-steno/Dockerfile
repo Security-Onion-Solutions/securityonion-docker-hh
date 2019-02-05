@@ -9,8 +9,9 @@ RUN yum update -y && \
 # Install epel
 RUN yum -y install epel-release bash libpcap iproute tcpdump && yum clean all
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
-RUN yum -y install snappy leveldb jq libaio libseccomp golang which openssl python36u && \
-    yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
+RUN yum -y install snappy leveldb jq libaio libseccomp golang which openssl python36u
+RUN pip3.6 install flask
+RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the steno package
 RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/stenographer_20180316/stenographer-0-1.20180316git57b88aa.el7.centos.x86_64.rpm
