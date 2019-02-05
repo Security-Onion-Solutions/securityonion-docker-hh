@@ -10,7 +10,7 @@ RUN yum update -y && \
 RUN yum -y install epel-release bash libpcap iproute tcpdump && yum clean all
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 RUN yum -y install snappy leveldb jq libaio libseccomp golang which openssl python36u
-RUN pip3.6 install flask
+RUN /usr/bin/pip3.6 install flask
 RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the steno package
