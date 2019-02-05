@@ -7,8 +7,8 @@ RUN yum update -y && \
     yum clean all
 
 # Install epel
-RUN yum -y install epel-release bash libpcap iproute tcpdump && yum clean all
-RUN yum -y install snappy leveldb jq libaio libseccomp golang which openssl && \
+RUN yum -y install epel-release bash libpcap iproute tcpdump centos-release-scl && yum clean all
+RUN yum -y install snappy leveldb jq libaio libseccomp golang which openssl rh-python37 && \
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the steno package
