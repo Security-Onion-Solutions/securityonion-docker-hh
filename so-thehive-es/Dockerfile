@@ -16,18 +16,18 @@ RUN groupadd -g 939 socore && adduser -u 939 -g 939 -d /usr/share/elasticsearch 
 WORKDIR /usr/share/elasticsearch
 
 # Download/extract defined ES version. busybox tar can't strip leading dir.
-RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-5.6.0.tar.gz && \
-    EXPECTED_SHA=$(wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-5.6.0.tar.gz.sha512 | awk '{print $1}') && \
+RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.0.tar.gz && \
+    EXPECTED_SHA=$(wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.0.tar.gz.sha512 | awk '{print $1}') && \
     test $EXPECTED_SHA == $(sha512sum elasticsearch-oss-5.6.0.tar.gz | awk '{print $1}') && \
-    tar zxf elasticsearch-oss-5.6.0.tar.gz && \
-    chown -R elasticsearch:elasticsearch elasticsearch-5.6.0 && \
+    tar zxf elasticsearch-5.6.0.tar.gz && \
+    chown -R socore:socore elasticsearch-5.6.0 && \
     mv elasticsearch-5.6.0/* . && \
     rmdir elasticsearch-5.6.0 && \
     rm elasticsearch-oss-5.6.0.tar.gz
 
 RUN set -ex && for esdirs in config data logs; do \
         mkdir -p "$esdirs"; \
-        chown -R elasticsearch:elasticsearch "$esdirs"; \
+        chown -R socore:socore "$esdirs"; \
     done
 
 USER elasticsearch
@@ -39,7 +39,7 @@ COPY log4j2.properties config/
 COPY bin/es-docker bin/es-docker
 
 USER root
-RUN chown elasticsearch:elasticsearch config/elasticsearch.yml config/log4j2.properties bin/es-docker && \
+RUN chown socore:socore config/elasticsearch.yml config/log4j2.properties bin/es-docker && \
     chmod 0750 bin/es-docker
 
 USER elasticsearch
