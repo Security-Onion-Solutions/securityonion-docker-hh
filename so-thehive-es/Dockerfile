@@ -17,8 +17,6 @@ WORKDIR /usr/share/elasticsearch
 
 # Download/extract defined ES version. busybox tar can't strip leading dir.
 RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.0.tar.gz && \
-    EXPECTED_SHA=$(wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.0.tar.gz.sha512 | awk '{print $1}') && \
-    test $EXPECTED_SHA == $(sha512sum elasticsearch-5.6.0.tar.gz | awk '{print $1}') && \
     tar zxf elasticsearch-5.6.0.tar.gz && \
     chown -R socore:socore elasticsearch-5.6.0 && \
     mv elasticsearch-5.6.0/* . && \
