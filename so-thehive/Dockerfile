@@ -16,7 +16,7 @@ RUN apt-get update \
   && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
   && apt-get update \
-  && apt-get install -y sudo \
+  && apt-get install -y sudo gnupg\
                         $BUILD_DEPS \
   && npm install -g grunt-cli \
                     bower \
