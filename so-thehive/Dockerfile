@@ -37,7 +37,7 @@ RUN apt-get update \
 FROM openjdk:8
 COPY --from=build-env /opt/thehive /opt/thehive
 
-RUN useradd -u 939 -g 939 thehive \
+RUN useradd -u 939 thehive \
   && mkdir /var/log/thehive \
   && chown -R thehive /opt/thehive \
                       /var/log/thehive \
