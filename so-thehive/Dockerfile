@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM openjdk:8 as build-env
 LABEL maintainer="Ilya Glotov <contact@ilyaglotov.com>" \
       repository="https://github.com/TheHive-Project/TheHive"
 
@@ -16,7 +16,7 @@ RUN apt-get update \
   && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
   && apt-get update \
-  && apt-get install -y sudo gnupg\
+  && apt-get install -y sudo \
                         $BUILD_DEPS \
   && npm install -g grunt-cli \
                     bower \
