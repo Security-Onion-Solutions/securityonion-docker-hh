@@ -108,7 +108,7 @@ RUN apt-get update \
                         libimage-exiftool-perl \
                         libmagic1 \
                         libssl-dev \
-  && useradd -u 939 -g 939 cortex \
+  && useradd -u 939 cortex \
   && mkdir /var/log/cortex \
   && chown -R cortex /opt/cortex \
                       /opt/Cortex-Analyzers \
