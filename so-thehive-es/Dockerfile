@@ -11,19 +11,19 @@ RUN yum update -y && \
     yum install -y java-1.8.0-openjdk-headless wget which && \
     yum clean all
 
-RUN groupadd -g 930 elasticsearch && adduser -u 930 -g 930 -d /usr/share/elasticsearch elasticsearch
+RUN groupadd -g 939 socore && adduser -u 939 -g 939 -d /usr/share/elasticsearch socore
 
 WORKDIR /usr/share/elasticsearch
 
 # Download/extract defined ES version. busybox tar can't strip leading dir.
-RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-6.5.2.tar.gz && \
-    EXPECTED_SHA=$(wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-6.5.2.tar.gz.sha512 | awk '{print $1}') && \
-    test $EXPECTED_SHA == $(sha512sum elasticsearch-oss-6.5.2.tar.gz | awk '{print $1}') && \
-    tar zxf elasticsearch-oss-6.5.2.tar.gz && \
-    chown -R elasticsearch:elasticsearch elasticsearch-6.5.2 && \
-    mv elasticsearch-6.5.2/* . && \
-    rmdir elasticsearch-6.5.2 && \
-    rm elasticsearch-oss-6.5.2.tar.gz
+RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-5.6.0.tar.gz && \
+    EXPECTED_SHA=$(wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-5.6.0.tar.gz.sha512 | awk '{print $1}') && \
+    test $EXPECTED_SHA == $(sha512sum elasticsearch-oss-5.6.0.tar.gz | awk '{print $1}') && \
+    tar zxf elasticsearch-oss-5.6.0.tar.gz && \
+    chown -R elasticsearch:elasticsearch elasticsearch-5.6.0 && \
+    mv elasticsearch-5.6.0/* . && \
+    rmdir elasticsearch-5.6.0 && \
+    rm elasticsearch-oss-5.6.0.tar.gz
 
 RUN set -ex && for esdirs in config data logs; do \
         mkdir -p "$esdirs"; \
@@ -45,4 +45,4 @@ RUN chown elasticsearch:elasticsearch config/elasticsearch.yml config/log4j2.pro
 USER elasticsearch
 CMD ["/bin/bash", "bin/es-docker"]
 
-EXPOSE 9200 9300
+EXPOSE 9400 9500
