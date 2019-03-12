@@ -23,7 +23,7 @@ RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsear
     chown -R socore:socore elasticsearch-5.6.0 && \
     mv elasticsearch-5.6.0/* . && \
     rmdir elasticsearch-5.6.0 && \
-    rm elasticsearch-oss-5.6.0.tar.gz
+    rm elasticsearch-5.6.0.tar.gz
 
 RUN set -ex && for esdirs in config data logs; do \
         mkdir -p "$esdirs"; \
