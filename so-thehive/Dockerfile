@@ -1,4 +1,4 @@
-FROM openjdk:8 as build-env
+FROM debian:stretch-slim
 LABEL maintainer="Ilya Glotov <contact@ilyaglotov.com>" \
       repository="https://github.com/TheHive-Project/TheHive"
 
