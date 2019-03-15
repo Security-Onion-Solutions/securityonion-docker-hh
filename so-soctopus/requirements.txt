@@ -1,0 +1,4 @@
+requests==2.9.1
+elasticsearch==6.3.1
+Flask==1.0.2
+thehive4py==1.6.0
