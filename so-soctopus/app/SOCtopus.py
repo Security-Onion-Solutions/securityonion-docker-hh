@@ -19,7 +19,7 @@ def sendFIR(esid):
 def sendGRR(esid, flow_name):
     return createGRRFlow(esid, flow_name)
 
-@app.route("/hive/alert/<esid>")
+@app.route("/thehive/alert/<esid>")
 def sendHiveAlert(esid):
     return createHiveAlert(esid)
 
