@@ -12,5 +12,5 @@ def getHits(esid):
     search = es.search(index="*:logstash-*", doc_type="doc", body={"query": {"bool": {"must": { "match": { '_id' : esid }}}}})
     hits = search['hits']['total']
     if hits > 0:
-      return search
+        return search
 
