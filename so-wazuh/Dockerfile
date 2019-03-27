@@ -2,7 +2,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Wazuh Manager"
+LABEL version="Wazuh Manager HH1.0.7"
 LABEL description="Wazuh Manager and API running in Docker container for use with Security Onion"
 
 RUN yum update -y
@@ -27,9 +27,9 @@ RUN /repos.bash
 # Install wazuh-manager
 RUN yum install -y wazuh-manager
 
-# Install nodejs and wazuh-api 
+# Install nodejs and wazuh-api
 RUN curl -sL https://rpm.nodesource.com/setup_8.x | bash -
-RUN yum install -y nodejs 
+RUN yum install -y nodejs
 
 #RUN rpm -i https://packages.wazuh.com/yum/el/7/x86_64/wazuh-api-2.0.1-1.el7.x86_64.rpm
 RUN yum install -y wazuh-api

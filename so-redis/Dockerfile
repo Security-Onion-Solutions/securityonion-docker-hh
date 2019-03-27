@@ -1,5 +1,8 @@
 # Based off of https://github.com/docker-library/redis/blob/1e20bfbe22f999959f8997a823fa1ed5784fd8cc/4.0/Dockerfile
 #
+LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="REDIS HH1.0.7"
+LABEL description="REDIS running in Docker container for use with Security Onion"
 FROM debian:jessie-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added

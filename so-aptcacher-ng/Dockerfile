@@ -1,7 +1,8 @@
 FROM ubuntu:bionic-20180526
 
-#LABEL maintainer="sameer@damagehead.com"
-LABEL maintainer="mike.reeves@securityonionsolutions.com"
+LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="apt-cacher-ng HH1.0.7"
+LABEL description="apt-cacher running in Docker container for use with Security Onion"
 
 ENV APT_CACHER_NG_VERSION=3.1 \
     APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
@@ -23,7 +24,7 @@ COPY repos/* /etc/apt-cacher-ng/
 
 RUN chmod 755 /sbin/so-entrypoint.sh && chown -R 939:939 /etc/apt-cacher-ng
 RUN ln -sf /dev/stdout /var/log/apt-cacher-ng/apt-cacher.log; \
-    ln -sf /dev/stderr /var/log/apt-cacher-ng/apt-cacher.err; 
+    ln -sf /dev/stderr /var/log/apt-cacher-ng/apt-cacher.err;
 
 EXPOSE 3142/tcp
 

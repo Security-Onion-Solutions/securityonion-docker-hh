@@ -1,7 +1,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="SOCtopus v0.1"
+LABEL version="SOCtopus v0.1 HH1.0.7"
 LABEL description="API for automating SOC-related functions"
 
 RUN yum update -y && yum -y install rsync epel-release

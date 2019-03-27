@@ -1,6 +1,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="Google Stenographer HH1.0.7"
 LABEL description="Google Stenographer running in a docker for use with Security Onion."
 
 RUN yum update -y && \
@@ -10,7 +11,7 @@ RUN yum update -y && \
 RUN yum -y install epel-release bash libpcap iproute tcpdump && yum clean all
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 RUN yum -y install snappy leveldb jq libaio libseccomp golang which openssl python36u python36u-pip
-RUN /usr/bin/pip3.6 install flask fask_restful
+RUN /usr/bin/pip3.6 install
 RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the steno package
