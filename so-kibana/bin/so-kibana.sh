@@ -54,6 +54,7 @@ echo
 # Load dashboards, visualizations, index pattern(s), etc.
 for i in /usr/share/kibana/dashboards/*.json; do
   sed -i "s/OSQPLACEHOLDER/$MASTER/g" $i
+  sed -i "s/THEHIVESERVER/$MASTER/g" $i
 	curl -XPOST localhost:5601/api/kibana/dashboards/import?force=true -H 'kbn-xsrf:true' -H 'Content-type:application/json' -d @$i >> /var/log/kibana/dashboards.log 2>&1 &
 	echo -n "."
 done
