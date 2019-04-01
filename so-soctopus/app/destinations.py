@@ -20,7 +20,12 @@ def createHiveAlert(esid):
     hive_key = parser.get('hive', 'hive_key')
     hive_verifycert = parser.get('hive', 'hive_verifycert')
     tlp = int(parser.get('hive', 'hive_tlp'))
-    api = TheHiveApi(hive_url, hive_key, cert=hive_verifycert)
+    
+    if 'False' in hive_verifycert:
+        api = TheHiveApi(hive_url, hive_key, cert=False)
+    else:
+        api = TheHiveApi(hive_url, hive_key, cert=True)
+    
     #if hits > 0:
     for result in search['hits']['hits']:
 
