@@ -4,6 +4,8 @@
 <title>Security Onion - Hybrid Hunter</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
 <style>
 * {
   box-sizing: border-box;
@@ -98,6 +100,7 @@ a {
 		<h2>Known Issues:</h2>
 		<ul>
 			<li>Attempting to send a Bro event to The Hive that does not contain a source and destination IP (ex. Bro files, or X509) will result in an exception - a fix for this will be implemented in the next release.</li>
+      <li>If attempting to pivot from Kibana, ensure that you can resolve the master via DNS -- otherwise, populate your local hosts file with an entry to point to the master.</li>
 		</ul>
 	</p>
 </div>
