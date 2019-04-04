@@ -16,37 +16,42 @@ import requests
 def createHiveAlert(esid):
     search = getHits(esid)
     #Hive Stuff
+    #es_url = parser.get('es', 'es_url')
     hive_url = parser.get('hive', 'hive_url')
     hive_key = parser.get('hive', 'hive_key')
     hive_verifycert = parser.get('hive', 'hive_verifycert')
     tlp = int(parser.get('hive', 'hive_tlp'))
     
+    # Check if verifying cert
     if 'False' in hive_verifycert:
         api = TheHiveApi(hive_url, hive_key, cert=False)
     else:
         api = TheHiveApi(hive_url, hive_key, cert=True)
-    
+
     #if hits > 0:
     for result in search['hits']['hits']:
 
-          # Check for sdescription = str(message)description = str(message)rc/dst IP/ports
+          # Get initial details
           message = result['_source']['message']
           description = str(message)
           sourceRef = str(uuid.uuid4())[0:6]
           tags=["SecurityOnion"]
           artifacts=[]
           id = None
+          host = str(result['_index']).split(":")[0]
+          index = str(result['_index']).split(":")[1]
+          event_type = result['_source']['event_type']
 
           if 'source_ip' in result['_source']:
-              src = result['_source']['source_ip']
+              src = str(result['_source']['source_ip'])
           if 'destination_ip' in result['_source']:
-              dst = result['_source']['destination_ip']
-          if 'source_port' in result['_source']:
-              srcport = result['_source']['source_port']
-          if 'destination_port' in result['_source']:
-              dstport = result['_source']['destination_port']
+              dst = str(result['_source']['destination_ip'])
+          #if 'source_port' in result['_source']:
+          #    srcport = result['_source']['source_port']
+          #if 'destination_port' in result['_source']:
+          #    dstport = result['_source']['destination_port']
           # NIDS Alerts
-          if 'snort' in result['_source']['event_type']:
+          if 'snort' in event_type:
               alert = result['_source']['alert']
               category = result['_source']['category']
               sensor = result['_source']['interface']
@@ -59,7 +64,7 @@ def createHiveAlert(esid):
               artifacts.append(AlertArtifact(dataType='other', data=sensor))
               
           # Bro logs
-          elif 'bro' in result['_source']['event_type']:
+          elif 'bro' in event_type:
               _map_key_type ={
                   "conn": "Connection",
                   "dhcp": "DHCP",
@@ -95,35 +100,42 @@ def createHiveAlert(esid):
                   '''
 
                   return _map_key_type.get(indicator_type)
-              event_type = result['_source']['event_type']
+              
               bro_tag = event_type.strip('bro_')
               bro_tag_title = map_key_type(bro_tag)
-              print(bro_tag)
-              uid = result['_source']['uid']
+              title= str('New Bro ' + bro_tag_title + ' record!')
+
+              
+              if 'source_ip' in result['_source']:
+                  artifacts.append(AlertArtifact(dataType='ip', data=src))
+              if 'destination_ip' in result['_source']:
+                  artifacts.append(AlertArtifact(dataType='ip', data=dst))
               if 'sensor_name' in result['_source']:
-                  sensor = result['_source']['sensor_name']
-                  artifacts.append(AlertArtifact(dataType='ip', data=src))
-                  artifacts.append(AlertArtifact(dataType='ip', data=dst))
-                  artifacts.append(AlertArtifact(dataType='other', data=uid))
+                  sensor = str(result['_source']['sensor_name'])
                   artifacts.append(AlertArtifact(dataType='other', data=sensor))
-              
-              else:
-                  artifacts.append(AlertArtifact(dataType='ip', data=src))
-                  artifacts.append(AlertArtifact(dataType='ip', data=dst))
+              if 'uid' in result['_source']:
+                  uid = str(result['_source']['uid'])
+                  title= str('New Bro ' + bro_tag_title + ' record! - ' + uid)
                   artifacts.append(AlertArtifact(dataType='other', data=uid))
+              if 'fuid' in result['_source']:
+                  fuid = str(result['_source']['fuid'])
+                  title= str('New Bro ' + bro_tag_title + ' record! - ' + fuid)
+                  artifacts.append(AlertArtifact(dataType='other', data=fuid))
+              if 'id' in result['_source']:
+                  fuid = str(result['_source']['id'])
+                  title= str('New Bro ' + bro_tag_title + ' record! - ' + fuid)
+                  artifacts.append(AlertArtifact(dataType='other', data=fuid))
               
-              title= str('New Bro ' + bro_tag_title + ' record! - ' + uid)
               tags.append('bro')
               tags.append(bro_tag)
 
           # Wazuh/OSSEC logs
-          elif 'ossec' in result['_source']['event_type']:
+          elif 'ossec' in event_type:
               agent_name = result['_source']['agent']['name']
               if 'description' in result['_source']:
                   ossec_desc = result['_source']['description']
               else:
                   ossec_desc = result['_source']['full_log']
-              event_id = result['_source']['event_id']
               if 'ip' in result['_source']['agent']:
                   agent_ip = result['_source']['agent']['ip']
                   artifacts.append(AlertArtifact(dataType='ip', data=agent_ip))
@@ -134,7 +146,7 @@ def createHiveAlert(esid):
               title= ossec_desc
               tags.append("wazuh")
           
-          elif 'sysmon' in result['_source']['event_type']:
+          elif 'sysmon' in event_type:
               if 'ossec' in result['_source']['tags']:
                   agent_name = result['_source']['agent']['name']
                   agent_ip = result['_source']['agent']['ip']
@@ -146,7 +158,7 @@ def createHiveAlert(esid):
               tags.append("wazuh")
            
           else:
-              title = "New " + result['_source']['event_type'] + " Event From Security Onion"
+              title = "New " + event_type + " Event From Security Onion"
           
           # Build alert
           hivealert = Alert(
@@ -167,10 +179,19 @@ def createHiveAlert(esid):
               print(json.dumps(response.json(), indent=4, sort_keys=True))
               print('')
               id = response.json()['id']
+
+              # If running standalone / eval tell ES that we sent the alert
+              #es_type = 'doc'
+              #es_index = index
+              #es_headers = {'Content-Type' : 'application/json'} 
+              #es_data = '{"script" : {"source": "ctx._source.tags.add(params.tag)","lang": "painless","params" : {"tag" : "Sent to TheHive"}}}'
+              #update_es_event = requests.post(es_url + '/' + es_index + '/' + es_type + '/' + esid +  '/_update', headers=es_headers, data=es_data)
+              #print(update_es_event.content) 
+          
           else:
               print('ko: {}/{}'.format(response.status_code, response.text))
               sys.exit(0)
-    
+           
     # Redirect to TheHive instance
     return redirect(hive_url + '/index.html#/alert/list')
 
