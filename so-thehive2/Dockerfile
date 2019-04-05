@@ -9,9 +9,10 @@ RUN yum -y install thehive
 RUN groupmod -g 939 thehive \
   && usermod -u 939 -g 939 thehive \
   && ls -la /opt \
-  && chown -R thehive /opt/thehive \
-                      /var/log/thehive \
-  && echo "play.http.secret.key=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 49)" >> /opt/thehive/conf/application.conf \
+  && ls -la /opt/thehive
+RUN chown -R thehive /opt/thehive \
+                      /var/log/thehive 
+RUN echo "play.http.secret.key=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 49)" >> /opt/thehive/conf/application.conf \
   && echo -e 'search.host = ["elasticsearch:9300"]\n\
 play.http.secret.key = ${?PLAY_SECRET}' >> /opt/thehive/conf/application.conf
 
