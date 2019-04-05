@@ -6,8 +6,8 @@ LABEL description="Wazuh Manager and API running in Docker container for use wit
 RUN yum update -y
 RUN yum install -y https://dl.bintray.com/thehive-project/rpm-stable/thehive-project-release-1.1.0-2.noarch.rpm
 RUN yum -y install thehive
-RUN groupadd -g 939 thehive \
-  && useradd -u 939 -g 939 thehive \
+RUN groupmod -g 939 thehive \
+  && usermod -u 939 -g 939 thehive \
   && mkdir /var/log/thehive \
   && chown -R thehive /opt/thehive \
                       /var/log/thehive \
