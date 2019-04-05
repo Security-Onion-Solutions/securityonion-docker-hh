@@ -8,7 +8,7 @@ RUN yum install -y https://dl.bintray.com/thehive-project/rpm-stable/thehive-pro
 RUN yum -y install thehive
 RUN groupmod -g 939 thehive \
   && usermod -u 939 -g 939 thehive \
-  && mkdir /var/log/thehive \
+  && ls -la /opt \
   && chown -R thehive /opt/thehive \
                       /var/log/thehive \
   && echo "play.http.secret.key=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 49)" >> /opt/thehive/conf/application.conf \
