@@ -31,14 +31,12 @@ RUN apt-get update && apt-get install -qq -y tar libfontconfig curl ca-certifica
     cp "$GF_PATHS_HOME/conf/sample.ini" "$GF_PATHS_CONFIG" && \
     cp "$GF_PATHS_HOME/conf/ldap.toml" /etc/grafana/ldap.toml
 
-RUN if [ ! -z "${GF_INSTALL_PLUGINS}" ]; then \
-      OLDIFS=$IFS; \
-      IFS=','; \
-      for plugin in ${GF_INSTALL_PLUGINS}; do \
-        IFS=$OLDIFS; \
-        grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install ${plugin}; \
-      done; \
-    fi
+RUN grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install mtanda-histogram-panel \
+    && grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install grafana-piechart-panel \
+    && grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install grafana-clock-panel \
+    && grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install grafana-simple-json-datasource \
+    && grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install ryantxu-ajax-panel \
+    && grafana-cli --pluginsDir "$GF_PATHS_PLUGINS" plugins install michaeldmoore-multistat-panel
 
 RUN chown -R socore:socore "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" && \
     chmod 777 "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS"
