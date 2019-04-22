@@ -1,0 +1,4 @@
+hostname ninja
+root_directory /var/launcher/ninja
+osqueryd_path /usr/local/launcher/bin/osqueryd
+enroll_secret_path /etc/launcher/secret
