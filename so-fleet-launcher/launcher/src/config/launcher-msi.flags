@@ -1,0 +1,4 @@
+enroll_secret_path C:\Program Files\Kolide\Launcher-launcher\conf\secret
+hostname ninja
+root_directory C:\Program Files\Kolide\Launcher-launcher\data
+osqueryd_path C:\Program Files\Kolide\Launcher-launcher\bin\osqueryd
