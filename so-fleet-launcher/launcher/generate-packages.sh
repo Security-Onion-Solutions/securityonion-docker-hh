@@ -42,9 +42,11 @@ fi
 
 #Copy over edited config files
 cp src/config/launcher-msi.flags msi/fil2D6AA082EFCB559A36C9A1939CD0F5A6
+cp src/config/launcher-msi.flags /output/launcher-msi.flags
 cp src/config/secret msi/fil65D833A357F62546DF7DC5CD82053062
 
 cp src/config/launcher.flags /etc/launcher/
+cp src/config/launcher.flags /output/launcher.flags
 cp src/config/secret /etc/launcher/
 
 ###---Start MSI rebuild
