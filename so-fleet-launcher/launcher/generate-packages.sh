@@ -33,9 +33,12 @@ else
     touch msi/fil61BEFB046816E66FFC69B5A2B0F10704
 fi
 
-#If autoupdate is specified, add required flags to the flag file
-if [ "$3" = "enabled" ]
+#Autoupdate is enabled by default, but can be disabled with "disabled" flag
+if [ "$3" = "disabled" ]
 then
+    #autoupdate disabled - do not add autoupdate flags to flag file
+    :
+else
     printf "autoupdate\nupdate_channel stable\n" >> src/config/launcher-msi.flags
     printf "autoupdate\nupdate_channel stable\n" >> src/config/launcher.flags
 fi
