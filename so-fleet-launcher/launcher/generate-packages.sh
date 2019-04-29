@@ -37,6 +37,7 @@ fi
 if [ "$3" = "disabled" ]
 then
     #autoupdate disabled - do not add autoupdate flags to flag file
+    :
 else
     printf "autoupdate\nupdate_channel stable\n" >> src/config/launcher-msi.flags
     printf "autoupdate\nupdate_channel stable\n" >> src/config/launcher.flags
