@@ -1,39 +1,56 @@
 # Based off of https://github.com/wazuh/wazuh-docker
+FROM centos:7
 
-FROM phusion/baseimage:latest
-ARG FILEBEAT_VERSION=6.1.3
+LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="Wazuh Manager HH1.0.7"
+LABEL description="Wazuh Manager and API running in Docker container for use with Security Onion"
 
-RUN apt-get update; apt-get -y dist-upgrade
-RUN apt-get -y install openssl postfix bsd-mailx curl apt-transport-https lsb-release
-RUN groupadd -g 1000 ossec
-RUN useradd -u 1000 -g 1000 ossec
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - &&\
-    apt-get install -y nodejs
-RUN curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -
-RUN echo "deb https://packages.wazuh.com/3.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
-RUN apt-get update && apt-get -y install wazuh-manager wazuh-api expect
+RUN yum update -y
 
-ADD files/data_dirs.env /data_dirs.env
-ADD files/init.bash /init.bash
+# Install pre-reqs
+RUN yum install -y initscripts expect logrotate openssl
+
+# Creating ossec users
+RUN groupadd -g 945 ossec && \
+    useradd -u 943 -g 945 -d /var/ossec -s /sbin/nologin ossecm && \
+    useradd -u 944 -g 945 -d /var/ossec -s /sbin/nologin ossecr && \
+    useradd -u 945 -g 945 -d /var/ossec -s /sbin/nologin ossec
+
+# Add Wazuh repo
+ADD config/repos.bash /repos.bash
+RUN chmod +x /repos.bash
+RUN /repos.bash
+
+# Download wazuh-manager pkg
+#RUN rpm -i https://packages.wazuh.com/yum/el/7/x86_64/wazuh-manager-2.0.1-1.el7.x86_64.rpm
+
+# Install wazuh-manager
+RUN yum install -y wazuh-manager
+
+# Install nodejs and wazuh-api
+RUN curl -sL https://rpm.nodesource.com/setup_8.x | bash -
+RUN yum install -y nodejs
+
+#RUN rpm -i https://packages.wazuh.com/yum/el/7/x86_64/wazuh-api-2.0.1-1.el7.x86_64.rpm
+RUN yum install -y wazuh-api
+
+# Add OSSEC config
+ADD config/securityonion_rules.xml /var/ossec/ruleset/rules/securityonion_rules.xml
+ADD config/ossec.conf /var/ossec/etc/ossec.conf
+
+# Adding first run script.
+ADD config/data_dirs.env /data_dirs.env
+ADD config/init.bash /init.bash
 
 # Sync calls are due to https://github.com/docker/docker/issues/9547
 RUN chmod 755 /init.bash &&\
-  sync && /init.bash &&\
-  sync && rm /init.bash
+    sync && /init.bash &&\
+    sync && rm /init.bash
 
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb &&\
-    dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb && rm filebeat-${FILEBEAT_VERSION}-amd64.deb
+# Adding entrypoint
+ADD config/entrypoint.sh /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
 
-#COPY config/filebeat.yml /etc/filebeat/
+RUN yum clean all
 
-ADD config/run.sh /tmp/run.sh
-RUN chmod 755 /tmp/run.sh
-
-VOLUME ["/var/ossec/data"]
-
-EXPOSE 55000/tcp 
-#1514/udp 1515/tcp 514/udp
-
-# Run supervisord so that the container will stay alive
-
-ENTRYPOINT ["/tmp/run.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

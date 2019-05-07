@@ -2,7 +2,7 @@
 
 /usr/local/bin/kibana-docker &
 
-KIBANA_VERSION=6.4.2
+KIBANA_VERSION=6.5.2
 MAX_WAIT=60
 
 # Check to see if Kibana is available
@@ -26,7 +26,8 @@ wait_step=0
 #else
 #    echo "Kibana Index is there... Next."
 #fi
-
+# Let's sleep some more and let Kibana come all the way up.
+sleep 30
 # Apply Kibana config
 echo
 echo "Applying Kibana config..."
@@ -52,6 +53,8 @@ echo
 # Apply all the dashboards
 # Load dashboards, visualizations, index pattern(s), etc.
 for i in /usr/share/kibana/dashboards/*.json; do
+  sed -i "s/OSQPLACEHOLDER/$MASTER/g" $i
+  sed -i "s/THEHIVESERVER/$MASTER/g" $i
 	curl -XPOST localhost:5601/api/kibana/dashboards/import?force=true -H 'kbn-xsrf:true' -H 'Content-type:application/json' -d @$i >> /var/log/kibana/dashboards.log 2>&1 &
 	echo -n "."
 done

@@ -16,8 +16,8 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="SO Core 0.0.2"
-LABEL description="Security Onion Core Functions"
+LABEL version="SO Core HH1.0.7"
+LABEL description="Security Onion Core Functions Docker"
 
 RUN yum update -y && yum -y install rsync epel-release
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm &&\

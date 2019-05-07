@@ -1,6 +1,9 @@
 # Based off of https://github.com/docker-library/redis/blob/1e20bfbe22f999959f8997a823fa1ed5784fd8cc/4.0/Dockerfile
 #
 FROM debian:jessie-slim
+LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="REDIS HH1.0.7"
+LABEL description="REDIS running in Docker container for use with Security Onion"
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r socore --gid 939 && useradd -r --uid 939 -g socore socore
@@ -27,9 +30,9 @@ RUN set -ex; \
 	\
 	apt-get purge -y --auto-remove $fetchDeps
 
-ENV REDIS_VERSION 4.0.9
-ENV REDIS_DOWNLOAD_URL http://download.redis.io/releases/redis-4.0.9.tar.gz
-ENV REDIS_DOWNLOAD_SHA df4f73bc318e2f9ffb2d169a922dec57ec7c73dd07bccf875695dbeecd5ec510
+ENV REDIS_VERSION 4.0.11
+ENV REDIS_DOWNLOAD_URL http://download.redis.io/releases/redis-4.0.11.tar.gz
+ENV REDIS_DOWNLOAD_SHA fc53e73ae7586bcdacb4b63875d1ff04f68c5474c1ddeda78f00e5ae2eed1bbb
 
 # for redis-sentinel see: http://redis.io/topics/sentinel
 RUN set -ex; \
