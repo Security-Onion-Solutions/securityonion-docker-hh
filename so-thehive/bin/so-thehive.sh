@@ -10,4 +10,4 @@ done
 rm -f garbage_file
 sleep 5
 
-/opt/thehive/bin/thehive
+exec /opt/thehive/bin/thehive
