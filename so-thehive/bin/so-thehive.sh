@@ -1,3 +1,5 @@
+#!/bin/bash
+
 rm -f garbage_file
 while ! wget -O garbage_file ${ELASTICSEARCH_HOST}:9500 2>/dev/null
 do
