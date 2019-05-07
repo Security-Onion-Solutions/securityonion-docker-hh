@@ -23,4 +23,4 @@ USER thehive
 
 EXPOSE 9000
 
-ENTRYPOINT ["/opt/thehive/bin/so-thehive"]
+ENTRYPOINT ["/opt/thehive/bin/so-thehive.sh"]
