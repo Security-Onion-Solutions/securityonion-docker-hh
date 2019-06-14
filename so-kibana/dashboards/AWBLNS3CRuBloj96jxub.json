@@ -1,11 +1,11 @@
 {
-  "version": "6.5.2",
+  "version": "6.7.0",
   "objects": [
     {
       "id": "AWBLMr9vRuBloj96jxp1",
       "type": "search",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM3MCwxXQ==",
       "attributes": {
         "title": "All Beats Logs",
         "description": "",
@@ -30,8 +30,8 @@
     {
       "id": "AWBLNriuRuBloj96jxv3",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM3MiwxXQ==",
       "attributes": {
         "title": "Beats - Computer Names",
         "visState": "{\"title\":\"Beats - Computer Names\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"type\":\"table\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"computer_name.keyword\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
@@ -46,8 +46,8 @@
     {
       "id": "AWBLN7X2RuBloj96jxxY",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM3NiwxXQ==",
       "attributes": {
         "title": "Beats - Process IDs",
         "visState": "{\"title\":\"Beats - Process IDs\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"type\":\"table\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"process_id\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
@@ -62,8 +62,8 @@
     {
       "id": "AWBLOT8MRuBloj96jx0N",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM3OCwxXQ==",
       "attributes": {
         "title": "Beats - Event IDs",
         "visState": "{\"title\":\"Beats - Event IDs\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"type\":\"table\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"event_id\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
@@ -78,8 +78,8 @@
     {
       "id": "AWBLONJCRuBloj96jxzY",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM4MSwxXQ==",
       "attributes": {
         "title": "Beats - Usernames",
         "visState": "{\n  \"title\": \"Beats - Usernames\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showMeticsAtAllLevels\": false,\n    \"showPartialRows\": false,\n    \"showTotal\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"totalFunc\": \"sum\",\n    \"type\": \"table\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"user.name\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}",
@@ -94,8 +94,8 @@
     {
       "id": "AWBLQ2__RuBloj96jyDn",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM4MiwxXQ==",
       "attributes": {
         "title": "Beats - Log Count Over Time",
         "visState": "{\"title\":\"Beats - Log Count Over Time\",\"type\":\"line\",\"params\":{\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp per 30 minutes\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
@@ -110,11 +110,11 @@
     {
       "id": "b3b449d0-3429-11e7-9d52-4f090484f59e",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.448Z",
-      "version": 110,
+      "updated_at": "2019-04-04T12:22:34.280Z",
+      "version": "WzYwNywxXQ==",
       "attributes": {
         "title": "Navigation",
-        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"[Home](/kibana/app/kibana#/dashboard/94b52620-342a-11e7-9d52-4f090484f59e)   \\n[Help](/kibana/app/kibana#/dashboard/AV6-POJSDwoBUzALqKAg)   \\n\\n**Alert Data**  \\n[Bro Notices](/kibana/app/kibana#/dashboard/01600fb0-34e4-11e7-9669-7f1d3242b798)   \\n[ElastAlert](/kibana/app/kibana#/dashboard/1d98d620-7dce-11e7-846a-150cdcaf3374)   \\n[HIDS](/kibana/app/kibana#/dashboard/0de7a390-3644-11e7-a6f7-4f44d7bf1c33)  \\n[NIDS](/kibana/app/kibana#/dashboard/7f27a830-34e5-11e7-9669-7f1d3242b798)      \\n\\n**Bro Hunting**   \\n[Connections](/kibana/app/kibana#/dashboard/e0a34b90-34e6-11e7-9118-45bd317f0ca4)   \\n[DCE/RPC](/kibana/app/kibana#/dashboard/46582d50-3af2-11e7-a83b-b1b4da7d15f4)   \\n[DHCP](/kibana/app/kibana#/dashboard/85348270-357b-11e7-ac34-8965f6420c51)  \\n[DNP3](/kibana/app/kibana#/dashboard/2fdf5bf0-3581-11e7-98ef-19df58fe538b)  \\n[DNS](/kibana/app/kibana#/dashboard/ebf5ec90-34bf-11e7-9b32-bb903919ead9)  \\n[Files](/kibana/app/kibana#/dashboard/2d315d80-3582-11e7-98ef-19df58fe538b)  \\n[FTP](/kibana/app/kibana#/dashboard/27f3b380-3583-11e7-a588-05992195c551)  \\n[HTTP](/kibana/app/kibana#/dashboard/230134a0-34c6-11e7-8360-0b86c90983fd)  \\n[Intel](/kibana/app/kibana#/dashboard/468022c0-3583-11e7-a588-05992195c551)  \\n[IRC](/kibana/app/kibana#/dashboard/56a34ce0-3583-11e7-a588-05992195c551)  \\n[Kerberos](/kibana/app/kibana#/dashboard/6b0d4870-3583-11e7-a588-05992195c551)  \\n[Modbus](/kibana/app/kibana#/dashboard/70c005f0-3583-11e7-a588-05992195c551)  \\n[MySQL](/kibana/app/kibana#/dashboard/7929f430-3583-11e7-a588-05992195c551)  \\n[NTLM](/kibana/app/kibana#/dashboard/022713e0-3ab0-11e7-a83b-b1b4da7d15f4)  \\n[PE](/kibana/app/kibana#/dashboard/8a10e380-3583-11e7-a588-05992195c551)  \\n[RADIUS](/kibana/app/kibana#/dashboard/90b246c0-3583-11e7-a588-05992195c551)  \\n[RDP](/kibana/app/kibana#/dashboard/97f8c3a0-3583-11e7-a588-05992195c551)  \\n[RFB](/kibana/app/kibana#/dashboard/9ef20ae0-3583-11e7-a588-05992195c551)  \\n[SIP](/kibana/app/kibana#/dashboard/ad3c0830-3583-11e7-a588-05992195c551)  \\n[SMB](/kibana/app/kibana#/dashboard/b3a53710-3aaa-11e7-8b17-0d8709b02c80)  \\n[SMTP](/kibana/app/kibana#/dashboard/b10a9c60-3583-11e7-a588-05992195c551)  \\n[SNMP](/kibana/app/kibana#/dashboard/b65c2710-3583-11e7-a588-05992195c551)  \\n[Software](/kibana/app/kibana#/dashboard/c2c99c30-3583-11e7-a588-05992195c551)  \\n[SSH](/kibana/app/kibana#/dashboard/c6ccfc00-3583-11e7-a588-05992195c551)  \\n[SSL](/kibana/app/kibana#/dashboard/cca67b60-3583-11e7-a588-05992195c551)  \\n[Syslog](/kibana/app/kibana#/dashboard/c4bbe040-76b3-11e7-ba96-cba76a1e264d)   \\n[Tunnels](/kibana/app/kibana#/dashboard/d7b54ae0-3583-11e7-a588-05992195c551)  \\n[Weird](/kibana/app/kibana#/dashboard/de2da250-3583-11e7-a588-05992195c551)  \\n[X.509](/kibana/app/kibana#/dashboard/e5aa7170-3583-11e7-a588-05992195c551)  \\n\\n**Host Hunting**   \\n[Autoruns](/kibana/app/kibana#/dashboard/61d43810-6d62-11e7-8ddb-e71eb260f4a3)   \\n[Beats](/kibana/app/kibana#/dashboard/AWBLNS3CRuBloj96jxub)  \\n[OSSEC](/kibana/app/kibana#/dashboard/3a457d70-3583-11e7-a588-05992195c551)    \\n[Sysmon](/kibana/app/kibana#/dashboard/6d189680-6d62-11e7-8ddb-e71eb260f4a3)  \\n[Osquery](/kibana/app/kibana#/dashboard/9d0e2da0-14e1-11e9-82f7-0da02d93a48b)      \\n\\n**Other**   \\n[Domain Stats](/kibana/app/kibana#/dashboard/AWAi6wvxAvKNGEbUWO_j)  \\n[Firewall](/kibana/app/kibana#/dashboard/50173bd0-3582-11e7-98ef-19df58fe538b)   \\n[Frequency](/kibana/app/kibana#/dashboard/AWAi5k4jAvKNGEbUWFis)  \\n[Stats](/kibana/app/kibana#/dashboard/130017f0-46ce-11e7-946f-1bfb1be7c36b)   \\n[Syslog](/kibana/app/kibana#/dashboard/4323af90-76e5-11e7-ab14-e1a4c1bc11e0)\",\"type\":\"markdown\",\"fontSize\":10,\"openLinksInNewTab\":false},\"aggs\":[]}",
+        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"[Home](/app/kibana#/dashboard/94b52620-342a-11e7-9d52-4f090484f59e)   \\n[Help](/app/kibana#/dashboard/AV6-POJSDwoBUzALqKAg)   \\n\\n**Alert Data**  \\n[Bro Notices](/app/kibana#/dashboard/01600fb0-34e4-11e7-9669-7f1d3242b798)   \\n[ElastAlert](/app/kibana#/dashboard/1d98d620-7dce-11e7-846a-150cdcaf3374)   \\n[HIDS](/app/kibana#/dashboard/0de7a390-3644-11e7-a6f7-4f44d7bf1c33)  \\n[NIDS](/app/kibana#/dashboard/7f27a830-34e5-11e7-9669-7f1d3242b798)      \\n\\n**Bro Hunting**   \\n[Connections](/app/kibana#/dashboard/e0a34b90-34e6-11e7-9118-45bd317f0ca4)   \\n[DCE/RPC](/app/kibana#/dashboard/46582d50-3af2-11e7-a83b-b1b4da7d15f4)   \\n[DHCP](/app/kibana#/dashboard/85348270-357b-11e7-ac34-8965f6420c51)  \\n[DNP3](/app/kibana#/dashboard/2fdf5bf0-3581-11e7-98ef-19df58fe538b)  \\n[DNS](/app/kibana#/dashboard/ebf5ec90-34bf-11e7-9b32-bb903919ead9)  \\n[Files](/app/kibana#/dashboard/2d315d80-3582-11e7-98ef-19df58fe538b)  \\n[FTP](/app/kibana#/dashboard/27f3b380-3583-11e7-a588-05992195c551)  \\n[HTTP](/app/kibana#/dashboard/230134a0-34c6-11e7-8360-0b86c90983fd)  \\n[Intel](/app/kibana#/dashboard/468022c0-3583-11e7-a588-05992195c551)  \\n[IRC](/app/kibana#/dashboard/56a34ce0-3583-11e7-a588-05992195c551)  \\n[Kerberos](/app/kibana#/dashboard/6b0d4870-3583-11e7-a588-05992195c551)  \\n[Modbus](/app/kibana#/dashboard/70c005f0-3583-11e7-a588-05992195c551)  \\n[MySQL](/app/kibana#/dashboard/7929f430-3583-11e7-a588-05992195c551)  \\n[NTLM](/app/kibana#/dashboard/022713e0-3ab0-11e7-a83b-b1b4da7d15f4)  \\n[PE](/app/kibana#/dashboard/8a10e380-3583-11e7-a588-05992195c551)  \\n[RADIUS](/app/kibana#/dashboard/90b246c0-3583-11e7-a588-05992195c551)  \\n[RDP](/app/kibana#/dashboard/97f8c3a0-3583-11e7-a588-05992195c551)  \\n[RFB](/app/kibana#/dashboard/9ef20ae0-3583-11e7-a588-05992195c551)  \\n[SIP](/app/kibana#/dashboard/ad3c0830-3583-11e7-a588-05992195c551)  \\n[SMB](/app/kibana#/dashboard/b3a53710-3aaa-11e7-8b17-0d8709b02c80)  \\n[SMTP](/app/kibana#/dashboard/b10a9c60-3583-11e7-a588-05992195c551)  \\n[SNMP](/app/kibana#/dashboard/b65c2710-3583-11e7-a588-05992195c551)  \\n[Software](/app/kibana#/dashboard/c2c99c30-3583-11e7-a588-05992195c551)  \\n[SSH](/app/kibana#/dashboard/c6ccfc00-3583-11e7-a588-05992195c551)  \\n[SSL](/app/kibana#/dashboard/cca67b60-3583-11e7-a588-05992195c551)  \\n[Syslog](/app/kibana#/dashboard/c4bbe040-76b3-11e7-ba96-cba76a1e264d)   \\n[Tunnels](/app/kibana#/dashboard/d7b54ae0-3583-11e7-a588-05992195c551)  \\n[Weird](/app/kibana#/dashboard/de2da250-3583-11e7-a588-05992195c551)  \\n[X.509](/app/kibana#/dashboard/e5aa7170-3583-11e7-a588-05992195c551)  \\n\\n**Host Hunting**   \\n[Autoruns](/app/kibana#/dashboard/61d43810-6d62-11e7-8ddb-e71eb260f4a3)   \\n[Beats](/app/kibana#/dashboard/AWBLNS3CRuBloj96jxub)  \\n[OSSEC](/app/kibana#/dashboard/3a457d70-3583-11e7-a588-05992195c551)    \\n[Sysmon](/app/kibana#/dashboard/6d189680-6d62-11e7-8ddb-e71eb260f4a3)      \\n\\n**Other**   \\n[Domain Stats](/app/kibana#/dashboard/AWAi6wvxAvKNGEbUWO_j)  \\n[Firewall](/app/kibana#/dashboard/50173bd0-3582-11e7-98ef-19df58fe538b)   \\n[Frequency](/app/kibana#/dashboard/AWAi5k4jAvKNGEbUWFis)  \\n[Stats](/app/kibana#/dashboard/130017f0-46ce-11e7-946f-1bfb1be7c36b)   \\n[Syslog](/app/kibana#/dashboard/4323af90-76e5-11e7-ab14-e1a4c1bc11e0)\",\"type\":\"markdown\",\"fontSize\":10,\"openLinksInNewTab\":false},\"aggs\":[]}",
         "uiStateJSON": "{}",
         "description": "",
         "version": 1,
@@ -126,8 +126,8 @@
     {
       "id": "AWDHHHR8xQT5EBNmq4z7",
       "type": "visualization",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM4NSwxXQ==",
       "attributes": {
         "title": "Beats - Log Count",
         "visState": "{\"title\":\"Beats - Log Count\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":\"30\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"bgFill\":\"#FB9E00\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
@@ -142,8 +142,8 @@
     {
       "id": "AWBLHZaBRuBloj96jvrD",
       "type": "index-pattern",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzM5NywxXQ==",
       "attributes": {
         "title": "*:logstash-beats-*",
         "timeFieldName": "@timestamp",
@@ -155,8 +155,8 @@
     {
       "id": "AWBLNS3CRuBloj96jxub",
       "type": "dashboard",
-      "updated_at": "2019-04-01T16:01:23.116Z",
-      "version": 2,
+      "updated_at": "2019-04-04T12:22:34.205Z",
+      "version": "WzQwMiwxXQ==",
       "attributes": {
         "title": "Beats",
         "hits": 0,
