@@ -19,7 +19,7 @@ WORKDIR /usr/share/elasticsearch
 RUN wget --progress=bar:force https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-6.7.2.tar.gz && \
     EXPECTED_SHA=$(wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-6.7.2.tar.gz.sha512 | awk '{print $1}') && \
     test $EXPECTED_SHA == $(sha512sum elasticsearch-oss-6.7.2.tar.gz | awk '{print $1}') && \
-    tar zxf elasticsearch-oss-6.5.2.tar.gz && \
+    tar zxf elasticsearch-oss-6.7.2.tar.gz && \
     chown -R elasticsearch:elasticsearch elasticsearch-6.7.2 && \
     mv elasticsearch-6.7.2/* . && \
     rmdir elasticsearch-6.7.2 && \
