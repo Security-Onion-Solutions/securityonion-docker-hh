@@ -5,8 +5,8 @@ LABEL description="Fleet running in Docker container for use with Security Onion
 
 RUN apk --update add ca-certificates unzip curl
 RUN mkdir -p /tmp/fleet && cd /tmp/fleet \
-&& curl -OL https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/Fleet1.0.6/sos_fleet_106.zip \
-&& unzip sos_fleet_106.zip \
+&& curl -OL https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/Fleet1.1.0/sos_fleet_1.1.0.zip \
+&& unzip sos_fleet_1.1.0.zip \
 && cp fleet /usr/bin/fleet \
 && cp fleetctl /usr/bin/fleetctl \
 && cd /tmp && rm -rf /tmp/fleet
