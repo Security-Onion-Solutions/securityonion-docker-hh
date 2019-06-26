@@ -1,7 +1,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Google Stenographer HH1.0.7"
+LABEL version="Google Stenographer HH1.1.0"
 LABEL description="Google Stenographer running in a docker for use with Security Onion."
 
 RUN yum update -y && \

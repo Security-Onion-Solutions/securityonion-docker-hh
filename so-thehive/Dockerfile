@@ -1,7 +1,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="TheHive v1.1.0 HH1.0.8"
+LABEL version="TheHive v1.1.0 HH1.1.0"
 LABEL description="TheHive Docker container for use with Security Onion"
 RUN yum update -y
 RUN yum install -y https://dl.bintray.com/thehive-project/rpm-stable/thehive-project-release-1.1.0-2.noarch.rpm
