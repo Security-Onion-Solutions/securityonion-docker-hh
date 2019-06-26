@@ -2,7 +2,7 @@ FROM centos:7
 
 # Originally developed by Justin Henderson justin@hasecuritysolutions.com
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="freqserver HH1.0.7"
+LABEL version="freqserver HH1.1.0"
 LABEL description="freqserver running in Docker container for use with Security Onion"
 
 RUN yum update -y && \
