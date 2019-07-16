@@ -71,6 +71,7 @@ a {
 <div class="topnav">
   <a href="/kibana/" target="_blank">Kibana</a>
   <a href="/grafana/" target="_blank">Grafana</a>
+  <a href="/sensoroni/" target="_blank">Sensoroni</a>
   <a href="/fleet/" target="_blank">Fleet</a>
 	<a href="/thehive/" target="_blank">TheHive</a>
 	<a href="/packages/" target="_blank">OSquery Binaries</a>
@@ -85,15 +86,15 @@ a {
 	<p><center><h1>Hybrid Hunter Alpha v1.1.0 Release Notes</h1></center><br>
 		<h2>Changes:</h2>
 		<ul>
-			<li>Suricata 4.1.4</li>
-			<li>Eval and Master installs now ask which components you would like to install</li>
-			<li>Fleet (osquery) now has it's own additional setup script. <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Configuring-Osquery-with-Security-Onion" target="_blank">See the Docs!</a></li>
-			<li>Fleet setup script now generates auto install packages for Windows, CentOS, and Ubuntu</li>
-			<li>When Fleet setup is completed, all SO nodes will auto install the appropriate auto install package</li>
-      <li>We now have a progress bar during install!</li>
-      <li>The setup script will now tell you if it was successful</li>
-      <li>Added Grafana plugin Pie Chart</li>
-      <li>The Hive Docker moved to Centos 7 based container</li>
+			<li>Alpha is here!!</li>
+			<li>There is a new PCAP interface called <a href="https://github.com/sensoroni/sensoroni" target="_blank">Sensoroni</a>. Pivoting is done via Kibana. See details <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Pulling-PCAP" target="_blank">here</a>.</li>
+			<li>Bond interface setup now uses nmcli for better compatibility in the network based setup script.</li>
+      <li>Filebeat traffic for HH components now use a separate port. (5644) This will allow you to send beats to the default port (5044) and choose how you want to secure it. It is still recommended to use full SSL via filebeat and if you already have this set up you will need to change to port 5044. We will continue to refine this in future vesrions.</li>
+      <li>Authentication is now enabled by default for all the web based components. There will be some major changes before we get to beta in how authentication in general is handled due to Elastic "Features" and other components.</li>
+      <li>Add users to the web interface via the command "sudo so-user-add username" and follow the prompts.</li>
+      <li>Bro 2.6.2!</li>
+      <li>All docker images were updated to reflect Alpha status.</li>
+      <li>Added Sensoroni to the nav bar on the main page</li>
 	</p>
 </div>
 
