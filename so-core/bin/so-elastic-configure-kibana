@@ -1,9 +1,0 @@
-#!/bin/bash
-
-. /opt/so/bin/so-elastic-common
-
-. /opt/so/bin/so-elastic-configure-kibana-config
-
-. /opt/so/bin/so-elastic-configure-kibana-dashboards
-
-. /opt/so/bin/so-elastic-configure-kibana-shortcuts
