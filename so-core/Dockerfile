@@ -23,16 +23,12 @@ RUN yum update -y && yum -y install rsync epel-release
 RUN yum -y install nginx
 RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
-RUN mkdir -p /opt/socore/bin
 RUN mkdir -p /opt/socore/html
-
-#COPY bin/* /opt/socore/bin/
 
 COPY files/startso.sh /opt/socore/
 COPY files/html/* /opt/socore/html/
 
 RUN chmod +x /opt/socore/startso.sh
-#RUN chmod +x /opt/socore/bin/*
 
 # Create socore user.
 RUN groupadd --gid 939 socore && \
