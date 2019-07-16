@@ -20,14 +20,9 @@ LABEL version="SO Core HH1.1.0"
 LABEL description="Security Onion Core Functions Docker"
 
 RUN yum update -y && yum -y install rsync epel-release
-RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm &&\
-    rpm --import /etc/pki/rpm-gpg/IUS-COMMUNITY-GPG-KEY
-RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo &&\
-    yum -y update && yum -y install docker-ce
+RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm 
 RUN yum -y install nginx python36u python36u-pip python36u-ssl
-RUN pip3.6 install --upgrade pip
-RUN pip3.6 install flask && \
-    yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
+RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 RUN mkdir -p /opt/socore/bin
 RUN mkdir -p /opt/socore/html
