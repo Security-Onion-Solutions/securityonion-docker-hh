@@ -11,7 +11,7 @@
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
 	padding-left: 30px;
-	padding right: 30px;
+	padding-right: 30px;
 }
 
 body {
@@ -24,6 +24,11 @@ a {
 	text-align: left;
 	padding: 0px;
 }
+
+.center {
+	margin: 0 auto;
+}
+
 /* Style the top navigation bar */
 .topnav {
   overflow: hidden;
@@ -67,45 +72,45 @@ a {
 </style>
 </head>
 <body>
-
-<div class="topnav">
-  <a href="/kibana/" target="_blank">Kibana</a>
-  <a href="/grafana/" target="_blank">Grafana</a>
-  <a href="/sensoroni/" target="_blank">Sensoroni</a>
-  <a href="/fleet/" target="_blank">Fleet</a>
-	<a href="/thehive/" target="_blank">TheHive</a>
-	<a href="/packages/" target="_blank">OSquery Binaries</a>
-	<a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/FAQ" target="_blank">FAQ</a>
-	<a href="https://www.securityonionsolutions.com" target="_blank">Security Onion Solutions</a>
-	<a href="https://blog.securityonion.net" target="_blank">Blog</a>
-</div>
-
-<div class="content">
-	<center><a href="https://securityonion.net"><img STYLE="border: none;" src="alpha_logo.jpg" alt="Security Onion" align="center" target="_blank"></img></a><br></center>
-
-	<p><center><h1>Hybrid Hunter Alpha v1.1.0 Release Notes</h1></center><br>
-		<h2>Changes:</h2>
-		<ul>
-			<li>Alpha is here!!</li>
-			<li>There is a new PCAP interface called <a href="https://github.com/sensoroni/sensoroni" target="_blank">Sensoroni</a>. Pivoting is done via Kibana. See details <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Pulling-PCAP" target="_blank">here</a>.</li>
-			<li>Bond interface setup now uses nmcli for better compatibility in the network based setup script.</li>
-      <li>Filebeat traffic for HH components now use a separate port. (5644) This will allow you to send beats to the default port (5044) and choose how you want to secure it. It is still recommended to use full SSL via filebeat and if you already have this set up you will need to change to port 5044. We will continue to refine this in future vesrions.</li>
-      <li>Authentication is now enabled by default for all the web based components. There will be some major changes before we get to beta in how authentication in general is handled due to Elastic "Features" and other components.</li>
-      <li>Add users to the web interface via the command "sudo so-user-add username" and follow the prompts.</li>
-      <li>Bro 2.6.2!</li>
-      <li>All docker images were updated to reflect Alpha status.</li>
-      <li>Added Sensoroni to the nav bar on the main page.</li>
-      <li>Some initial utilities were added locally. Check out the list <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Utilities" target="_blank">here</a>.</li>
-	</p>
-</div>
-
-<div class="footer">
-  <b>Disclaimer of Warranty</b><br>
-	<small>THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM .AS IS. WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</small><br>
-	<br>
-	<b>Limitation of Liability</b><br>
-	<small>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</small><br>
-</div>
-
+	<div class="center">
+		<div class="topnav center">
+			<a href="/kibana/" target="_blank">Kibana</a>
+			<a href="/grafana/" target="_blank">Grafana</a>
+			<a href="/sensoroni/" target="_blank">Sensoroni</a>
+			<a href="/fleet/" target="_blank">Fleet</a>
+			<a href="/thehive/" target="_blank">TheHive</a>
+			<a href="/packages/" target="_blank">OSquery Binaries</a>
+			<a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/FAQ" target="_blank">FAQ</a>
+			<a href="https://www.securityonionsolutions.com" target="_blank">Security Onion Solutions</a>
+			<a href="https://blog.securityonion.net" target="_blank">Blog</a>
+		</div>
+		
+		<div class="content center">
+			<center><a href="https://securityonion.net"><img STYLE="border: none;" src="alpha_logo.jpg" alt="Security Onion" align="center" target="_blank"></img></a><br></center>
+		
+			<p><center><h1>Hybrid Hunter Alpha v1.1.0 Release Notes</h1></center><br>
+				<h2>Changes:</h2>
+				<ul>
+					<li>Alpha is here!!</li>
+					<li>There is a new PCAP interface called <a href="https://github.com/sensoroni/sensoroni" target="_blank">Sensoroni</a>. Pivoting is done via Kibana. See details <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Pulling-PCAP" target="_blank">here</a>.</li>
+					<li>Bond interface setup now uses nmcli for better compatibility in the network based setup script.</li>
+			<li>Filebeat traffic for HH components now use a separate port. (5644) This will allow you to send beats to the default port (5044) and choose how you want to secure it. It is still recommended to use full SSL via filebeat and if you already have this set up you will need to change to port 5044. We will continue to refine this in future vesrions.</li>
+			<li>Authentication is now enabled by default for all the web based components. There will be some major changes before we get to beta in how authentication in general is handled due to Elastic "Features" and other components.</li>
+			<li>Add users to the web interface via the command "sudo so-user-add username" and follow the prompts.</li>
+			<li>Bro 2.6.2!</li>
+			<li>All docker images were updated to reflect Alpha status.</li>
+			<li>Added Sensoroni to the nav bar on the main page.</li>
+			<li>Some initial utilities were added locally. Check out the list <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Utilities" target="_blank">here</a>.</li>
+			</p>
+		</div>
+		
+		<div class="footer center">
+		<b>Disclaimer of Warranty</b><br>
+			<small>THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM .AS IS. WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</small><br>
+			<br>
+			<b>Limitation of Liability</b><br>
+			<small>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</small><br>
+		</div>
+	</div>
 </body>
 </html>
