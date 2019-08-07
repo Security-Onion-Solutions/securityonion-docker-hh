@@ -29,5 +29,6 @@ RUN chown -R 937:937 /opt/bro && \
 # Copy over the entry script.
 COPY files/bro.sh /usr/local/sbin/bro.sh
 RUN chmod +x /usr/local/sbin/bro.sh
+RUN pip install ipaddress
 
 ENTRYPOINT ["/usr/local/sbin/bro.sh"]
