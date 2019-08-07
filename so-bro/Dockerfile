@@ -9,7 +9,7 @@ RUN yum update -y && \
 
 # Install epel
 RUN yum -y install epel-release bash libpcap iproute && yum clean all
-RUN yum -y install jemalloc numactl libnl3 libdnet gdb GeoIP && \
+RUN yum -y install jemalloc numactl libnl3 libdnet gdb GeoIP python-ipaddress && \
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the Bro package
@@ -29,6 +29,5 @@ RUN chown -R 937:937 /opt/bro && \
 # Copy over the entry script.
 COPY files/bro.sh /usr/local/sbin/bro.sh
 RUN chmod +x /usr/local/sbin/bro.sh
-RUN pip install ipaddress
 
 ENTRYPOINT ["/usr/local/sbin/bro.sh"]
