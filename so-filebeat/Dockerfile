@@ -31,4 +31,3 @@ RUN mkdir data logs && \
 
 USER socore
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
-CMD ["-e"]
