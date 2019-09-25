@@ -1,0 +1,15 @@
+# Config file for osquery-based Sigma rules for use with Security Onion
+title: SO osquery
+logsources:
+  osquery:
+    product: osquery
+    index: logstash-osquery-*
+defaultindex: logstash-*
+fieldmappings:
+    qid: osquery.columns.qid
+    hostname: osquery.hostname
+    counter: osquery.counter
+    column_name: osquery.columns.name
+    query_name: osquery.name
+    username: osquery.columns.username
+    uid: osquery.columns.uid
