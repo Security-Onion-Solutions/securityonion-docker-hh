@@ -194,7 +194,7 @@ def createHiveAlert(esid):
               sys.exit(0)
            
     # Redirect to TheHive instance
-    return redirect(hive_url + '/index.html#/alert/list')
+    return redirect(hive_url + '/index.html#!/alert/list')
 
 def createMISPEvent(esid):
     search = getHits(esid)
