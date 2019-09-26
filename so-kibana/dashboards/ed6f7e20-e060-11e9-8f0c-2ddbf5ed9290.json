@@ -2,17 +2,17 @@
   "version": "6.7.2",
   "objects": [
     {
-      "id": "41ec0ca0-6f13-11e7-86c8-a1b6db3b051a",
+      "id": "d58ec1a0-34e4-11e7-9669-7f1d3242b798",
       "type": "visualization",
-      "updated_at": "2019-09-26T12:53:19.416Z",
-      "version": "WzQ3MCwxXQ==",
+      "updated_at": "2019-09-26T12:53:19.189Z",
+      "version": "WzMzMiwxXQ==",
       "attributes": {
-        "visState": "{\"title\":\"DNS - Baby Domain Requests\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"highest_registered_domain.keyword\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Domain\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"creation_date\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"_term\"}}],\"listeners\":{}}",
+        "visState": "{\"title\":\"NIDS - Alerts Over Time\",\"type\":\"line\",\"params\":{\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp per 30 minutes\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"lineWidth\":2,\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
         "description": "",
-        "title": "DNS - Baby Domain Requests",
-        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "title": "NIDS - Alerts Over Time",
+        "uiStateJSON": "{}",
         "version": 1,
-        "savedSearchId": "fce833e0-6f12-11e7-86c8-a1b6db3b051a",
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": "{\"filter\":[]}"
         }
@@ -41,25 +41,149 @@
       }
     },
     {
-      "id": "fce833e0-6f12-11e7-86c8-a1b6db3b051a",
+      "id": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
       "type": "search",
-      "updated_at": "2019-09-26T12:53:19.416Z",
-      "version": "WzQ3NSwxXQ==",
+      "updated_at": "2019-09-26T13:17:09.529Z",
+      "version": "WzY0NSwxXQ==",
       "attributes": {
+        "title": "NIDS - Alerts",
+        "description": "",
+        "hits": 0,
+        "columns": [
+          "source_ip",
+          "source_port",
+          "destination_ip",
+          "destination_port",
+          "_id"
+        ],
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "hits": 0,
-        "description": "",
-        "title": "DNS - Domains with creation date < 3 months",
         "version": 1,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"event_type:bro_dns AND _exists_:creation_date AND creation_date:[now-3M TO now]\",\"analyze_wildcard\":true}},\"filter\":[]}"
-        },
-        "columns": [
-          "_source"
-        ]
+          "searchSourceJSON": "{\"index\":\"*:logstash-*\",\"highlightAll\":true,\"version\":true,\"filter\":[],\"query\":{\"query\":\"event_type:ids\",\"language\":\"lucene\"}}"
+        }
+      }
+    },
+    {
+      "id": "620283e0-3af5-11e7-a83b-b1b4da7d15f4",
+      "type": "visualization",
+      "updated_at": "2019-09-26T12:53:19.189Z",
+      "version": "WzMzNywxXQ==",
+      "attributes": {
+        "visState": "{\"title\":\"NIDS Alerts - Source Port\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source_port\",\"size\":100,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Port\"}}],\"listeners\":{}}",
+        "description": "",
+        "title": "NIDS Alerts - Source Port",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "6.7.2"
+      }
+    },
+    {
+      "id": "AWDG3ym0xQT5EBNmq3mG",
+      "type": "visualization",
+      "updated_at": "2019-09-26T12:53:19.189Z",
+      "version": "WzM0NCwxXQ==",
+      "attributes": {
+        "title": "NIDS - Alert Count",
+        "visState": "{\"title\":\"NIDS - Alert Count\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":\"30\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"bgFill\":\"#FB9E00\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "description": "",
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "6.7.2"
+      }
+    },
+    {
+      "id": "3f040620-4a44-11e8-9b0a-f1d33346f773",
+      "type": "visualization",
+      "updated_at": "2019-09-26T12:53:19.189Z",
+      "version": "WzM0NiwxXQ==",
+      "attributes": {
+        "title": "NIDS - Destination Port",
+        "visState": "{\"title\":\"NIDS - Destination Port\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"destination_port\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":100,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Destination Port\"}}]}",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "description": "",
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "6.7.2"
+      }
+    },
+    {
+      "id": "3a1b54b0-e061-11e9-8f0c-2ddbf5ed9290",
+      "type": "visualization",
+      "updated_at": "2019-09-26T13:26:46.319Z",
+      "version": "WzY0OSwxXQ==",
+      "attributes": {
+        "title": "NIDS - Alert Summary - Drilldown",
+        "visState": "{\"title\":\"NIDS - Alert Summary - Drilldown\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"showMetricsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source_ip\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Source IP Address\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"destination_ip\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Destination IP Address\"}}]}",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "description": "",
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "6.7.2"
+      }
+    },
+    {
+      "id": "1b3faca0-e064-11e9-8f0c-2ddbf5ed9290",
+      "type": "visualization",
+      "updated_at": "2019-09-26T14:11:11.027Z",
+      "version": "WzY2NCwxXQ==",
+      "attributes": {
+        "title": "NIDS - Drilldown - Alert Title",
+        "visState": "{\"title\":\"NIDS - Drilldown - Alert Title\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":false},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":12}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"top_hits\",\"schema\":\"metric\",\"params\":{\"field\":\"alert.keyword\",\"aggregate\":\"concat\",\"size\":1,\"sortField\":\"@timestamp\",\"sortOrder\":\"desc\"}}]}",
+        "uiStateJSON": "{}",
+        "description": "",
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "6.7.2"
+      }
+    },
+    {
+      "id": "6533dd40-e064-11e9-8f0c-2ddbf5ed9290",
+      "type": "visualization",
+      "updated_at": "2019-09-26T13:49:01.076Z",
+      "version": "WzY1NywxXQ==",
+      "attributes": {
+        "title": "NIDS - Drilldown - Rule Signature",
+        "visState": "{\"title\":\"NIDS - Drilldown - Rule Signature\",\"type\":\"table\",\"params\":{\"perPage\":1,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"top_hits\",\"schema\":\"metric\",\"params\":{\"field\":\"rule_signature.keyword\",\"aggregate\":\"concat\",\"size\":1,\"sortField\":\"@timestamp\",\"sortOrder\":\"desc\",\"customLabel\":\"NIDS Signature\"}}]}",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "description": "",
+        "savedSearchId": "9a5a35c0-342f-11e7-9e93-53b62e1857b2",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "6.7.2"
       }
     },
     {
@@ -76,21 +200,20 @@
       }
     },
     {
-      "id": "AWAi6wvxAvKNGEbUWO_j",
+      "id": "ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290",
       "type": "dashboard",
-      "updated_at": "2019-09-26T12:53:19.416Z",
-      "version": "WzQ4OSwxXQ==",
+      "updated_at": "2019-09-26T14:11:48.705Z",
+      "version": "WzY2NywxXQ==",
       "attributes": {
-        "title": "Baby Domains",
+        "title": "NIDS - SID Drilldown",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":2,\"y\":0,\"w\":10,\"h\":12,\"i\":\"1\"},\"type\":\"visualization\",\"id\":\"41ec0ca0-6f13-11e7-86c8-a1b6db3b051a\",\"version\":\"6.1.1\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":0,\"y\":0,\"w\":2,\"h\":12,\"i\":\"2\"},\"type\":\"visualization\",\"id\":\"b3b449d0-3429-11e7-9d52-4f090484f59e\",\"version\":\"6.1.1\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":12,\"w\":12,\"h\":9,\"i\":\"3\"},\"type\":\"search\",\"id\":\"fce833e0-6f12-11e7-86c8-a1b6db3b051a\",\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"],\"version\":\"6.1.1\"}]",
+        "panelsJSON": "[{\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"gridData\":{\"h\":8,\"i\":\"3\",\"w\":32,\"x\":16,\"y\":0},\"id\":\"d58ec1a0-34e4-11e7-9669-7f1d3242b798\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"gridData\":{\"h\":51,\"i\":\"4\",\"w\":8,\"x\":0,\"y\":0},\"id\":\"b3b449d0-3429-11e7-9d52-4f090484f59e\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"embeddableConfig\":{\"columns\":[\"source_ip\",\"source_port\",\"destination_ip\",\"destination_port\",\"_id\"],\"sort\":[\"@timestamp\",\"desc\"]},\"gridData\":{\"h\":22,\"i\":\"6\",\"w\":48,\"x\":0,\"y\":51},\"id\":\"9a5a35c0-342f-11e7-9e93-53b62e1857b2\",\"panelIndex\":\"6\",\"type\":\"search\",\"version\":\"6.7.2\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":17,\"i\":\"12\",\"w\":20,\"x\":8,\"y\":34},\"id\":\"620283e0-3af5-11e7-a83b-b1b4da7d15f4\",\"panelIndex\":\"12\",\"title\":\"NIDS Alert - Source Port\",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"gridData\":{\"h\":8,\"i\":\"16\",\"w\":8,\"x\":8,\"y\":0},\"id\":\"AWDG3ym0xQT5EBNmq3mG\",\"panelIndex\":\"16\",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"gridData\":{\"h\":17,\"i\":\"18\",\"w\":20,\"x\":28,\"y\":34},\"id\":\"3f040620-4a44-11e8-9b0a-f1d33346f773\",\"panelIndex\":\"18\",\"title\":\"NIDS Alert  - Destination Port\",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":16,\"i\":\"19\",\"w\":40,\"x\":8,\"y\":18},\"id\":\"3a1b54b0-e061-11e9-8f0c-2ddbf5ed9290\",\"panelIndex\":\"19\",\"title\":\"NIDS - Alert Summary \",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":10,\"i\":\"20\",\"w\":17,\"x\":8,\"y\":8},\"id\":\"1b3faca0-e064-11e9-8f0c-2ddbf5ed9290\",\"panelIndex\":\"20\",\"title\":\"NIDS - Alert Title\",\"type\":\"visualization\",\"version\":\"6.7.2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":10,\"i\":\"21\",\"w\":23,\"x\":25,\"y\":8},\"id\":\"6533dd40-e064-11e9-8f0c-2ddbf5ed9290\",\"panelIndex\":\"21\",\"title\":\"NIDS - Rule Signature\",\"type\":\"visualization\",\"version\":\"6.7.2\"}]",
         "optionsJSON": "{\"darkTheme\":true,\"useMargins\":true}",
-        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
         "version": 1,
         "timeRestore": false,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"}}"
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
         }
       }
     }
