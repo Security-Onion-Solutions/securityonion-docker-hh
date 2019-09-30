@@ -88,22 +88,29 @@ a {
 		<div class="content center">
 			<center><a href="https://securityonion.net"><img STYLE="border: none;" src="alpha_logo.jpg" alt="Security Onion" align="center" target="_blank"></img></a><br></center>
 
-			<p><center><h1>Hybrid Hunter Alpha v1.1.0 Release Notes</h1></center><br>
+			<p><center><h1>Hybrid Hunter Alpha v1.1.1 Release Notes</h1></center><br>
 				<h2>Changes:</h2>
 				<ul>
-          <li>Alpha is here!! Check out the <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Hybrid-Hunter-Quick-Start-Guide" target="_blank">Hybrid Hunter Quick Start Guide</a>.</li>
-          <li>There is a new PCAP interface called <a href="https://github.com/sensoroni/sensoroni" target="_blank">Sensoroni</a>. Pivoting is done via Kibana. See details <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Pulling-PCAP" target="_blank">here</a>. </li>
-          <li>Bond interface setup now uses "nmcli" for better compatibility in the network based setup script.</li>
-          <li>Filebeat traffic for HH components now use a separate port (5644). This will allow you to send Beats to the default port (5044) and choose how you want to secure it. It is still recommended to use full SSL via Filebeat and if you already have this set up you will need to change to port 5044. We will continue to refine this in future versions.</li>
-          <li>Authentication is now enabled by default for all the web based components. There will be some major changes before we get to beta with how authentication in general is handled due to Elastic "Features" and other components.</li>
-          <li>Add users to the web interface via "so-user-add" and follow the prompts.</li>
-          <li>"so-allow" now exists to make your life easier.</li>
-          <li>Bro 2.6.2.</li>
-          <li>All Docker images were updated to reflect Alpha status.</li>
-          <li>Disabled DEBUG logging on a lot of components to reduce space usage.</li>
-          <li>Added a rule update cron job so the master pulls new rules down every day at 7AM UTC.</li>
-          <li>You can now manually run a rule update using the "so-rule-update" command.</li>
-				</p>
+          <li>Alpha 2 is here!</li>
+          <li>Suricata 4.1.5.</li>
+          <li>Bro/Zeek 2.6.4.</li>
+          <li>TheHive 3.4.0 (Includes ES 6.8.3 for TheHive only).</li>
+          <li>Fixed Bro/Zeek packet loss calculation for Grafana.</li>
+          <li>Updated to latest Sensoroni for websockets to enable job status updates without refreshing.</li>
+          <li>NIDS and HIDS dashboard updates.</li>
+          <li>Playbook and ATT&CK Navigator features are now included.</li>
+          <li>Filebeat now logs to a file, instead of stdout.</li>
+          <li>Elastalert has been updated to use Python 3 and allow for use of custom alerters.</li>
+          <li>Elasticsearch Ingest is now used to consume Zeek logs and Suricata alerts (instead of the traditional Logstash pipeline). This reduces the memory footprint of Logstash dramatically!</li>
+          <li>Several changes to the setup script have been made to improve stability of the setup process:</li>
+              <ul>
+                  <li>Setup now modifies your hosts file so that the install works better in environments without DNS.</li>
+                  <li>You are now prompted for setting a password for the socore user.</li>
+                  <li>The install now forces a reboot at the end of the install. This fixes an issue with some of the Docker containers being in the wrong state from a manual reboot. Manual reboots are fine after the initial reboot.</li>
+              </ul>
+          <li>Check out the <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Hybrid-Hunter-Quick-Start-Guide" target="_blank">Hybrid Hunter Quick Start Guide</a>.</li>
+        </ul>
+      </p>
 		</div>
 
 		<div class="footer center">
