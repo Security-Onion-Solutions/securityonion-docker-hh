@@ -34,9 +34,9 @@ RUN groupadd --gid 931 logstash && \
       logstash
 
 # Add Logstash itself.
-RUN curl -Lo - https://artifacts.elastic.co/downloads/logstash/logstash-oss-6.5.2.tar.gz | \
+RUN curl -Lo - https://artifacts.elastic.co/downloads/logstash/logstash-oss-6.7.2.tar.gz | \
     tar zxf - -C /usr/share \
-    && mv /usr/share/logstash-6.5.2 /usr/share/logstash \
+    && mv /usr/share/logstash-6.7.2 /usr/share/logstash \
     && chown --recursive logstash:logstash /usr/share/logstash/ \
     && ln -s /usr/share/logstash /opt/logstash && mkdir /usr/share/logstash/pipeline.so \
     && mkdir /usr/share/logstash/pipeline.freq && mkdir /usr/share/logstash/pipeline.dstats \

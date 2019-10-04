@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident
+from flask import Flask, request
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, playbookWebhook
 from config import parser, filename
 import logging
 
@@ -35,5 +35,10 @@ def sendRTIR(esid):
 def sendSlack(esid):
     return createSlackAlert(esid)
 
+@app.route("/playbook/webhook", methods=['POST'])
+def sendPlaybook():
+    webhook_content = request.get_json()
+    return playbookWebhook(webhook_content)
+
 if __name__ == "__main__" :
-    app.run(host='0.0.0.0', port=7000, debug=True)
+    app.run(host='0.0.0.0', port=7000)

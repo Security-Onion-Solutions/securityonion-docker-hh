@@ -1,7 +1,0 @@
-#!/bin/bash
-
-. /opt/so/bin/so-elastic-common
-
-/opt/so/bin/so-elastic-stop
-echo
-/opt/so/bin/so-elastic-start

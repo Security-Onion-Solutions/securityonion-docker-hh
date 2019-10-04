@@ -8,3 +8,5 @@ rt==1.0.11
 grr-api-client==3.2.4.post6
 grr-response-proto==3.2.4.post6
 pymisp==2.4.103
+ruamel.yaml==0.16.5
+sigmatools==0.12.1

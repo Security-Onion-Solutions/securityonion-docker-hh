@@ -1,11 +1,11 @@
 {
-  "version": "6.5.2",
+  "version": "6.7.2",
   "objects": [
     {
       "id": "4f6f3440-6d62-11e7-8ddb-e71eb260f4a3",
       "type": "dashboard",
-      "updated_at": "2019-04-01T16:01:22.866Z",
-      "version": 2,
+      "updated_at": "2019-09-26T12:53:19.145Z",
+      "version": "WzQyLDFd",
       "attributes": {
         "hits": 0,
         "timeRestore": false,

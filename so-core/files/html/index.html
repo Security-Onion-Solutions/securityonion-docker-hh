@@ -11,7 +11,7 @@
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
 	padding-left: 30px;
-	padding right: 30px;
+	padding-right: 30px;
 }
 
 body {
@@ -24,6 +24,11 @@ a {
 	text-align: left;
 	padding: 0px;
 }
+
+.center {
+	margin: 0 auto;
+}
+
 /* Style the top navigation bar */
 .topnav {
   overflow: hidden;
@@ -67,43 +72,54 @@ a {
 </style>
 </head>
 <body>
+	<div class="center">
+		<div class="topnav center">
+			<a href="/kibana/" target="_blank">Kibana</a>
+			<a href="/grafana/" target="_blank">Grafana</a>
+			<a href="/sensoroni/" target="_blank">Sensoroni</a>
+			<a href="/fleet/" target="_blank">Fleet</a>
+			<a href="/thehive/" target="_blank">TheHive</a>
+			<a href="/packages/" target="_blank">Osquery Packages</a>
+			<a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/FAQ" target="_blank">FAQ</a>
+			<a href="https://www.securityonionsolutions.com" target="_blank">Security Onion Solutions</a>
+			<a href="https://blog.securityonion.net" target="_blank">Blog</a>
+		</div>
 
-<div class="topnav">
-  <a href="/kibana/" target="_blank">Kibana</a>
-  <a href="/grafana/" target="_blank">Grafana</a>
-  <a href="/fleet/" target="_blank">Fleet</a>
-	<a href="/thehive/" target="_blank">TheHive</a>
-	<a href="/packages/" target="_blank">OSquery Binaries</a>
-	<a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/FAQ" target="_blank">FAQ</a>
-	<a href="https://www.securityonionsolutions.com" target="_blank">Security Onion Solutions</a>
-	<a href="https://blog.securityonion.net" target="_blank">Blog</a>
-</div>
+		<div class="content center">
+			<center><a href="https://securityonion.net"><img STYLE="border: none;" src="alpha_logo.jpg" alt="Security Onion" align="center" target="_blank"></img></a><br></center>
 
-<div class="content">
-	<center><a href="https://securityonion.net"><img STYLE="border: none;" src="so_smaller.png" alt="Security Onion" align="center" height="170px" target="_blank"></img></a><br></center>
+			<p><center><h1>Hybrid Hunter Alpha v1.1.1 Release Notes</h1></center><br>
+				<h2>Changes:</h2>
+				<ul>
+          <li>Alpha 2 is here!</li>
+          <li>Suricata 4.1.5.</li>
+          <li>Bro/Zeek 2.6.4.</li>
+          <li>TheHive 3.4.0 (Includes ES 6.8.3 for TheHive only).</li>
+          <li>Fixed Bro/Zeek packet loss calculation for Grafana.</li>
+          <li>Updated to latest Sensoroni for websockets to enable job status updates without refreshing.</li>
+          <li>NIDS and HIDS dashboard updates.</li>
+          <li>Playbook and ATT&CK Navigator features are now included.</li>
+          <li>Filebeat now logs to a file, instead of stdout.</li>
+          <li>Elastalert has been updated to use Python 3 and allow for use of custom alerters.</li>
+          <li>Elasticsearch Ingest is now used to consume Zeek logs and Suricata alerts (instead of the traditional Logstash pipeline). This reduces the memory footprint of Logstash dramatically!</li>
+          <li>Several changes to the setup script have been made to improve stability of the setup process:</li>
+              <ul>
+                  <li>Setup now modifies your hosts file so that the install works better in environments without DNS.</li>
+                  <li>You are now prompted for setting a password for the socore user.</li>
+                  <li>The install now forces a reboot at the end of the install. This fixes an issue with some of the Docker containers being in the wrong state from a manual reboot. Manual reboots are fine after the initial reboot.</li>
+              </ul>
+          <li>Check out the <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Hybrid-Hunter-Quick-Start-Guide" target="_blank">Hybrid Hunter Quick Start Guide</a>.</li>
+        </ul>
+      </p>
+		</div>
 
-	<p><center><h1>Hybrid Hunter v1.0.8 Release Notes</h1></center><br>
-		<h2>Changes:</h2>
-		<ul>
-			<li>Suricata 4.1.4</li>
-			<li>Eval and Master installs now ask which components you would like to install</li>
-			<li>Fleet (osquery) now has it's own additional setup script. <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Configuring-Osquery-with-Security-Onion" target="_blank">See the Docs!</a></li>
-			<li>Fleet setup script now generates auto install packages for Windows, CentOS, and Ubuntu</li>
-			<li>When Fleet setup is completed, all SO nodes will auto install the appropriate auto install package</li>
-      <li>We now have a progress bar during install!</li>
-      <li>The setup script will now tell you if it was successful</li>
-      <li>Added Grafana plugin Pie Chart</li>
-      <li>The Hive Docker moved to Centos 7 based container</li>
-	</p>
-</div>
-
-<div class="footer">
-  <b>Disclaimer of Warranty</b><br>
-	<small>THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM .AS IS. WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</small><br>
-	<br>
-	<b>Limitation of Liability</b><br>
-	<small>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</small><br>
-</div>
-
+		<div class="footer center">
+		<b>Disclaimer of Warranty</b><br>
+			<small>THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM .AS IS. WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</small><br>
+			<br>
+			<b>Limitation of Liability</b><br>
+			<small>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</small><br>
+		</div>
+	</div>
 </body>
 </html>

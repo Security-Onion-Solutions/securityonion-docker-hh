@@ -4,6 +4,10 @@ FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
 
+# Create a common centos update layer
+RUN yum update -y && \
+    yum clean all
+
 # Set this environment variable to true to set timezone on container start.
 ENV SET_CONTAINER_TIMEZONE false
 
@@ -41,7 +45,6 @@ ENV ELASTICSEARCH_HOST elasticsearch
 ENV ELASTICSEARCH_PORT 9200
 
 # Add ElastAlert user
-#RUN useradd -ms /bin/bash elastalert
 RUN groupadd --gid 933 elastalert && \
     adduser --uid 933 --gid 933 \
       --home-dir /usr/share/elastalert --no-create-home \
@@ -55,16 +58,28 @@ COPY ./files/elastalert_config.conf ${ELASTALERT_CONFIG}
 COPY ./files/elastalert_supervisord.conf ${ELASTALERT_SUPERVISOR_CONF} 
 
 # Install software required for Elastalert and NTP for time synchronization.
-#RUN yum install -y unzip wget ntp.x86_64 openssl-devel.x86_64 openssl.x86_64 libffi.x86_64 libffi-devel.x86_64 python-devel.x86_64 gcc.x86_64 compat-gcc-44.x86_64 libgcc.x86_64 tzdata.noarch; \
-#    rm -rf /var/cache/yum/*; \
-RUN yum update -y && \
-    yum install -y unzip wget ntp.x86_64 openssl-devel.x86_64 openssl.x86_64 libffi.x86_64 libffi-devel.x86_64 python-devel.x86_64 gcc.x86_64 compat-gcc-44.x86_64 libgcc.x86_64 tzdata.noarch && \
-    yum clean all; \
+RUN yum update -y && yum -y install epel-release && \
+    yum install -y \
+      https://centos7.iuscommunity.org/ius-release-el7.rpm \
+      unzip \
+      wget \
+      ntp.x86_64 \
+      openssl-devel.x86_64 \
+      openssl.x86_64 \
+      libffi.x86_64 \
+      libffi-devel.x86_64 \
+      libyaml-devel \
+      gcc.x86_64 \
+      compat-gcc-44.x86_64 \
+      libgcc.x86_64 \
+      tzdata.noarch;
 
-# Install pip - required for installation of Elastalert.
-    wget https://bootstrap.pypa.io/get-pip.py; \
-    python get-pip.py; \
-    rm -rf get-pip.py; \
+RUN yum -y makecache && \
+    yum -y install \
+      python36-devel.x86_64 \
+      python36-libs.x86_64 \
+      python36-pip.noarch \
+    yum clean all; \
 
 # Download and unpack Elastalert.
     wget ${ELASTALERT_URL}; \
@@ -74,10 +89,14 @@ RUN yum update -y && \
 
 WORKDIR ${ELASTALERT_HOME}
 
+# Copy over Elastalert mappings
+COPY ./files/elastalert.json ./files/past_elastalert.json elastalert/es_mappings/6/
+
 # Install Elastalert.
-RUN pip uninstall twilio --yes; \
-    pip install twilio==6.0.0; \
-    python setup.py install; \
+RUN python3.6 setup.py install; \
+
+# Install Supervisor.
+    python3.6 -m pip install supervisor; \
 
 # Install Supervisor.
     easy_install supervisor; \
@@ -99,7 +118,7 @@ RUN pip uninstall twilio --yes; \
     chown -R elastalert:elastalert ${ELASTALERT_HOME}; \
     chown -R elastalert:elastalert /var/run/elastalert/; \
     chown elastalert:elastalert /opt/start-elastalert.sh; \
-    chown elastalert:elastalert /usr/bin/supervisord; \
+    chown elastalert:elastalert /usr/local/bin/supervisord; \
 
 # Elastalert configuration:
     # Set the rule directory in the Elastalert config file to external rules directory.
@@ -123,7 +142,7 @@ RUN pip uninstall twilio --yes; \
     sed -i -e"s|stderr_logfile=.*log|stderr_logfile=${LOG_DIR}/elastalert_stderr.log|g" ${ELASTALERT_SUPERVISOR_CONF}; \
 
     # Modify the start-command.
-    sed -i -e"s|python elastalert.py|python -m elastalert.elastalert --config ${ELASTALERT_CONFIG}|g" ${ELASTALERT_SUPERVISOR_CONF}; \
+    sed -i -e"s|python elastalert.py|python3.6 -m elastalert.elastalert --config ${ELASTALERT_CONFIG}|g" ${ELASTALERT_SUPERVISOR_CONF}; \
 
 # Copy the Elastalert configuration file to Elastalert home directory to be used when creating index first time an Elastalert container is launched.
     cp ${ELASTALERT_CONFIG} ${ELASTALERT_HOME}/config.yaml; \

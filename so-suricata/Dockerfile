@@ -1,8 +1,8 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Suricata 4.1.4"
-LABEL description="Suricata 4.1.4 running in a docker for use with Security Onion."
+LABEL version="Suricata 4.1.5"
+LABEL description="Suricata 4.1.5 running in a docker for use with Security Onion."
 
 RUN yum update -y && \
     yum clean all
@@ -14,7 +14,7 @@ RUN yum -y install GeoIP luajit libnet jansson libyaml cargo rustc && \
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the Suricata package
-RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/securityonion-suricata-4.1.4/securityonion-suricata-4.1.4.0.rpm
+RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/securityonion-suricata-4.1.5.0/securityonion-suricata-4.1.5.0.rpm
 # Create Suricata User.
 RUN groupadd --gid 940 suricata && \
     adduser --uid 940 --gid 940 \

@@ -1,7 +1,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Google Stenographer HH1.0.7"
+LABEL version="Google Stenographer HH1.1.1"
 LABEL description="Google Stenographer running in a docker for use with Security Onion."
 
 RUN yum update -y && \
@@ -16,6 +16,10 @@ RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the steno package
 RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/stenographer_20180316/stenographer-0-1.20180316git57b88aa.el7.centos.x86_64.rpm
+RUN mkdir -p /opt/sensoroni && cd /opt/sensoroni \
+&& curl -OL https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/sensoroni0.1.8b/sensoroni \
+&& curl -OL https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/sensoroni0.1.8b/version.json \
+&& chmod +x /opt/sensoroni/sensoroni
 
 # setcap
 RUN setcap 'CAP_NET_RAW+ep CAP_NET_ADMIN+ep CAP_IPC_LOCK+ep CAP_SETGID+ep' /usr/bin/stenotype
@@ -24,6 +28,7 @@ RUN setcap 'CAP_NET_RAW+ep CAP_NET_ADMIN+ep CAP_IPC_LOCK+ep CAP_SETGID+ep' /usr/
 RUN mkdir -p /nsm/pcap/files \
     && mkdir -p /nsm/pcap/index \
     && chown -R 941:941 /nsm/pcap \
+    && chown -R 941:941 /opt/sensoroni \
     && mkdir -p /etc/stenographer/certs \
     && mkdir -p /var/log/stenographer \
     && usermod -s /bin/bash stenographer

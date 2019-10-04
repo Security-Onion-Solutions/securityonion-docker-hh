@@ -7,6 +7,7 @@ from pymisp import PyMISP
 from grr_api_client import api
 from flask import redirect
 from config import parser
+import playbook
 import json
 import uuid
 import sys
@@ -193,7 +194,7 @@ def createHiveAlert(esid):
               sys.exit(0)
            
     # Redirect to TheHive instance
-    return redirect(hive_url + '/index.html#/alert/list')
+    return redirect(hive_url + '/index.html#!/alert/list')
 
 def createMISPEvent(esid):
     search = getHits(esid)
@@ -361,3 +362,50 @@ def createFIREvent(esid):
     
     # Redirect to FIR instance
     return redirect(fir_url + '/events') 
+
+
+def playbookWebhook(webhook_content):
+    """
+    Process incoming playbook webhook.
+    
+    """
+    action = webhook_content['payload']['action']
+    issue_tracker_name = webhook_content['payload']['issue']['tracker']['name']
+    issue_id = webhook_content['payload']['issue']['id']
+    issue_status_name = webhook_content['payload']['issue']['status']['name']
+
+    if action == 'opened' and issue_tracker_name == 'Sigma Import':
+        playbook.play_create(str(issue_id))
+    elif action == 'updated' and issue_tracker_name == 'Play':
+        journal_details = webhook_content['payload']['journal']['details']
+        detection_updated = False
+        for item in journal_details:
+            # Check to see if the Sigma field has changed
+            if item['prop_key'] == '21':
+                # Sigma field updated --> Call function - Update Play metadata
+                playbook.play_update(issue_id)
+                # Create/Update ElastAlert config
+                if issue_status_name == "Active" and not detection_updated:
+                    detection_updated = True
+                    playbook.elastalert_update(issue_id)
+                    playbook.navigator_update()
+                    playbook.thehive_casetemplate_update(issue_id)
+                elif issue_status_name == "Inactive" and not detection_updated:
+                    detection_updated = True
+                    playbook.elastalert_disable(issue_id)
+                    playbook.navigator_update()
+
+            # Check to see if the Play status has changed to Active or Inactive
+            elif item['prop_key'] == 'status_id' and not detection_updated:
+                if item['value'] == '3':
+                    # Status = Active --> Enable EA & TheHive
+                    detection_updated = True
+                    playbook.elastalert_update(issue_id)
+                    playbook.navigator_update()
+                    playbook.thehive_casetemplate_update(issue_id)
+                elif item['value'] == '4':
+                    # Status = Inactive --> Disable EA
+                    detection_updated = True
+                    playbook.elastalert_disable(issue_id)
+                    playbook.navigator_update()
+    return "success"

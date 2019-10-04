@@ -1,52 +1,26 @@
-FROM openjdk:8 as build-env
-LABEL maintainer="Ilya Glotov <contact@ilyaglotov.com>" \
-      repository="https://github.com/TheHive-Project/TheHive"
+FROM centos:7
 
-ENV THEHIVE_VERSION=3.2.1 \
-    APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 \
-    BUILD_DEPS="sbt \
-                nodejs \
-                git \
-                libpng-dev"
-
-RUN apt-get update \
-  && apt-get install -y apt-transport-https \
-  \
-  && echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list \
-  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 \
-  && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
-  && apt-get update \
-  && apt-get install -y sudo \
-                        $BUILD_DEPS \
-  && npm install -g grunt-cli \
-                    bower \
-  && git -c advice.detachedHead=false \
-            clone \
-            --branch=$THEHIVE_VERSION \
-            --depth=1 \
-            https://github.com/TheHive-Project/TheHive.git \
-  && echo '{"allow_root": true}' > /root/.bowerrc \
-  && cd TheHive \
-  && sbt clean stage \
-  && mv /TheHive/target/universal/stage /opt/thehive \
-  && apt-get purge -y $BUILD_DEPS \
-  && rm -rf /TheHive \
-  && rm -rf /root/* \
-  && rm -rf /var/lib/apt/lists/*
-
-FROM openjdk:8
-COPY --from=build-env /opt/thehive /opt/thehive
-
-RUN useradd -u 939 thehive \
-  && mkdir /var/log/thehive \
-  && chown -R thehive /opt/thehive \
-                      /var/log/thehive \
-  && echo "play.http.secret.key=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 49)" >> /opt/thehive/conf/application.conf \
+LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="TheHive v1.1.0 HH1.1.1"
+LABEL description="TheHive Docker container for use with Security Onion"
+RUN yum update -y
+RUN yum install -y https://dl.bintray.com/thehive-project/rpm-stable/thehive-3.4.0-1.noarch.rpm
+RUN yum -y install thehive wget
+RUN groupmod -g 939 thehive \
+  && usermod -u 939 -g 939 thehive \
+  && ls -la /opt \
+  && ls -la /opt/thehive
+RUN mkdir -p /opt/thehive/conf
+RUN chown -R thehive /opt/thehive \
+                      /var/log/thehive
+RUN echo "play.http.secret.key=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 49)" >> /opt/thehive/conf/application.conf \
   && echo -e 'search.host = ["elasticsearch:9300"]\n\
 play.http.secret.key = ${?PLAY_SECRET}' >> /opt/thehive/conf/application.conf
+COPY bin/so-thehive.sh /opt/thehive/bin/so-thehive.sh
+RUN chmod +x /opt/thehive/bin/so-thehive.sh
 
 USER thehive
 
 EXPOSE 9000
 
-ENTRYPOINT ["/opt/thehive/bin/thehive"]
+ENTRYPOINT ["/opt/thehive/bin/so-thehive.sh"]
