@@ -154,9 +154,33 @@ def createHiveAlert(esid):
                   ossec_desc = result['_source']['full_log']
                   artifacts.append(AlertArtifact(dataType='ip', data=agent_ip))
                   artifacts.append(AlertArtifact(dataType='other', data=agent_name))
-                 
+                  tags.append("wazuh")
+              elif 'beat' in result['_source']['tags']:
+                  agent_name = str(result['_source']['beat']['hostname'])
+                  if 'beat_host' in result['_source']:
+                      os_name = str(result['_source']['beat_host']['os']['name'])
+                      artifacts.append(AlertArtifact(dataType='other', data=os_name))
+                  if 'source_hostname' in result['_source']:
+                      source_hostname = str(result['_source']['source_hostname'])
+                      artifacts.append(AlertArtifact(dataType='fqdn', data=source_hostname))
+                  if 'source_ip' in result['_source']:
+                      source_ip = str(result['_source']['source_ip'])
+                      artifacts.append(AlertArtifact(dataType='ip', data=source_ip))
+                  if 'destination_ip' in result['_source']:
+                      destination_ip = str(result['_source']['destination_ip'])
+                      artifacts.append(AlertArtifact(dataType='ip', data=destination_ip))
+                  if 'image_path' in result['_source']:
+                      image_path = str(result['_source']['image_path'])
+                      artifacts.append(AlertArtifact(dataType='filename', data=image_path))
+                  if 'Hashes' in result['_source']['event_data']:
+                      hashes = result['_source']['event_data']['Hashes']
+                      for hash in hashes.split(','):
+                          if hash.startswith('MD5') or hash.startswith('SHA256'):
+                              artifacts.append(AlertArtifact(dataType='hash', data=hash.split('=')[1]))
+                  tags.append("beats")
+              else:
+                  agent_name = ''
               title= "New Sysmon Event! - " + agent_name
-              tags.append("wazuh")
            
           else:
               title = "New " + event_type + " Event From Security Onion"
