@@ -10,4 +10,7 @@ done
 rm -f /tmp/garbage_file
 sleep 5
 
+# Remove the old PID
+rm -f /opt/thehive/RUNNING_PID
+
 /opt/thehive/bin/thehive
