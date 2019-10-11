@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, playbookWebhook
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan,  playbookWebhook
 from config import parser, filename
 import logging
 
@@ -34,6 +34,10 @@ def sendRTIR(esid):
 @app.route("/slack/<esid>")
 def sendSlack(esid):
     return createSlackAlert(esid)
+
+@app.route("/strelka/filescan/<esid>")
+def sendStrelka(esid):
+    return createStrelkaScan(esid)
 
 @app.route("/playbook/webhook", methods=['POST'])
 def sendPlaybook():

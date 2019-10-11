@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from helpers import getHits
+from helpers import getHits, getConn
 from thehive4py.api import TheHiveApi
 from thehive4py.models import Alert, AlertArtifact, CustomFieldHelper
 from pymisp import PyMISP
 from grr_api_client import api
-from flask import redirect
+from grr import listProcessFlow, checkFlowStatus, downloadFlowResults
+from flask import redirect, request, render_template
+from requests.auth import HTTPBasicAuth
 from config import parser
 import playbook
 import json
@@ -13,6 +15,9 @@ import uuid
 import sys
 import rt
 import requests
+import os
+import base64
+import time
 
 def createHiveAlert(esid):
     search = getHits(esid)
@@ -232,27 +237,52 @@ def createMISPEvent(esid):
             
     # Redirect to MISP instance    
     return redirect(misp_url + '/events/index')
-
 def createGRRFlow(esid, flow_name):
     search = getHits(esid)
+
+    hive_url = parser.get('hive', 'hive_url')
+    hive_key = parser.get('hive', 'hive_key')
+    hive_verifycert = parser.get('hive', 'hive_verifycert')
+    tlp = int(parser.get('hive', 'hive_tlp'))
+
+    # Check if verifying cert
+    if 'False' in hive_verifycert:
+        hiveapi = TheHiveApi(hive_url, hive_key, cert=False)
+    else:
+        hiveapi = TheHiveApi(hive_url, hive_key, cert=True)
+
     grr_url = parser.get('grr', 'grr_url')
     grr_user = parser.get('grr', 'grr_user')
     grr_pass = parser.get('grr', 'grr_pass')
     grrapi = api.InitHttp(api_endpoint=grr_url,
                       auth=(grr_user, grr_pass))
-  
+
+    base64string = '%s:%s' % (grr_user, grr_pass)
+    base64string = base64.b64encode( bytes(base64string, "utf-8") )
+    authheader =  "Basic %s" % base64string
+    index_response = requests.get(grr_url, auth=HTTPBasicAuth(grr_user, grr_pass))
+    csrf_token = index_response.cookies.get("csrftoken")
+    headers = {
+        "Authorization": authheader,
+        "x-csrftoken": csrf_token,
+        "x-requested-with": "XMLHttpRequest"
+    }
+    cookies = {
+        "csrftoken": csrf_token
+    }
+
     for result in search['hits']['hits']:
         result = result['_source']
         message = result['message']
         description = str(message)
         info = description
-        
+
         if 'source_ip' in result:
             source_ip = result['source_ip']
-       
+
         if 'destination_ip' in result:
             destination_ip = result['destination_ip']
-        
+
         for ip in source_ip, destination_ip:
             search_result = grrapi.SearchClients(ip)
             grr_result = {}
@@ -265,16 +295,57 @@ def createGRRFlow(esid, flow_name):
                 #flow_name = "ListProcesses"
                 if client_id is None:
                     pass
-                
-                # Run flow
-                flow_obj = grrapi.Client(client_id)
-                flow_obj.CreateFlow(name=flow_name)
-	
-        if client_id != '':
-            # Redirect to GRR instance
-            return redirect(grr_url + '/#/clients/' + client_id + '/flows')    
-        else:
-            return "No matches found for source or destination ip"
+
+                # Process flow and get flow id
+                flow_id = listProcessFlow(client_id,grr_url,headers,cookies,grr_user,grr_pass)
+
+                # Get status
+                status = checkFlowStatus(client_id,grr_url,flow_id,headers,cookies,grr_user,grr_pass)
+
+                # Keep checking to see if complete
+                while status != "terminated":
+                    time.sleep(15)
+                    print("Flow not yet completed..watiing 15 secs before attempting to check status again...")
+                    status = checkFlowStatus(client_id,grr_url,flow_id,headers,cookies,grr_user,grr_pass)
+
+                # If terminated, run the download
+                if status == "terminated":
+                    downloadFlowResults(client_id,grr_url,flow_id,headers,cookies,grr_user,grr_pass)
+                #print("Done!")
+
+                # Run flow via API client
+                #flow_obj = grrapi.Client(client_id)
+                #flow_obj.CreateFlow(name=flow_name)
+                title = "Test Alert with GRR Flow"
+                description = str(message)
+                sourceRef = str(uuid.uuid4())[0:6]
+                tags=["SecurityOnion","GRR"]
+                artifacts=[]
+                id = None
+                filepath = "/tmp/soctopus/" + client_id + ".zip"
+                artifacts.append(AlertArtifact(dataType='file', data=str(filepath)))
+
+                # Build alert
+                hivealert = Alert(
+                  title= title,
+                  tlp=tlp,
+                  tags=tags,
+                  description=description,
+                  type='external',
+                  source='SecurityOnion',
+                  sourceRef=sourceRef,
+                  artifacts=artifacts
+                )
+
+                # Send it off
+                response = hiveapi.create_alert(hivealert)
+
+
+            if client_id:
+                # Redirect to GRR instance
+                return redirect(grr_url + '/#/clients/' + client_id + '/flows')
+            else:
+                return "No matches found for source or destination ip"
 
 def createRTIRIncident(esid):
     search = getHits(esid)
@@ -409,3 +480,21 @@ def playbookWebhook(webhook_content):
                     playbook.elastalert_disable(issue_id)
                     playbook.navigator_update()
     return "success"
+
+def createStrelkaScan(esid):
+  search = getHits(esid)
+  for result in search['hits']['hits']:
+      result = result['_source']
+      message = result['message']
+      event_type = result['event_type']
+      extracted_file = result['extracted']
+      conn_id = result['uid'][0]
+      sensorsearch = getConn(conn_id)
+
+      for result in sensorsearch['hits']['hits']:
+          result = result['_source']
+          sensor = result['sensor_name'].rsplit('-',1)[0]
+          strelka_scan_drop = "echo " + sensor + "," + extracted_file + " >>  /tmp/soctopus/strelkaq.log"
+          os.system(strelka_scan_drop)
+
+          return render_template('strelka.html', extracted_file=extracted_file, sensor=sensor)
