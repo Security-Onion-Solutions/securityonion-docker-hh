@@ -137,7 +137,7 @@ export default {
                 this.$store.state.api_response.alert_type = 'success';
                 this.$store.state.show_alert = true;
 
-                await sleep(100);
+                await sleep(2000);
 
                 if (res.data.redirect !== '') {
                   window.location = res.data.redirect;
@@ -175,3 +175,4 @@ export default {
     float: right;
   }
 </style>
+

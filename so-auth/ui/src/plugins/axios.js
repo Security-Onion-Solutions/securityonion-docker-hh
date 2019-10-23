@@ -10,7 +10,7 @@ import Vue from 'vue';
 import axios from 'axios';
 
 const config = {
-  baseURL: process.env.VUE_APP_API_URI,
+  baseURL: process.env.VUE_APP_API_URI || `http://${window.location.host}/so-auth/api`,
   timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
@@ -58,3 +58,4 @@ Plugin.install = (Vue, options) => {
 Vue.use(Plugin);
 
 export default Plugin;
+
