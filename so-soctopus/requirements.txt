@@ -1,6 +1,6 @@
 requests==2.21.0
 future==0.16.0
-Werkzeug==0.11.3
+Werkzeug==0.15.3
 elasticsearch==6.3.1
 Flask==1.0.2
 thehive4py==1.6.0
