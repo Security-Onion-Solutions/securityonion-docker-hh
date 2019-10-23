@@ -101,5 +101,4 @@ yarn-error.log
 
 # End of https://www.gitignore.io/api/node,vuejs
 
-.env*
-!.env.example
+
