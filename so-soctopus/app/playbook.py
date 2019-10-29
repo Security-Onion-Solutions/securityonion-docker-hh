@@ -199,12 +199,12 @@ def play_metadata(issue_id):
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
 
     if product == 'osquery':
-        esquery = subprocess.run(["sigmac","-t", "es-qs", "dump.txt", "-c", "securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
+        esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", "-c", "securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
     else:
-        esquery = subprocess.run(["sigmac","-t", "es-qs", "dump.txt", "-c", "securityonion-network.yml", "-c", "securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
+        esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", "-c", "securityonion-network.yml", "-c", "securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
     
-    #esquery = subprocess.run(["sigmac","-t", "es-qs", "dump.txt", f"{sigma_config}"], stdout=subprocess.PIPE, encoding='ascii')
-    #esquery = subprocess.run(["sigmac","-t", "es-qs", "dump.txt", "-c", "filebeat-defaultindex"], stdout=subprocess.PIPE, encoding='ascii')
+    #esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", f"{sigma_config}"], stdout=subprocess.PIPE, encoding='ascii')
+    #esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", "-c", "filebeat-defaultindex"], stdout=subprocess.PIPE, encoding='ascii')
     #sigma_config = '"-c","securityonion-osquery.yml"' if play.get('product') == 'osquery'\
     #else '"-c","securityonion-network.yml","-c", "securityonion-winlogbeat.yml"'
 

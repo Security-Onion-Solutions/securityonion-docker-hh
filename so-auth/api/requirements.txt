@@ -1,0 +1,16 @@
+bcrypt
+cffi
+Click
+Flask>=0.12
+Flask-Cors
+Flask-SQLAlchemy
+Flask-Testing
+itsdangerous
+Jinja2
+MarkupSafe
+pycparser
+PyJWT
+six
+SQLAlchemy
+Werkzeug
+pyOpenSSL
