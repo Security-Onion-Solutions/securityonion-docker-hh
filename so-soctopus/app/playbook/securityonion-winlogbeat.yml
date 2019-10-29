@@ -43,6 +43,7 @@ fieldmappings:
     CallingProcessName: event_data.CallingProcessName
     CallTrace: event_data.CallTrace
     CommandLine: event_data.CommandLine
+    Company: event_data.Company
     ComputerName: event_data.ComputerName
     CurrentDirectory: event_data.CurrentDirectory
     Description: event_data.Description
