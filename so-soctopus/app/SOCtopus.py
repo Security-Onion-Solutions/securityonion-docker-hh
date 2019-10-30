@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from flask import Flask, request
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan,  playbookWebhook
+from flask import Flask, render_template, request, redirect
+from flask_bootstrap import Bootstrap
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert
 from config import parser, filename
 import logging
 
