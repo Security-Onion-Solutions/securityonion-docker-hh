@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from helpers import getHits, getConn
+from helpers import getHits, getConn, doUpdate
 from thehive4py.api import TheHiveApi
 from thehive4py.models import Alert, AlertArtifact, CustomFieldHelper
 from pymisp import PyMISP
 from grr_api_client import api
 from grr import listProcessFlow, checkFlowStatus, downloadFlowResults
-from flask import redirect, request, render_template
 from requests.auth import HTTPBasicAuth
+from flask import Flask, redirect, request, render_template, flash, jsonify
+from flask_wtf import FlaskForm
+from forms import DefaultForm
+from wtforms import StringField
+from elasticsearch import Elasticsearch
 from config import parser
 import playbook
 import json
@@ -18,6 +22,7 @@ import requests
 import os
 import base64
 import time
+import jsonpickle
 
 def createHiveAlert(esid):
     search = getHits(esid)
@@ -189,18 +194,62 @@ def createHiveAlert(esid):
            
           else:
               title = "New " + event_type + " Event From Security Onion"
+          form = DefaultForm()
+          artifact_string = jsonpickle.encode(artifacts)
+          return render_template('hive.html', title=title, tlp=tlp,tags=tags, description=description, artifact_string=artifact_string, sourceRef=sourceRef, form=form)         
           
-          # Build alert
-          hivealert = Alert(
-              title= title,
-              tlp=tlp,
-              tags=tags,
-              description=description,
-              type='external',
-              source='SecurityOnion',
-              sourceRef=sourceRef,
-              artifacts=artifacts
-          )
+def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
+
+  hive_url = parser.get('hive', 'hive_url')
+  hive_key = parser.get('hive', 'hive_key')
+  hive_verifycert = parser.get('hive', 'hive_verifycert')
+  tlp = int(parser.get('hive', 'hive_tlp'))
+
+  # Check if verifying cert
+  if 'False' in hive_verifycert:
+        hiveapi = TheHiveApi(hive_url, hive_key, cert=False)
+  else:
+        hiveapi = TheHiveApi(hive_url, hive_key, cert=True)
+
+  newtags = tags.strip('][').replace("'","").split(', ')
+
+  artifacts = json.loads(artifact_string)
+
+  #print(newtags)
+  # Build alert
+  hivealert = Alert(
+     title= title,
+     tlp=tlp,
+     tags=newtags,
+     description=description,
+     type='external',
+     source='SecurityOnion',
+     sourceRef=sourceRef,
+     artifacts=artifacts
+  )
+
+  # Send it off
+  response = hiveapi.create_alert(hivealert)
+  if response.status_code == 201:
+              print(json.dumps(response.json(), indent=4, sort_keys=True))
+              print('')
+              id = response.json()['id']
+
+              # If running standalone / eval tell ES that we sent the alert
+              #es_type = 'doc'
+              #es_index = index
+              #es_headers = {'Content-Type' : 'application/json'}
+              #es_data = '{"script" : {"source": "ctx._source.tags.add(params.tag)","lang": "painless","params" : {"tag" : "Sent to TheHive"}}}'
+              #update_es_event = requests.post(es_url + '/' + es_index + '/' + es_type + '/' + esid +  '/_update', headers=es_headers, data=es_data)
+              #print(update_es_event.content)
+
+  else:
+              print('ko: {}/{}'.format(response.status_code, response.text))
+              sys.exit(0)
+
+  # Redirect to TheHive instance
+  return redirect(hive_url + '/index.html#/alert/list')
+
 
           # Send it off
           response = api.create_alert(hivealert) 
@@ -522,3 +571,31 @@ def createStrelkaScan(esid):
           os.system(strelka_scan_drop)
 
           return render_template('strelka.html', extracted_file=extracted_file, sensor=sensor)
+
+def showESResult(esid):
+  search = getHits(esid)
+  for result in search['hits']['hits']:
+      esindex = result['_index']
+      result = result['_source']
+      #print(result)
+
+  return render_template("result.html", result=result, esindex=esindex)
+
+class DefaultForm(FlaskForm):
+   esindex = StringField('esindex')
+   esid = StringField('esid')
+
+
+def eventModifyFields(esid):
+  search = getHits(esid)
+  for result in search['hits']['hits']:
+      esindex = result['_index']
+      result = result['_source']
+      tags = result['tags']
+      form = DefaultForm()
+  return render_template('update_event.html',result=result, esindex=esindex,esid=esid,tags=tags,form=form)
+
+def eventUpdateFields(esindex,esid,tags):
+  doUpdate(esindex,esid,tags)
+  return showESResult(esid)
+

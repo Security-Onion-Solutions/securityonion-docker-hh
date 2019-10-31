@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from flask import Flask, request
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan,  playbookWebhook
+from flask import Flask, render_template, request, redirect
+from flask_bootstrap import Bootstrap
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert
 from config import parser, filename
 import logging
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisismysecret'
@@ -20,8 +21,22 @@ def sendGRR(esid, flow_name):
     return createGRRFlow(esid, flow_name)
 
 @app.route("/thehive/alert/<esid>")
-def sendHiveAlert(esid):
+def creatHive(esid):
     return createHiveAlert(esid)
+
+def sendHive():
+    if request.method == 'POST':
+      if request.form['submit_button'] == 'Submit':
+        result = request.form.to_dict()
+        title = result['title']
+        tlp = result['tlp']
+        description = result['description']
+        tags = result['tags']
+        artifact_string = result['artifact_string']
+        sourceRef = result['sourceRef']
+        return sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string)
+      else:
+        return render_template("cancel.html")
 
 @app.route("/misp/event/<esid>")
 def sendMISP(esid):
@@ -43,6 +58,24 @@ def sendStrelka(esid):
 def sendPlaybook():
     webhook_content = request.get_json()
     return playbookWebhook(webhook_content)
+
+@app.route("/es/showresult/<esid>")
+def sendESQuery(esid):
+    return showESResult(esid)
+
+@app.route("/es/event/modify/<esid>")
+def sendModifyESEvent(esid):
+    return eventModifyFields(esid)
+
+@app.route("/es/event/update", methods = ['GET', 'POST'])
+def sendESEventUpdate():
+   if request.method == 'POST':
+    result = request.form
+    esid = result['esid']
+    esindex = result['esindex']
+    tags = result['tags']
+    #return render_template('postresult.html',result=result)
+    return eventUpdateFields(esindex,esid,tags)
 
 if __name__ == "__main__" :
     app.run(host='0.0.0.0', port=7000)
