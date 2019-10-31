@@ -248,31 +248,7 @@ def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
               sys.exit(0)
 
   # Redirect to TheHive instance
-  return redirect(hive_url + '/index.html#/alert/list')
-
-
-          # Send it off
-          response = api.create_alert(hivealert) 
-
-          if response.status_code == 201:
-              print(json.dumps(response.json(), indent=4, sort_keys=True))
-              print('')
-              id = response.json()['id']
-
-              # If running standalone / eval tell ES that we sent the alert
-              #es_type = 'doc'
-              #es_index = index
-              #es_headers = {'Content-Type' : 'application/json'} 
-              #es_data = '{"script" : {"source": "ctx._source.tags.add(params.tag)","lang": "painless","params" : {"tag" : "Sent to TheHive"}}}'
-              #update_es_event = requests.post(es_url + '/' + es_index + '/' + es_type + '/' + esid +  '/_update', headers=es_headers, data=es_data)
-              #print(update_es_event.content) 
-          
-          else:
-              print('ko: {}/{}'.format(response.status_code, response.text))
-              sys.exit(0)
-           
-    # Redirect to TheHive instance
-    return redirect(hive_url + '/index.html#!/alert/list')
+  return redirect(hive_url + '/index.html#!/alert/list')
 
 def createMISPEvent(esid):
     search = getHits(esid)

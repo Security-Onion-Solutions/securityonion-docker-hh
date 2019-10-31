@@ -9,8 +9,10 @@ RUN yum -y install https://centos7.iuscommunity.org/ius-release-el7.rpm
 #RUN rpm --import /etc/pki/rpm-gpg/IUS-COMMUNITY-GPG-KEY
 RUN yum -y makecache && yum -y install python36u python36u-pip && pip3.6 install --upgrade pip && yum clean all
 RUN mkdir -p SOCtopus
+RUN mkdir -p SOCtopus/templates
 ADD ./requirements.txt SOCtopus/
 ADD ./app/* SOCtopus/
+ADD ./templates/* SOCtopus/templates
 WORKDIR SOCtopus
 RUN pip3.6 install -r requirements.txt
 ENTRYPOINT ["python3.6", "SOCtopus.py"]

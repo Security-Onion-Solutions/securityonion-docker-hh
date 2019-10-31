@@ -8,6 +8,7 @@ import logging
 import json
 
 app = Flask(__name__)
+Bootstrap(app)
 app.config['SECRET_KEY'] = 'thisismysecret'
 
 logging.basicConfig(filename=filename, level=logging.DEBUG)
@@ -21,9 +22,10 @@ def sendGRR(esid, flow_name):
     return createGRRFlow(esid, flow_name)
 
 @app.route("/thehive/alert/<esid>")
-def creatHive(esid):
+def createHive(esid):
     return createHiveAlert(esid)
 
+@app.route("/thehive/alert/send", methods = ['POST'])
 def sendHive():
     if request.method == 'POST':
       if request.form['submit_button'] == 'Submit':
