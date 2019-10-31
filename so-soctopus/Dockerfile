@@ -12,7 +12,7 @@ RUN mkdir -p SOCtopus
 RUN mkdir -p SOCtopus/templates
 ADD ./requirements.txt SOCtopus/
 ADD ./app/* SOCtopus/
-ADD ./templates/* SOCtopus/templates
+ADD ./templates/* SOCtopus/templates/
 WORKDIR SOCtopus
 RUN pip3.6 install -r requirements.txt
 ENTRYPOINT ["python3.6", "SOCtopus.py"]
