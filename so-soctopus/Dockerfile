@@ -11,6 +11,7 @@ RUN yum -y makecache && yum -y install python36u python36u-pip && pip3.6 install
 RUN mkdir -p SOCtopus
 RUN mkdir -p SOCtopus/templates
 RUN mkdir -p SOCtopus/playbook
+RUN mkdir -p /var/log/SOCtopus
 ADD ./requirements.txt SOCtopus/
 ADD ./app/*.py SOCtopus/
 ADD ./app/*.conf SOCtopus/
