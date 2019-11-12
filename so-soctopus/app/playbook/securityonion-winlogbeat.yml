@@ -95,3 +95,5 @@ fieldmappings:
     User: event_data.User
     WorkstationName: event_data.WorkstationName
     Product: event_data.Product
+    GroupSid: event_data.GroupSid    
+    RelativeTargetName: event_data.RelativeTargetName
