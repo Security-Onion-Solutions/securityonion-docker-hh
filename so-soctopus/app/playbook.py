@@ -203,9 +203,9 @@ def play_metadata(issue_id):
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
 
     if product == 'osquery':
-        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
+        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
     else:
-        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "sysmon.yml", "-c", "securityonion-network.yml", "-c", "securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
+        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
     
     ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
     ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
