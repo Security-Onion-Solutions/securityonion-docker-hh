@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from config import parser
+import fileinput
 import json
 import os
-from time import gmtime, strftime
 import re
 import shutil
 import subprocess
 import uuid
+from time import gmtime, strftime
 
-import fileinput
 import requests
-import ruamel.yaml
-yaml = ruamel.yaml.YAML(typ='safe')
 
+import ruamel.yaml
+from config import parser
+
+yaml = ruamel.yaml.YAML(typ='safe')
 
 playbook_headers = {'X-Redmine-API-Key': parser.get("playbook", "playbook_key"), 'Content-Type': 'application/json'}
 playbook_url = parser.get("playbook", "playbook_url")
@@ -76,12 +77,10 @@ def thehive_casetemplate_update(issue_id):
 
     return 200, "success"
 
-
 def elastalert_update(issue_id):
     play = play_metadata(issue_id)
-
     play_file = f"/etc/playbook-rules/{play['playid']}.yaml"
-
+    ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", play['esquery'])
     if os.path.exists(play_file):
         os.remove(play_file)
 
@@ -91,9 +90,8 @@ def elastalert_update(issue_id):
         else:
             shutil.copy('/etc/playbook-rules/generic.template', play_file)
         for line in fileinput.input(play_file, inplace=True):
-            line = re.sub(r'name:\s\S*', f"name: {play['title']}", line.rstrip())
-            line = re.sub(r'query:\s\'.*\'', f"query: \'{play['esquery']}\'", line.rstrip())
-            line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play['playid']}'", line.rstrip())
+            line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
+            line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play['playid']}'\n{ea_config_raw}", line.rstrip())
             print(line)
 
     except FileNotFoundError:
@@ -115,9 +113,9 @@ def play_create(issue_id):
     
     play_id = uuid.uuid4().hex
 
-    payload = {"issue": {"subject": play['title'],"project_id": 1,"status":"Draft", "tracker": "Play", "custom_fields": [\
+    payload2 = {"issue": {"subject": play['title'],"project_id": 1,"status":"Draft", "tracker": "Play", "custom_fields": [\
     {"id": 6, "name": "Title", "value": play['title']},\
-    {"id": 24, "name": "Playbook", "value": "External"},\
+    {"id": 24, "name": "Playbook", "value": play['playbook']},\
     {"id": 15, "name": "ES Query", "value": play['esquery'] },\
     {"id": 23, "name": "Level", "value": play['level']},\
     {"id": 25, "name": "Product", "value": play['product']},\
@@ -127,12 +125,14 @@ def play_create(issue_id):
     {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"},\
     {"id": 28, "name": "PlayID", "value": play_id[0:9]},\
     {"id": 27, "name": "Tags", "value": play['tags']},\
+    {"id": 30, "name": "Signature ID", "value": play['sigid']},\
     {"id": 21, "name": "Sigma", "value": play['sigma']}\
     ]}}
-    
+
+  
     # POST/PUT payload to Redmine to create play
     url = f"{playbook_url}/issues.json"
-    r = requests.post(url, data=json.dumps(payload),
+    r = requests.post(url, data=json.dumps(payload2),
                       headers=playbook_headers, verify=False)
 
     if r.status_code == 201:
@@ -149,6 +149,7 @@ def play_create(issue_id):
                          headers=playbook_headers, verify=False)
 
     return 'success', 200
+    #return json.dumps(payload2)
 
 
 def play_update(issue_id):
@@ -186,12 +187,15 @@ def play_metadata(issue_id):
             play['hiveid'] = item['value']
         elif item['name'] == "PlayID":
             play['playid'] = item['value']
+        elif item['name'] == "Playbook":
+            play['playbook'] = item['value']
 
+    # Cleanup the Sigma data to get it ready for parsing
     sigma_raw = re.sub(
         "{{collapse\(View Sigma\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_raw)
     sigma = yaml.load(sigma_raw)
 
-    # Call sigmac tool to generate ES Query
+    # Call sigmac tool to generate ElastAlert config
     dump = open('dump.txt', 'w')
     print(sigma, file=dump)
     dump.close()
@@ -199,22 +203,17 @@ def play_metadata(issue_id):
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
 
     if product == 'osquery':
-        esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", "-c", "securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
+        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
     else:
-        esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", "-c", "securityonion-network.yml", "-c", "securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
+        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "sysmon.yml", "-c", "securityonion-network.yml", "-c", "securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
     
-    #esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", f"{sigma_config}"], stdout=subprocess.PIPE, encoding='ascii')
-    #esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "dump.txt", "-c", "filebeat-defaultindex"], stdout=subprocess.PIPE, encoding='ascii')
-    #sigma_config = '"-c","securityonion-osquery.yml"' if play.get('product') == 'osquery'\
-    #else '"-c","securityonion-network.yml","-c", "securityonion-winlogbeat.yml"'
-
+    ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
+    ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
+    
     # Prep ATT&CK Tags
     tags = re.findall(r"t\d{4}", ''.join(
         sigma.get('tags'))) if sigma.get('tags') else ''
     play['tags'] = [element.upper() for element in tags]
-
-
-    print (sigma.get('tasks'))
 
     return {
         'playid': play.get('playid'),
@@ -228,7 +227,10 @@ def play_metadata(issue_id):
         'author': sigma.get('author') if sigma.get('author') else 'none',
         'falsepositives': '_False Positives_\n' + '\n'.join(sigma.get('falsepositives')) if sigma.get('falsepositives') else '_False Positives_\n Unknown',
         'logfields': '\n\n_Interesting Log Fields_\n' + '\n'.join(sigma.get('fields')) if sigma.get('fields') else '',
-        'esquery': esquery.stdout.strip(),
+        'esquery': f'{{{{collapse(View ElastAlert Config)\n<pre><code class="yaml">\n\n{ea_config}\n</code></pre>\n}}}}',
         'tasks': sigma.get('tasks'),
-        'product': product
+        'product': product,
+        'sigid': sigma.get('id') if sigma.get('id') else 'none',
+        'playbook': play.get('playbook')
     }
+
