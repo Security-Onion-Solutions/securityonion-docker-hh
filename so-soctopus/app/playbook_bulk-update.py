@@ -30,7 +30,7 @@ playbook_plays = requests.get(url, headers=playbook_headers, verify=False).json(
 #Create / Update the community Sigma repo
 sigma_repo = f"sigma/README.md"
 if os.path.exists(sigma_repo):
-    git_status = subprocess.run(["git","--git-dir=sigma/.git", "--work-tree=sigma", "pull"], stdout=subprocess.PIPE, encoding='ascii')
+    git_status = subprocess.run(["git","--git-dir=sigma/.git", "pull"], stdout=subprocess.PIPE, encoding='ascii')
 else:     
     git_status = subprocess.run(["git","clone", "https://github.com/Neo23x0/sigma.git"], stdout=subprocess.PIPE, encoding='ascii')
 
