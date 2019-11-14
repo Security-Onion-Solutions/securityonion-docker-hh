@@ -111,3 +111,4 @@ def __check_token__(token: str, token_type: str):
 def save_model(db_model):
     db.session.add(db_model)
     db.session.commit()
+

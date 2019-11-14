@@ -151,3 +151,4 @@ def renew_auth_token(user_id):
     except Exception as e:  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
+

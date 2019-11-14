@@ -38,3 +38,7 @@ def create_app():
 if __name__ == '__main__':
     so_auth = create_app()
     so_auth.run()
+else:
+    gunicorn_app = create_app()
+
+

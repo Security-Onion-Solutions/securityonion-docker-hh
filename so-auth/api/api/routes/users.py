@@ -176,3 +176,4 @@ def delete_user(user_id):  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 """
+
