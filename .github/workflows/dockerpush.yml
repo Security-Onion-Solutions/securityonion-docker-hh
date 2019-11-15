@@ -1,0 +1,30 @@
+name: Build and publish Docker images
+
+env: 
+  VERSION: 0.0.1
+
+on:
+  push:
+    branches: 
+      - master
+
+jobs:
+  build-so-auth:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build so-auth-ui
+      working-directory: ./so-auth/ui
+      run: |
+        docker login  docker.pkg.github.com -u ${{ secrets.GITHUB_USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
+        docker build . --file Dockerfile --tag docker.pkg.github.com/rwwiv/securityonion-docker-hh/so-auth-ui:${VERSION}
+        docker push docker.pkg.github.com/rwwiv/securityonion-docker-hh/so-auth-ui:${VERSION}
+    - uses: actions/checkout@v1
+    - name: Build so-auth-api
+      working-directory: ./so-auth/api
+      run: |
+        docker login  docker.pkg.github.com -u ${{ secrets.GITHUB_USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
+        docker build . --file Dockerfile --tag docker.pkg.github.com/rwwiv/securityonion-docker-hh/so-auth-api:${VERSION}
+        docker push docker.pkg.github.com/rwwiv/securityonion-docker-hh/so-auth-api:${VERSION}
+    
+        
