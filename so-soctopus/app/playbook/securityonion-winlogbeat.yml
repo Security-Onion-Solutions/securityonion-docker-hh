@@ -48,23 +48,25 @@ fieldmappings:
     CurrentDirectory: event_data.CurrentDirectory
     Description: event_data.Description
     DestinationHostname: event_data.DestinationHostname
-    DestinationIp: event_data.DestinationIp
+    DestinationIp: destination_ip
     DestinationIsIpv6: event_data.DestinationIsIpv6
-    DestinationPort: event_data.DestinationPort
+    DestinationPort: destination_port
     Details: event_data.Details
     EngineVersion: event_data.EngineVersion
     EventType: event_data.EventType
     FailureCode: event_data.FailureCode
     FileName: event_data.FileName
+    FileVersion: event_data.FileVersion
     GrantedAccess: event_data.GrantedAccess
     GroupName: event_data.GroupName
     Hashes: event_data.Hashes
     HiveName: event_data.HiveName
     HostVersion: event_data.HostVersion
-    Image: event_data.Image
+    Image: image_path
     ImageLoaded: event_data.ImageLoaded
     ImagePath: event_data.ImagePath
     Imphash: event_data.Imphash
+    Initiated: event_data.Initiated
     LogonProcessName: event_data.LogonProcessName
     LogonType: event_data.LogonType
     NewProcessName: event_data.NewProcessName
