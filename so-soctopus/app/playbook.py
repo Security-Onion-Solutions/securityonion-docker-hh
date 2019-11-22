@@ -51,6 +51,10 @@ def thehive_casetemplate_update(issue_id):
             tasks.append ({"order":task_order,"title":task_title,"description":task_desc})
     else: tasks = []
 
+    for analyzer in play['case_analyzers']:
+       minimal_name = re.sub(r' - \S*$', '', analyzer)
+       tasks.insert(0,{"order":0,"title":f"Analyzer - {minimal_name}","description":minimal_name})
+
     #Build the case template
     case_template = {"name":play['playid'],"severity":2,"tlp":3,"metrics":{},"customFields":{\
         "playObjective":{"string":play['description']},\
@@ -189,6 +193,8 @@ def play_metadata(issue_id):
             play['playid'] = item['value']
         elif item['name'] == "Playbook":
             play['playbook'] = item['value']
+        elif item['name'] == "Case Analyzers":
+            play['case_analyzers'] = item['value']
 
     # Cleanup the Sigma data to get it ready for parsing
     sigma_raw = re.sub(
@@ -231,6 +237,7 @@ def play_metadata(issue_id):
         'tasks': sigma.get('tasks'),
         'product': product,
         'sigid': sigma.get('id') if sigma.get('id') else 'none',
-        'playbook': play.get('playbook')
+        'playbook': play.get('playbook'),
+        'case_analyzers': play.get('case_analyzers')        
     }
 
