@@ -94,6 +94,8 @@ def elastalert_update(issue_id):
         else:
             shutil.copy('/etc/playbook-rules/generic.template', play_file)
         for line in fileinput.input(play_file, inplace=True):
+            line = re.sub(r'-\s''', f"- {play['playbook']}", line.rstrip())
+            line = re.sub(r'tags:.*$', f"tags: ['playbook','{play['playid']}','{play['playbook']}']", line.rstrip())
             line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
             line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play['playid']}'\n{ea_config_raw}", line.rstrip())
             print(line)
