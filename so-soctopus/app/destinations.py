@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from helpers import getHits, getConn, doUpdate
 from thehive4py.api import TheHiveApi
-from thehive4py.models import Alert, AlertArtifact, CustomFieldHelper
+from thehive4py.models import Alert, AlertArtifact, CaseTask, CustomFieldHelper
 from pymisp import PyMISP
 from grr_api_client import api
 from grr import listProcessFlow, checkFlowStatus, downloadFlowResults
@@ -14,6 +14,7 @@ from wtforms import StringField
 from elasticsearch import Elasticsearch
 from config import parser
 import playbook
+import re
 import json
 import uuid
 import sys
@@ -23,23 +24,30 @@ import os
 import base64
 import time
 import jsonpickle
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+hive_url = parser.get('hive', 'hive_url')
+hive_key = parser.get('hive', 'hive_key')
+hive_verifycert = parser.get('hive', 'hive_verifycert')
+
+def hiveInit():
+   # Check if verifying cert
+   if 'False' in hive_verifycert:
+       api = TheHiveApi(hive_url, hive_key, cert=False)
+   else:
+       api = TheHiveApi(hive_url, hive_key, cert=True)
+   return api
 
 def createHiveAlert(esid):
     search = getHits(esid)
     #Hive Stuff
     #es_url = parser.get('es', 'es_url')
     hive_url = parser.get('hive', 'hive_url')
-    hive_key = parser.get('hive', 'hive_key')
-    hive_verifycert = parser.get('hive', 'hive_verifycert')
+    api = hiveInit()
     tlp = int(parser.get('hive', 'hive_tlp'))
-    
-    # Check if verifying cert
-    if 'False' in hive_verifycert:
-        api = TheHiveApi(hive_url, hive_key, cert=False)
-    else:
-        api = TheHiveApi(hive_url, hive_key, cert=True)
-
-    #if hits > 0:
     for result in search['hits']['hits']:
 
           # Get initial details
@@ -200,9 +208,6 @@ def createHiveAlert(esid):
           
 def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
 
-  hive_url = parser.get('hive', 'hive_url')
-  hive_key = parser.get('hive', 'hive_key')
-  hive_verifycert = parser.get('hive', 'hive_verifycert')
   tlp = int(parser.get('hive', 'hive_tlp'))
 
   # Check if verifying cert
@@ -289,9 +294,6 @@ def createMISPEvent(esid):
 def createGRRFlow(esid, flow_name):
     search = getHits(esid)
 
-    hive_url = parser.get('hive', 'hive_url')
-    hive_key = parser.get('hive', 'hive_key')
-    hive_verifycert = parser.get('hive', 'hive_verifycert')
     tlp = int(parser.get('hive', 'hive_tlp'))
 
     # Check if verifying cert
@@ -575,3 +577,183 @@ def eventUpdateFields(esindex,esid,tags):
   doUpdate(esindex,esid,tags)
   return showESResult(esid)
 
+def processHiveReq(webhook_content):
+   api = hiveInit()
+   event_details = getHiveStatus(webhook_content)
+   event_id = event_details.split(' ')[0]
+   event_status = event_details.split(' ')[1]
+   
+   # Run analyzers before case import
+   #if event_status == "alert_creation":
+   #    sys.stdout.flush()
+   #    alert_id = webhook_content['objectId']
+   #    observables = webhook_content['object']['artifacts']
+   #    analyzeAlertObservables(alert_id, observables)
+   
+   # Check to see if new case creation
+   #if event_status == "case_creation":
+   #    try:
+   #        observables = api.get_case_observables(case_id).json()
+   #    except:
+   #        pass
+   #    else:
+   #        analyzeCaseObservables(observables)
+          
+   
+   # Check to see if we are creating a new task
+   if event_status == "case_task_creation":
+       headers = {
+          'Authorization': 'Bearer ' + hive_key
+       }
+       task = webhook_content
+       task_id = webhook_content['objectId']
+       task_status = "InProgress"
+       task_group = webhook_content['object']['group']
+       task_case = webhook_content['object']['_parent']
+       task_title = webhook_content['object']['title']
+       #task_desc = webhook_content['object']['description']
+       
+       # Check the task to see if it matches our conventionm for auto-analyze tasks (via Playbook, etc)
+       if "Analyzer" in task_title:
+           analyzer_minimal = task_title.split(" - ")[1]
+           enabled_analyzers = getCortexAnalyzers()
+           supported_analyzers = parser.get('cortex', 'supported_analyzers').split(",")    
+           if analyzer_minimal in supported_analyzers:
+               # Start task
+               response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers, data={'status': task_status}, verify=False)
+               # Get observables related to case
+               observables = api.get_case_observables(task_case).json()
+               for analyzer in enabled_analyzers:
+                   if analyzer_minimal in analyzer['name']:
+                       for cortexId in analyzer['cortexIds']:
+                           # Look through all of our observables
+                           for observable in observables:
+                               # Check to see if observable type supported by analyzer
+                               if observable['dataType'] in analyzer['dataTypeList']:
+                                   # Run analyzer
+                                   api.run_analyzer(cortexId, observable['id'], analyzer['id'])
+                                   #analyzeCaseObservables(observables)
+               # Close task
+               task_status = "Completed"
+               response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers, data={'status': task_status}, verify=False)
+
+   sys.stdout.flush()
+   
+   return "success" 
+
+
+#def postAlertObservables(analyzer_results):
+#   for result in analyzer_results:
+#       print(result)
+#       sys.stdout.flush()
+#   return "OK"
+def analyzeAlertObservables(alert_id, observables):
+   """
+   Analyze TheHive observables
+   """
+   alert_id = alert_id
+   cortex_url =  parser.get('cortex', 'cortex_url')
+   cortex_key =  parser.get('cortex', 'cortex_key')
+   
+   api = hiveInit()
+   analyzers = getCortexAnalyzers()
+   for analyzer in analyzers:
+        # Get our list of Cortex servers (IDs)
+        for cortexId in analyzer['cortexIds']:
+            # Look through all of our observables
+            for observable in observables:
+                # Check to see if observable type supported by analyzer
+                if observable['dataType'] in analyzer['dataTypeList']:
+                    headers = {
+                        'Authorization': 'Bearer ' + cortex_key,
+                        'Content-Type': 'application/json'
+                    }
+                     
+                    data = {
+                            "data": observable['data'],
+                            "dataType": observable['dataType']
+                           }
+                    # Run analyzer
+                    startjob = requests.post(cortex_url + '/api/analyzer/' + analyzer['id'] + '/run', headers=headers, data=json.dumps(data), verify=False)
+                    wait_interval = '10second'
+                    job_id = startjob.json()['id']
+                    headers = {
+                        'Authorization': 'Bearer ' + cortex_key
+                    }
+
+                    getresults = requests.get(cortex_url + '/api/job/' + job_id +'/waitreport?atMost=' + wait_interval, headers=headers, verify=False)
+
+                    analyzer_results = getresults.json()
+                    job_status = analyzer_results['status']
+                    if job_status == "Success":
+                        level = analyzer_results['report']['summary']['taxonomies'][0]['level']
+                        customFields = {"customFields":{}}
+                        reputation = dict(order=1,string=level)
+                        customFields['customFields']['reputation'] = reputation
+                        headers = {
+                            'Authorization': 'Bearer ' + hive_key,
+                            'Content-Type': 'application/json'
+                        }
+                        data = json.dumps(customFields) 
+                        addcustomfields = requests.patch(hive_url + '/api/alert/' + alert_id, headers=headers, data=data, verify=False) 
+                    else:
+                        pass
+   return "OK"
+
+def analyzetaskObservables(observables,task):
+   """
+   Analyze TheHive observables
+   """
+   api = hiveInit()
+   analyzers = getCortexAnalyzers()
+
+   for analyzer in analyzers:
+        # Get our list of Cortex servers (IDs)
+        for cortexId in analyzer['cortexIds']:
+            # Look through all of our observables
+            for observable in observables:
+                # Check to see if observable type supported by analyzer
+                if observable['dataType'] in analyzer['dataTypeList']:
+                    # Run analyzer
+                    api.run_analyzer(cortexId, observable['id'], analyzer['id'])
+   return "OK"
+
+def analyzeCaseObservables(observables):
+   """
+   Analyze TheHive observables
+   """
+   api = hiveInit()
+   analyzers = getCortexAnalyzers()
+   
+   for analyzer in analyzers:
+        # Get our list of Cortex servers (IDs)
+        for cortexId in analyzer['cortexIds']:
+            # Look through all of our observables
+            for observable in observables:
+                # Check to see if observable type supported by analyzer
+                if observable['dataType'] in analyzer['dataTypeList']:
+                    # Run analyzer
+                    api.run_analyzer(cortexId, observable['id'], analyzer['id'])
+   return "OK" 
+
+def getHiveStatus(webhook_content):
+   """
+   Process incoming TheHive webhook
+   """
+   
+   operation = webhook_content['operation']
+   object_type = webhook_content['objectType']
+   object = webhook_content['object']
+   id = object['id']
+   status = str(object_type).lower() + "_" +  str(operation).lower()
+   sys.stdout.flush()
+   return  '{} {}'.format(id, status)
+
+def getCortexAnalyzers():
+   headers = {
+    'Authorization': 'Bearer ' + hive_key
+   }
+
+   response = requests.get(hive_url + '/api/connector/cortex/analyzer', headers=headers, verify=False)
+   analyzers = json.loads(response.text)
+   return analyzers
