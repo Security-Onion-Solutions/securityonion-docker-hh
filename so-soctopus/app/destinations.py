@@ -29,6 +29,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+es_url = parser.get('es', 'es_url')
 hive_url = parser.get('hive', 'hive_url')
 hive_key = parser.get('hive', 'hive_key')
 hive_verifycert = parser.get('hive', 'hive_verifycert')
@@ -65,23 +66,27 @@ def createHiveAlert(esid):
               src = str(result['_source']['source_ip'])
           if 'destination_ip' in result['_source']:
               dst = str(result['_source']['destination_ip'])
-          #if 'source_port' in result['_source']:
-          #    srcport = result['_source']['source_port']
-          #if 'destination_port' in result['_source']:
-          #    dstport = result['_source']['destination_port']
+          if 'source_port' in result['_source']:
+              srcport = str(result['_source']['source_port'])
+          if 'destination_port' in result['_source']:
+              dstport = str(result['_source']['destination_port'])
           # NIDS Alerts
-          if 'snort' in event_type:
+          if 'ids' in event_type:
               alert = result['_source']['alert']
+              sid = str(result['_source']['sid'])
               category = result['_source']['category']
-              sensor = result['_source']['interface']
+              sensor = result['_source']['sensor_name']
+              masterip = str(es_url.split("//")[1].split(":")[0])
               tags.append("nids")
               tags.append(category)
               title=alert
+              print(alert)
+              sys.stdout.flush()
               # Add artifacts
               artifacts.append(AlertArtifact(dataType='ip', data=src))
               artifacts.append(AlertArtifact(dataType='ip', data=dst))
               artifacts.append(AlertArtifact(dataType='other', data=sensor))
-              
+              description = "`NIDS Dashboard:` \n\n <https://" + masterip + "/kibana/app/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert
           # Bro logs
           elif 'bro' in event_type:
               _map_key_type ={
@@ -217,7 +222,7 @@ def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
         hiveapi = TheHiveApi(hive_url, hive_key, cert=True)
 
   newtags = tags.strip('][').replace("'","").split(', ')
-
+  description = description.strip('"')
   artifacts = json.loads(artifact_string)
 
   #print(newtags)
