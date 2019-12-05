@@ -587,13 +587,15 @@ def processHiveReq(webhook_content):
    event_details = getHiveStatus(webhook_content)
    event_id = event_details.split(' ')[0]
    event_status = event_details.split(' ')[1]
+   auto_analyze_alerts = parser.get('cortex', 'auto_analyze_alerts')
    
    # Run analyzers before case import
-   #if event_status == "alert_creation":
-   #    sys.stdout.flush()
-   #    alert_id = webhook_content['objectId']
-   #    observables = webhook_content['object']['artifacts']
-   #    analyzeAlertObservables(alert_id, observables)
+   if event_status == "alert_creation":
+       if auto_analyze_alerts == "yes":
+           sys.stdout.flush()
+           alert_id = webhook_content['objectId']
+           observables = webhook_content['object']['artifacts']
+           analyzeAlertObservables(alert_id, observables)
    
    # Check to see if new case creation
    #if event_status == "case_creation":
@@ -638,6 +640,14 @@ def processHiveReq(webhook_content):
                                    # Run analyzer
                                    api.run_analyzer(cortexId, observable['id'], analyzer['id'])
                                    #analyzeCaseObservables(observables)
+               # Add task log
+               headers = {
+                   'Authorization': 'Bearer ' + hive_key,
+                   'Content-Type': 'application/json'
+               }
+               task_log = "Automation - Ran " + analyzer_minimal + " analyzer."
+               data = {'message': task_log}
+               response = requests.post(hive_url + '/api/case/task/' + task_id + '/log', headers=headers, data=json.dumps(data), verify=False)
                # Close task
                task_status = "Completed"
                response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers, data={'status': task_status}, verify=False)
