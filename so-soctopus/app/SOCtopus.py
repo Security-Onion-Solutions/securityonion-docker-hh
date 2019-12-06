@@ -34,7 +34,7 @@ def sendHive():
         result = request.form.to_dict()
         title = result['title']
         tlp = result['tlp']
-        description = result['description']
+        description = result['description'].strip('\"')
         tags = result['tags']
         artifact_string = result['artifact_string']
         sourceRef = result['sourceRef']

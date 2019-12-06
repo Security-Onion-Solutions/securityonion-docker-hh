@@ -29,6 +29,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+es_url = parser.get('es', 'es_url')
 hive_url = parser.get('hive', 'hive_url')
 hive_key = parser.get('hive', 'hive_key')
 hive_verifycert = parser.get('hive', 'hive_verifycert')
@@ -52,6 +53,7 @@ def createHiveAlert(esid):
 
           # Get initial details
           message = result['_source']['message']
+          es_id = result['_id']
           description = str(message)
           sourceRef = str(uuid.uuid4())[0:6]
           tags=["SecurityOnion"]
@@ -65,23 +67,27 @@ def createHiveAlert(esid):
               src = str(result['_source']['source_ip'])
           if 'destination_ip' in result['_source']:
               dst = str(result['_source']['destination_ip'])
-          #if 'source_port' in result['_source']:
-          #    srcport = result['_source']['source_port']
-          #if 'destination_port' in result['_source']:
-          #    dstport = result['_source']['destination_port']
+          if 'source_port' in result['_source']:
+              srcport = str(result['_source']['source_port'])
+          if 'destination_port' in result['_source']:
+              dstport = str(result['_source']['destination_port'])
           # NIDS Alerts
-          if 'snort' in event_type:
+          if 'ids' in event_type:
               alert = result['_source']['alert']
+              sid = str(result['_source']['sid'])
               category = result['_source']['category']
-              sensor = result['_source']['interface']
+              sensor = result['_source']['sensor_name']
+              masterip = str(es_url.split("//")[1].split(":")[0])
               tags.append("nids")
               tags.append(category)
               title=alert
+              print(alert)
+              sys.stdout.flush()
               # Add artifacts
               artifacts.append(AlertArtifact(dataType='ip', data=src))
               artifacts.append(AlertArtifact(dataType='ip', data=dst))
               artifacts.append(AlertArtifact(dataType='other', data=sensor))
-              
+              description = "`NIDS Dashboard:` \n\n <https://" + masterip + "/kibana/app/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert + "\n\n `PCAP:` " + "https://" + masterip + "/kibana/app//sensoroni/securityonion/joblookup?redirectUrl=/sensoroni/&esid=" + es_id
           # Bro logs
           elif 'bro' in event_type:
               _map_key_type ={
@@ -217,7 +223,7 @@ def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
         hiveapi = TheHiveApi(hive_url, hive_key, cert=True)
 
   newtags = tags.strip('][').replace("'","").split(', ')
-
+  description = description.strip('"')
   artifacts = json.loads(artifact_string)
 
   #print(newtags)
@@ -582,13 +588,15 @@ def processHiveReq(webhook_content):
    event_details = getHiveStatus(webhook_content)
    event_id = event_details.split(' ')[0]
    event_status = event_details.split(' ')[1]
+   auto_analyze_alerts = parser.get('cortex', 'auto_analyze_alerts')
    
    # Run analyzers before case import
-   #if event_status == "alert_creation":
-   #    sys.stdout.flush()
-   #    alert_id = webhook_content['objectId']
-   #    observables = webhook_content['object']['artifacts']
-   #    analyzeAlertObservables(alert_id, observables)
+   if event_status == "alert_creation":
+       if auto_analyze_alerts == "yes":
+           sys.stdout.flush()
+           alert_id = webhook_content['objectId']
+           observables = webhook_content['object']['artifacts']
+           analyzeAlertObservables(alert_id, observables)
    
    # Check to see if new case creation
    #if event_status == "case_creation":
@@ -633,6 +641,15 @@ def processHiveReq(webhook_content):
                                    # Run analyzer
                                    api.run_analyzer(cortexId, observable['id'], analyzer['id'])
                                    #analyzeCaseObservables(observables)
+               # Add task log
+               headers = {
+                   'Authorization': 'Bearer ' + hive_key,
+                   'Content-Type': 'application/json'
+               }
+               task_log = "Automation - Ran " + analyzer_minimal + " analyzer."
+               data = {'message': task_log}
+               response = requests.post(hive_url + '/api/case/task/' + task_id + '/log', headers=headers, data=json.dumps(data), verify=False)
+               
                # Close task
                task_status = "Completed"
                response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers, data={'status': task_status}, verify=False)
