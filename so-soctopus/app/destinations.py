@@ -53,6 +53,7 @@ def createHiveAlert(esid):
 
           # Get initial details
           message = result['_source']['message']
+          es_id = result['_id']
           description = str(message)
           sourceRef = str(uuid.uuid4())[0:6]
           tags=["SecurityOnion"]
@@ -86,7 +87,7 @@ def createHiveAlert(esid):
               artifacts.append(AlertArtifact(dataType='ip', data=src))
               artifacts.append(AlertArtifact(dataType='ip', data=dst))
               artifacts.append(AlertArtifact(dataType='other', data=sensor))
-              description = "`NIDS Dashboard:` \n\n <https://" + masterip + "/kibana/app/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert
+              description = "`NIDS Dashboard:` \n\n <https://" + masterip + "/kibana/app/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert + "\n\n `PCAP:` " + "https://" + masterip + "/kibana/app//sensoroni/securityonion/joblookup?redirectUrl=/sensoroni/&esid=" + es_id
           # Bro logs
           elif 'bro' in event_type:
               _map_key_type ={
@@ -648,6 +649,7 @@ def processHiveReq(webhook_content):
                task_log = "Automation - Ran " + analyzer_minimal + " analyzer."
                data = {'message': task_log}
                response = requests.post(hive_url + '/api/case/task/' + task_id + '/log', headers=headers, data=json.dumps(data), verify=False)
+               
                # Close task
                task_status = "Completed"
                response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers, data={'status': task_status}, verify=False)
