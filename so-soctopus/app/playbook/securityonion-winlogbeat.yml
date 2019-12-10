@@ -30,7 +30,7 @@ logsources:
     service: driver-framework
     conditions:
       source: 'Microsoft-Windows-DriverFrameworks-UserMode/Operational'
-defaultindex: logstash-beats-*
+defaultindex: logstash-*
 fieldmappings:
     hostname: logbeat_hostname
     EventID: event_id
