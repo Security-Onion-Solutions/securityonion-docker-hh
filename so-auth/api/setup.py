@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Security Onion Auth',
-    version='0.1a',
+    version='1.1.3',
     # long_description=__doc__,
     packages=[
         'api',

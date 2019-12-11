@@ -15,7 +15,7 @@
             <a-input
               v-decorator="[
                 'username',
-                {rules: [{ required: true, message: 'Please input your username' }]}
+                {rules: [{ required: true, message: 'Please input a username' }]}
               ]"
               placeholder="Username"
             >
@@ -36,7 +36,7 @@
                 'password1',
                 {rules:
                   [
-                    { required: true, message: 'Please input your password' },
+                    { required: true, message: 'Please input a password' },
                   ]
                 }
               ]"
@@ -87,11 +87,14 @@
                 || fieldError('password1')
                 || fieldError('password2'))"
             >
-              Register
+              {{ buttonText }}
             </a-button>
           </a-form-item>
         </a-col>
-        <a-col :span="12">
+        <a-col
+          :span="12"
+          v-if="this.$route.path !== '/register'"
+        >
           <div class="login-link">
             Or
             <router-link to="/login">
@@ -101,10 +104,6 @@
         </a-col>
       </a-row>
     </a-form>
-    <div v-if="!isLocal">
-      <a-divider/>
-      <h3 class="warning">This requires an ssh tunnel to the master node</h3>
-    </div>
   </a-card>
 </template>
 
@@ -112,6 +111,12 @@
 import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
+import {
+  createUser, handleHtpError, handleHttpResponse, register, sleep,
+} from '../services/api-service';
+import { resetAlert } from '../services/helper-service';
+import { CHECK_FIRST_RUN } from '../constants/action-types';
+
 
 export default {
   name: 'RegisterCard',
@@ -120,21 +125,15 @@ export default {
     return {
       form: this.$form.createForm(this),
       validating: false,
-      isLocal: true,
     };
   },
+  computed: {
+    buttonText() {
+      return this.$route.path === '/register' ? 'Register' : 'Create User';
+    },
+  },
   beforeMount() {
-    this.$axios.post('/utils/check-local')
-      .then(() => {
-        this.isLocal = true;
-      })
-      .catch(() => {
-        this.isLocal = false;
-      });
-
-    if (this.$store.state.show_alert) {
-      this.$store.state.show_alert = false;
-    }
+    resetAlert();
   },
   methods: {
     fieldError(type) {
@@ -144,36 +143,37 @@ export default {
     },
     handleSubmit(e) {
       e.preventDefault();
+      this.validating = true;
       this.form.validateFields((err) => {
         if (!err) {
-          this.validating = true;
-          const data = {
-            username: this.form.getFieldValue('username'),
-            password: this.form.getFieldValue('password2'),
-          };
-
           setTimeout(() => {
-            this.$axios.post('/register', data)
-              .then((res) => {
-                this.$store.state.api_response = res.data;
-                this.$store.state.api_response.alert_type = 'success';
-                this.$store.state.show_alert = true;
-                this.$router.push('login');
-              })
-              .catch((error) => {
-                if (error.response) {
-                  this.$store.state.api_response = error.response.data;
-                  if (error.response.status < 500) {
-                    this.$store.state.api_response.alert_type = 'error';
-                  } else {
-                    this.$store.state.api_response.alert_type = 'warning';
-                  }
-                } else {
-                  this.$store.state.api_response.alert_type = 'error';
-                  this.$store.state.api_response.message = 'No response from server';
-                }
-                this.$store.state.show_alert = true;
-              });
+            if (this.$route.path === '/register') {
+              register(
+                this.form.getFieldValue('username'),
+                this.form.getFieldValue('password2'),
+              )
+                .then(async (res) => {
+                  handleHttpResponse(res);
+
+                  await sleep(1000);
+
+                  this.$store.dispatch(CHECK_FIRST_RUN).then(() => this.$router.push({ name: 'login' }));
+                })
+                .catch((error) => {
+                  handleHtpError(error);
+                  this.form.resetFields();
+                });
+            } else {
+              createUser(
+                this.form.getFieldValue('username'),
+                this.form.getFieldValue('password2'),
+              )
+                .then(async (res) => handleHttpResponse(res))
+                .catch((error) => {
+                  handleHtpError(error);
+                  this.form.resetFields();
+                });
+            }
           }, 2000);
 
           this.validating = false;
@@ -216,4 +216,3 @@ export default {
     color: @error-color;
   }
 </style>
-

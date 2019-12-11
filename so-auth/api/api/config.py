@@ -31,7 +31,9 @@ class BaseConfig(object):
     CSRF_ENABLED = True
     REQUEST_LIMITS = ['4/second', '60/minute', '600/hour']
 
-    PASSWORD_REGEX = re.compile('(?=.{6,})')
+    PASSWORD_REGEX = re.compile(r'(?=.{6,})')
+
+    CORS_HEADERS = 'Content-Type'
 
 
 class DevelopConfig(BaseConfig):

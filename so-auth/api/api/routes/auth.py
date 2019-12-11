@@ -3,14 +3,15 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify, current_app as app, make_response, redirect
 
+from models.admin import Admin
 from models.user import User
 from routes.constants import UNHANDLED_EXCEPTION_RESPONSE, LOGIN_FAIL_RESPONSE
-from routes.utils import save_model, requires_token, requires_localhost
+from routes.utils import save_model, requires_token, requires_first_run
 
 blueprint = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@blueprint.route('/', methods=["POST"], strict_slashes=False)
+@blueprint.route('/', methods=['POST', 'GET', 'PUT'], strict_slashes=False)
 @requires_token(token_type='auth')
 def check_auth(user_id):
     user: User = User.query.filter_by(id=user_id).first()
@@ -23,7 +24,7 @@ def check_auth(user_id):
 
 
 @blueprint.route('/register', methods=['POST'])
-@requires_localhost
+@requires_first_run
 def register_user():
     try:
         content: dict = request.get_json()
@@ -44,6 +45,12 @@ def register_user():
                     password=password
                 )
                 save_model(user)
+
+                # Since we successfully created the user, set the first run flag to False
+                admin_settings: Admin = Admin.query.filter_by(created=True).first()
+                admin_settings.first_run = False
+                save_model(admin_settings)
+
                 return jsonify({
                     'status': 'success',
                     'message': f'Created new user {user.username}'
@@ -81,7 +88,7 @@ def login():
                 'status': 'success',
                 'message': message,
                 'auth_token': auth_token.decode(),
-                'redirect': request.headers.get('X-Original-URI', ''),
+                'redirect': request.cookies.get('NSREDIRECT', ''),
             }
             if content.get('remember_me', False):
                 refresh_token = User.encode_token(user.id, user.username, is_refresh=True)
