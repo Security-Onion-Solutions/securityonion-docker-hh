@@ -127,3 +127,4 @@ class User(db.Model):
                 'message': invalid_token_message,
                 'error_code': 401,
             }
+

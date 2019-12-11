@@ -23,6 +23,7 @@ class TestUsers(TestCase):
 
     def setUp(self) -> None:
         db.create_all()
+
         user = User('test_username', 'test_password')
         db.session.add(user)
         db.session.commit()

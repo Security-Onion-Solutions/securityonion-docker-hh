@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, current_app as app
 
 from models.user import User
 from routes.constants import *
-from routes.utils import save_model
+from routes.utils import save_model, requires_token
 
 blueprint = Blueprint('users', __name__, url_prefix='/users')
 
@@ -12,7 +12,6 @@ blueprint = Blueprint('users', __name__, url_prefix='/users')
 """
 @blueprint.route('/', methods=['GET'], strict_slashes=False)
 @requires_token(token_type='auth')
-@requires_localhost
 def list_users(*_):  # pragma: no cover
     try:
         user_list: list = User.query.all()
@@ -41,6 +40,45 @@ def list_users(*_):  # pragma: no cover
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 """
 
+
+@blueprint.route('/create_user', methods=['POST'])
+@requires_token(token_type='auth')
+def create_user(*_):
+    try:
+        content: dict = request.get_json()
+        username: str = content.get('username')
+        user: User = User.query.filter_by(username=username).first()
+        if not user:
+            password: str = content.get('password')
+
+            if not match(app.config.get('PASSWORD_REGEX'), password):
+                return jsonify({
+                    'status': 'fail',
+                    'message': 'Password must be at least 6 characters'
+                }), 400
+
+            try:
+                user: User = User(
+                    username=username,
+                    password=password
+                )
+                save_model(user)
+                return jsonify({
+                    'status': 'success',
+                    'message': f'Created new user {user.username}'
+                }), 200
+            except Exception as e:  # pragma: no cover
+                app.logger.error(e)
+                return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
+        else:
+            return jsonify({
+                'status': 'fail',
+                'message': 'User already exists, please log in'
+            }), 401
+
+    except Exception as e:  # pragma: no cover
+        app.logger.error(e)
+        return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 
 # NOT IMPLEMENTED
 """
@@ -176,3 +214,4 @@ def delete_user(user_id):  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 """
+
