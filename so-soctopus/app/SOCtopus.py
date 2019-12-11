@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert, processHiveReq, getHiveStatus
 from config import parser, filename
 import logging
 import json
+import sys
+sys.getfilesystemencoding = lambda: 'UTF-8'
 
 app = Flask(__name__)
 Bootstrap(app)
 app.config['SECRET_KEY'] = 'thisismysecret'
 
-logging.basicConfig(filename=filename, level=logging.DEBUG)
+#logging.basicConfig(filename=filename, level=logging.DEBUG)
 
 @app.route("/fir/event/<esid>")
 def sendFIR(esid):
@@ -32,7 +34,7 @@ def sendHive():
         result = request.form.to_dict()
         title = result['title']
         tlp = result['tlp']
-        description = result['description']
+        description = result['description'].strip('\"')
         tags = result['tags']
         artifact_string = result['artifact_string']
         sourceRef = result['sourceRef']
@@ -78,6 +80,16 @@ def sendESEventUpdate():
     tags = result['tags']
     #return render_template('postresult.html',result=result)
     return eventUpdateFields(esindex,esid,tags)
+
+@app.route("/enrich", methods=['POST'])
+def sendEnrich():
+    if request.method == 'POST':
+        webhook_content = request.get_json()
+        #print(webhook_content)
+        #sys.stdout.flush()
+        #return "OK"
+        return processHiveReq(webhook_content)
+        #return getHiveStatus(webhook_content)
 
 if __name__ == "__main__" :
     app.run(host='0.0.0.0', port=7000)
