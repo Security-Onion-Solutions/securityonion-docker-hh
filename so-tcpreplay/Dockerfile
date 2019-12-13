@@ -42,5 +42,5 @@ RUN for i in securityonion-samples-20121202-1.noarch.rpm securityonion-samples-b
 RUN rm *.deb && \
     rm *.rpm
 
-ENTRYPOINT ["/usr/bin/tcpreplay"]
+ENTRYPOINT ["/bin/bash"]
 
