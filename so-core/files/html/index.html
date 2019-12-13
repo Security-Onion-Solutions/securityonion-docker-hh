@@ -91,26 +91,30 @@ a {
 		<div class="content center">
 			<center><a href="https://securityonion.net"><img STYLE="border: none;" src="alpha_logo.jpg" alt="Security Onion" align="center" target="_blank"></img></a><br></center>
 
-			<p><center><h1>Hybrid Hunter Alpha v1.1.2 Release Notes</h1></center><br>
+			<p><center><h1>Hybrid Hunter Alpha v1.1.3 Release Notes</h1></center><br>
 				<h2>Changes:</h2>
 				<ul>
-		  <li>Alpha 2 is here!</li>
-		  <li>Suricata 4.1.5.</li>
-		  <li>Bro/Zeek 2.6.4.</li>
-		  <li>TheHive 3.4.0 (Includes ES 6.8.3 for TheHive only).</li>
-		  <li>Fixed Bro/Zeek packet loss calculation for Grafana.</li>
-		  <li>Updated to latest Sensoroni for websockets to enable job status updates without refreshing.</li>
-		  <li>NIDS and HIDS dashboard updates.</li>
-		  <li>Playbook and ATT&CK Navigator features are now included.</li>
-		  <li>Filebeat now logs to a file, instead of stdout.</li>
-		  <li>Elastalert has been updated to use Python 3 and allow for use of custom alerters.</li>
-		  <li>Elasticsearch Ingest is now used to consume Zeek logs and Suricata alerts (instead of the traditional Logstash pipeline). This reduces the memory footprint of Logstash dramatically!</li>
-		  <li>Several changes to the setup script have been made to improve stability of the setup process:</li>
-			  <ul>
-				  <li>Setup now modifies your hosts file so that the install works better in environments without DNS.</li>
-				  <li>You are now prompted for setting a password for the socore user.</li>
-				  <li>The install now forces a reboot at the end of the install. This fixes an issue with some of the Docker containers being in the wrong state from a manual reboot. Manual reboots are fine after the initial reboot.</li>
-			  </ul>
+		<li>Overhaul of the setup script to support both ISO and network based setups</li>
+		<li>ISO will now boot properly from a USB stick.</li>
+		<li>Python 3 is now default.</li>
+		<li>Fix Filebeat from restarting every check in due to x509 refresh issue.</li>
+		<li>Cortex installed and integrated with TheHive.</li>
+		<li>Switched to using vanilla Kolide Fleet and upgraded to latest version (2.4) .</li>
+		<li>&nbsp;Playbook changes
+		<ul>
+		<li>Now preloaded with Plays generated from Sysmon Sigma signatures in the <a href="(https://github.com/Neo23x0/sigma/tree/master/rules/windows/sysmon).">Sigma community repo</a></li>
+		<li>New update script that updates / pulls in new Sigma signatures from the community repo .</li>
+		<li>Bulk enable / disable plays from the webui .</li>
+		<li>Updated sigmac mapping template &amp; configuration (backend is now elastalert) .</li>
+		<li>Updated TheHive alerts formatting</li>
+		</ul>
+		</li>
+		<li>OS patch scheduling
+		<ul>
+		<li>During setup, choose between auto, manual, or scheduled OS patch interval</li>
+		<li>For scheduled, create a new or import an existing named schedule</li>
+		</ul>
+		</li>
 		  <li>Check out the <a href="https://github.com/Security-Onion-Solutions/securityonion-saltstack/wiki/Hybrid-Hunter-Quick-Start-Guide" target="_blank">Hybrid Hunter Quick Start Guide</a>.</li>
 		</ul>
 	  </p>
