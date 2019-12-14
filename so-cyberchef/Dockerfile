@@ -14,6 +14,7 @@ RUN yum update -y && yum -y install epel-release && \
   cd CyberChef
 WORKDIR /CyberChef
 RUN npm install
-ENTRYPOINT ["grunt"]
-CMD ["dev"]
-
+RUN grunt prod
+COPY ./entrypoint.sh .
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["/CyberChef/entrypoint.sh"]
