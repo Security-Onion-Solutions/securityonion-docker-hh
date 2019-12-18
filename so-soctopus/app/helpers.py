@@ -22,3 +22,14 @@ def getConn(conn_id):
     hits = connsearch['hits']['total']
     if hits > 0:
         return connsearch
+
+def doUpdate(esindex,esid,tags):
+    # Connect to Elastic and get information about the connection.
+    esserver = parser.get('es', 'es_url')
+    es = Elasticsearch(esserver)
+    localindex = esindex.split(":")[1]
+    #source_to_update = '{"doc"{ "tags":["blue"]}}'
+    update = es.update(index=localindex, doc_type="_doc", id=esid, body={"doc":{ "tags":tags}}, refresh=True)
+    #update = es.update(index=esindex, doc_type="_doc", id=esid, body={"doc":{ "tags":["green"]}})
+    return update
+

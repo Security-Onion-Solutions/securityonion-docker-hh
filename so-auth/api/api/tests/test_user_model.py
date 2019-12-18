@@ -200,3 +200,4 @@ class TestUser(TestCase):
 
         self.assertEqual(401, decode_result.get('error_code'))
         self.assertEqual('Invalid token, please log in again', decode_result.get('message'))
+

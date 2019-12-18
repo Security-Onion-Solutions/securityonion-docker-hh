@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import { HIDE_ALERT } from '../constants/mutation-types';
+
 export default {
   name: 'ApiResponseAlert',
   data() {
@@ -20,18 +22,18 @@ export default {
   },
   computed: {
     visible() {
-      return this.$store.state.show_alert;
+      return this.$store.state.alertModule.showAlert;
     },
     alert_message() {
-      return this.$store.state.api_response.message;
+      return this.$store.state.alertModule.message;
     },
     alert_type() {
-      return this.$store.state.api_response.alert_type;
+      return this.$store.state.alertModule.alertType;
     },
   },
   methods: {
     handleClose() {
-      this.$store.state.show_alert = false;
+      this.$store.commit(HIDE_ALERT);
     },
   },
 };
@@ -40,4 +42,3 @@ export default {
 <style scoped>
 
 </style>
-

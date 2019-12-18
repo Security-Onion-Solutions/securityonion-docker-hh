@@ -133,8 +133,10 @@
 import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
-
-const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+import {
+  changePassword, handleHtpError, handleHttpResponse, sleep,
+} from '../services/api-service';
+import { resetAlert } from '../services/helper-service';
 
 
 export default {
@@ -147,9 +149,7 @@ export default {
     };
   },
   beforeMount() {
-    if (this.$store.state.show_alert) {
-      this.$store.state.show_alert = false;
-    }
+    resetAlert();
   },
   methods: {
     fieldError(type) {
@@ -159,39 +159,25 @@ export default {
     },
     handleSubmit(e) {
       e.preventDefault();
+      this.validating = true;
       this.form.validateFields((err) => {
         if (!err) {
-          this.validating = true;
-          const data = {
-            username: this.form.getFieldValue('username'),
-            old_password: this.form.getFieldValue('password0'),
-            new_password: this.form.getFieldValue('password2'),
-          };
-
           setTimeout(() => {
-            this.$axios.put('/users/change_password', data)
+            changePassword(
+              this.form.getFieldValue('username'),
+              this.form.getFieldValue('password0'),
+              this.form.getFieldValue('password2'),
+            )
               .then(async (res) => {
-                this.$store.state.api_response = res.data;
-                this.$store.state.api_response.alert_type = 'success';
-                this.$store.state.show_alert = true;
+                handleHttpResponse(res);
 
-                await sleep(2000);
+                await sleep(1000);
 
-                this.$router.push('login');
+                await this.$router.push({ name: 'login' });
               })
               .catch((error) => {
-                if (error.response) {
-                  this.$store.state.api_response = error.response.data;
-                  if (error.response.status < 500) {
-                    this.$store.state.api_response.alert_type = 'error';
-                  } else {
-                    this.$store.state.api_response.alert_type = 'warning';
-                  }
-                } else if (error) {
-                  this.$store.state.api_response.alert_type = 'error';
-                  this.$store.state.api_response.message = 'No response from server';
-                }
-                this.$store.state.show_alert = true;
+                handleHtpError(error);
+                this.form.resetFields();
               });
           }, 2000);
 
@@ -230,4 +216,3 @@ export default {
     float: right;
   }
 </style>
-

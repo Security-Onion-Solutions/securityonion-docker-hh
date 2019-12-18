@@ -201,3 +201,4 @@ class TestAuth(TestCase):
         response = self.client.post('/auth/renew')
 
         self.assert200(response)
+

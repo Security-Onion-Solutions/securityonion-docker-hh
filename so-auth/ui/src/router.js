@@ -1,15 +1,17 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import store from './store';
+import { CHECK_FIRST_RUN } from './constants/action-types';
 
 Vue.use(Router);
 
-export default new Router({
+
+const router = new Router({
   mode: 'history',
   base: process.env.VUE_APP_UI_BASE_PATH,
   routes: [
     {
       path: '/',
-      redirect: '/login',
     },
     {
       path: '/login',
@@ -22,6 +24,11 @@ export default new Router({
       component: () => import('./views/Register.vue'),
     },
     {
+      path: '/create-user',
+      name: 'create-user',
+      component: () => import('./views/Register.vue'),
+    },
+    {
       path: '/change-password',
       name: 'change-password',
       component: () => import('./views/ChangePassword.vue'),
@@ -29,3 +36,17 @@ export default new Router({
   ],
 });
 
+router.beforeResolve((to, from, next) => {
+  if (to.path === '/register') {
+    if (store.state.globalModule.firstRun) next();
+    else next('login');
+  } else if (store.state.globalModule.firstRun) {
+    store.dispatch(CHECK_FIRST_RUN).then(() => {
+      if (store.state.globalModule.firstRun) next('register');
+      else next();
+    });
+  } else if (to.path === '/') next('login');
+  else next();
+});
+
+export default router;

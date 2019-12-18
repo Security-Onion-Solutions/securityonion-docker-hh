@@ -1,7 +1,7 @@
 bcrypt
 cffi
 Click
-Flask>=0.12
+Flask>=1.1.1
 Flask-Cors
 Flask-SQLAlchemy
 Flask-Testing

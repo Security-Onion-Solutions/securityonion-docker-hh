@@ -4,6 +4,7 @@ from flask import request, jsonify, make_response, current_app as app
 
 from models import db
 from models.user import User
+from models.admin import Admin
 from routes.constants import JSON_ERROR_RESPONSE, UNHANDLED_EXCEPTION_RESPONSE
 
 
@@ -31,7 +32,7 @@ def requires_token(token_type: str):
                     return jsonify({
                         'message': 'Could not read cookie from request',
                         'status': 'fail'
-                    }), 500
+                    }), 401
                 check_token_result = __check_token__(token, token_type)
                 if type(check_token_result) == tuple:
                     res = make_response(check_token_result)
@@ -49,12 +50,38 @@ def requires_token(token_type: str):
     return __requires_token__
 
 
+def requires_first_run(f):
+    """
+    Require this function to be run only on first run
+    :param f:
+    :return:
+    """
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        try:
+            admin_settings: Admin = Admin.query.filter_by(created=True).first()
+            if not admin_settings.first_run:
+                return jsonify({
+                    'status': 'fail',
+                    'message': 'This can only be done during initial setup'
+                }), 401
+            else:
+                return f(*args, **kwargs)
+        except Exception as e:  # pragma: no cover
+            app.logger.error(e)
+            return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
+
+    return decorated
+
+
 def requires_localhost(f):
     """
     Require the remote address to be the same as the requesting ip address
     :param f: decorated function
     :return: function
     """
+
     @wraps(f)
     def decorated(*args, **kwargs):
         try:
@@ -65,6 +92,7 @@ def requires_localhost(f):
                 return jsonify({
                     'status': 'fail',
                     'message': 'This endpoint requires an SSH tunnel in order to be called',
+                    'remote_address': rem_addr,
                 }), 401
         except Exception as e:  # pragma: no cover
             app.logger.error(e)

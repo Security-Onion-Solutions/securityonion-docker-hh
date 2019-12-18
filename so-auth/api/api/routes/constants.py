@@ -22,3 +22,4 @@ LOGIN_FAIL_RESPONSE: dict = {
 class TokenType(Enum):
     REFRESH = auto
     AUTH = auto
+
