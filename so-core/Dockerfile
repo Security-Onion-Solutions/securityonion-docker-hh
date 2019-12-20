@@ -26,7 +26,7 @@ RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 RUN mkdir -p /opt/socore/html
 
 COPY files/startso.sh /opt/socore/
-COPY files/html/* /opt/socore/html/
+COPY files/html/ /opt/socore/html/
 
 RUN chmod +x /opt/socore/startso.sh
 
