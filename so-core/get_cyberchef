@@ -1,0 +1,7 @@
+#!/bin/bash
+VERSION="9.11.14"
+mkdir -p files/html/cyberchef && \
+wget https://github.com/gchq/CyberChef/releases/download/v$VERSION/CyberChef_v$VERSION.zip && \
+unzip -o CyberChef_v$VERSION.zip -d files/html/cyberchef && \
+mv files/html/cyberchef/CyberChef_v$VERSION.html files/html/cyberchef/index.html && \
+rm -f CyberChef_v$VERSION.zip
