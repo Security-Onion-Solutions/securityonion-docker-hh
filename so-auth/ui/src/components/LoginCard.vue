@@ -108,7 +108,6 @@ export default {
   data() {
     return {
       form: this.$form.createForm(this),
-      validating: false,
     };
   },
   beforeMount() {
@@ -116,13 +115,11 @@ export default {
   },
   methods: {
     fieldError(type) {
-      if (this.validating) { return 'validating'; }
       const { getFieldError, isFieldTouched } = this.form;
       return isFieldTouched(type) && getFieldError(type) ? 'error' : '';
     },
     handleSubmit(e) {
       e.preventDefault();
-      this.validating = true;
       this.form.validateFields((err) => {
         if (!err) {
           setTimeout(() => {
@@ -145,7 +142,6 @@ export default {
                 this.form.resetFields();
               });
           }, 2000);
-          this.validating = false;
         }
       });
     },

@@ -124,7 +124,6 @@ export default {
   data() {
     return {
       form: this.$form.createForm(this),
-      validating: false,
     };
   },
   computed: {
@@ -137,21 +136,16 @@ export default {
   },
   methods: {
     fieldError(type) {
-      if (this.validating) { return 'validating'; }
       const { getFieldError, isFieldTouched } = this.form;
       return isFieldTouched(type) && getFieldError(type) ? 'error' : '';
     },
     handleSubmit(e) {
       e.preventDefault();
-      this.validating = true;
       this.form.validateFields((err) => {
         if (!err) {
           setTimeout(() => {
             if (this.$route.path === '/register') {
-              register(
-                this.form.getFieldValue('username'),
-                this.form.getFieldValue('password2'),
-              )
+              register(this.form.getFieldValue('username'), this.form.getFieldValue('password2'))
                 .then(async (res) => {
                   handleHttpResponse(res);
 
@@ -164,10 +158,7 @@ export default {
                   this.form.resetFields();
                 });
             } else {
-              createUser(
-                this.form.getFieldValue('username'),
-                this.form.getFieldValue('password2'),
-              )
+              createUser(this.form.getFieldValue('username'), this.form.getFieldValue('password2'))
                 .then(async (res) => handleHttpResponse(res))
                 .catch((error) => {
                   handleHtpError(error);
@@ -175,8 +166,6 @@ export default {
                 });
             }
           }, 2000);
-
-          this.validating = false;
         }
       });
     },

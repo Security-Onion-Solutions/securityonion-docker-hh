@@ -14,3 +14,4 @@ six
 SQLAlchemy
 Werkzeug
 pyOpenSSL
+Flask-Limiter

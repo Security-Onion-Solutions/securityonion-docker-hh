@@ -4,7 +4,7 @@ import jwt
 import bcrypt
 from flask import current_app as app
 
-from models import db
+from api.models import db
 
 
 class User(db.Model):

@@ -4,9 +4,9 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from models import db
-from models.admin import Admin
-from routes import users, auth, admin
+from api.models import db
+from api.models.admin import Admin
+from api.routes import users, auth, admin
 
 
 def create_app():

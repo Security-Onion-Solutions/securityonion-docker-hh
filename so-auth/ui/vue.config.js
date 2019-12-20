@@ -8,4 +8,7 @@ module.exports = {
     },
   },
   transpileDependencies: ['vuex-persist'],
+  configureWebpack: {
+    devtool: 'source-map',
+  },
 };

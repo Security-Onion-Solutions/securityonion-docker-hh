@@ -1,4 +1,4 @@
-from models import db
+from api.models import db
 
 
 class Admin(db.Model):

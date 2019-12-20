@@ -3,10 +3,10 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify, current_app as app, make_response, redirect
 
-from models.admin import Admin
-from models.user import User
-from routes.constants import UNHANDLED_EXCEPTION_RESPONSE, LOGIN_FAIL_RESPONSE
-from routes.utils import save_model, requires_token, requires_first_run
+from api.models.admin import Admin
+from api.models.user import User
+from api.routes.constants import UNHANDLED_EXCEPTION_RESPONSE, LOGIN_FAIL_RESPONSE
+from api.routes.utils import save_model, requires_token, requires_first_run
 
 blueprint = Blueprint('auth', __name__, url_prefix='/auth')
 

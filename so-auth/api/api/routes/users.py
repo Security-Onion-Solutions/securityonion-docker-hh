@@ -1,9 +1,9 @@
 from re import match
 from flask import Blueprint, request, jsonify, current_app as app
 
-from models.user import User
-from routes.constants import *
-from routes.utils import save_model, requires_token
+from api.models.user import User
+from api.routes.constants import *
+from api.routes.utils import save_model, requires_token
 
 blueprint = Blueprint('users', __name__, url_prefix='/users')
 
