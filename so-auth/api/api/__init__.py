@@ -13,9 +13,9 @@ def create_app():
     app = Flask(__name__)
 
     if app.env == 'development':
-        app.config.from_object('config.DevelopConfig')
+        app.config.from_object('api.config.DevelopConfig')
     else:
-        app.config.from_object('config.BaseConfig')
+        app.config.from_object('api.config.BaseConfig')
 
     # init ORM
     with app.app_context():
@@ -28,7 +28,8 @@ def create_app():
             db.session.add(admin_instance)
             db.session.commit()
 
-    Limiter(app, default_limits=app.config.get('REQUEST_LIMITS'), key_func=get_remote_address)
+    # Request limiter was causing issues with Kibana setup, disabling for now
+    # Limiter(app, default_limits=app.config.get('REQUEST_LIMITS'), key_func=get_remote_address)
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=app.config.get('NUM_PROXIES'))
 
