@@ -182,8 +182,16 @@ def createHiveAlert(esid):
               elif 'beat' in result['_source']['tags']:
                   agent_name = str(result['_source']['beat']['hostname'])
                   if 'beat_host' in result['_source']:
-                      os_name = str(result['_source']['beat_host']['os']['name'])
-                      artifacts.append(AlertArtifact(dataType='other', data=os_name))
+                      try:
+                          os_name = str(result['_source']['beat_host']['os']['name'])
+                          artifacts.append(AlertArtifact(dataType='other', data=os_name))
+                      except:
+                          pass
+                      try:
+                          beat_name = str(result['_source']['beat_host']['name'])
+                          artifacts.append(AlertArtifact(dataType='other', data=beat_name))
+                      except:
+                          pass
                   if 'source_hostname' in result['_source']:
                       source_hostname = str(result['_source']['source_hostname'])
                       artifacts.append(AlertArtifact(dataType='fqdn', data=source_hostname))
