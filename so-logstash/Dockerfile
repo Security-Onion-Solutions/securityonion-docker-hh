@@ -1,7 +1,7 @@
 # This Dockerfile was based on the official Logstash Docker image:
 # https://github.com/elastic/logstash-docker
 
-# Copyright 2014,2015,2016,2017,2018 Security Onion Solutions, LLC
+# Copyright 2014,2015,2016,2017,2019,2020 Security Onion Solutions, LLC
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,28 +16,16 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-FROM centos:7
+FROM docker.elastic.co/logstash/logstash-oss:X.Y.Z
 
 LABEL maintainer "Security Onion Solutions, LLC"
 
-# Install Java and the "which" command, which is needed by Logstash's shell
-# scripts.
-RUN yum update -y && \
-    yum install -y java-1.8.0-openjdk-devel which && \
-    yum clean all
+USER root
 
-# Provide a non-root user to run the process.
-RUN groupadd --gid 931 logstash && \
-    adduser --uid 931 --gid 931 \
-      --home-dir /usr/share/logstash --no-create-home \
-      logstash
+RUN groupmod -g 931 logstash && \
+    usermod -u 931 -g 931 logstash
 
-# Add Logstash itself.
-RUN curl -Lo - https://artifacts.elastic.co/downloads/logstash/logstash-oss-6.7.2.tar.gz | \
-    tar zxf - -C /usr/share \
-    && mv /usr/share/logstash-6.7.2 /usr/share/logstash \
-    && chown --recursive logstash:logstash /usr/share/logstash/ \
+RUN chown --recursive logstash:logstash /usr/share/logstash/ \
     && ln -s /usr/share/logstash /opt/logstash && mkdir /usr/share/logstash/pipeline.so \
     && mkdir /usr/share/logstash/pipeline.freq && mkdir /usr/share/logstash/pipeline.dstats \
     && mkdir /usr/share/logstash/pipeline.enabled && chown --recursive 931:931 /usr/share/logstash/pipeline.enabled
@@ -60,18 +48,14 @@ ENV LANG='en_US.UTF-8' LC_ALL='en_US.UTF-8'
 
 # Place the startup wrapper script.
 ADD bin/docker-entrypoint /usr/local/bin/
-RUN chmod 0755 /usr/local/bin/docker-entrypoint
+RUN chmod 0755 /usr/local/bin/docker-entrypoint && \
+  yum clean all
 
 USER logstash
 
-# RUN cd /usr/share/logstash && LOGSTASH_PACK_URL=https://artifacts.elastic.co/downloads/logstash-plugins logstash-plugin install x-pack
-RUN cd /usr/share/logstash && LOGSTASH_PACK_URL=https://artifacts.elastic.co/downloads/logstash-plugins logstash-plugin install logstash-filter-translate
-RUN cd /usr/share/logstash && LOGSTASH_PACK_URL=https://artifacts.elastic.co/downloads/logstash-plugins logstash-plugin install logstash-filter-tld
-RUN cd /usr/share/logstash && LOGSTASH_PACK_URL=https://artifacts.elastic.co/downloads/logstash-plugins logstash-plugin install logstash-filter-elasticsearch
-RUN cd /usr/share/logstash && LOGSTASH_PACK_URL=https://artifacts.elastic.co/downloads/logstash-plugins logstash-plugin install logstash-filter-rest
-
-# ADD env2yaml/env2yaml /usr/local/bin/
-
-EXPOSE 9600 5044
+RUN cd /usr/share/logstash && LOGSTASH_PACK_URL=https://artifacts.elastic.co/downloads/logstash-plugins logstash-plugin install logstash-filter-translate && \
+  logstash-plugin install logstash-filter-tld && \
+  logstash-plugin install logstash-filter-elasticsearch && \
+  logstash-plugin install logstash-filter-rest
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
