@@ -3,9 +3,12 @@ import Vuex from 'vuex';
 import VuexPersistence from 'vuex-persist';
 
 import {
-  STORE_API_RESPONSE,
+  HIDE_ALERT,
+  RESET_FIRST_RUN,
   SET_ALERT,
-  SET_FIRST_RUN, RESET_FIRST_RUN, SHOW_ALERT, HIDE_ALERT,
+  SET_FIRST_RUN,
+  SHOW_ALERT,
+  STORE_API_RESPONSE,
 } from './constants/mutation-types';
 import { CHECK_FIRST_RUN } from './constants/action-types';
 
@@ -59,7 +62,9 @@ const globalModule = {
   actions: {
     [CHECK_FIRST_RUN]({ commit }) {
       Vue.prototype.$axios.post('/admin/first_run').then((res) => {
-        commit(SET_FIRST_RUN, res.data.first_run);
+        // eslint-disable-next-line camelcase
+        const { first_run } = res.data;
+        commit(SET_FIRST_RUN, first_run);
       });
     },
   },

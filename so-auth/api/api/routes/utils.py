@@ -2,10 +2,10 @@ from datetime import datetime
 from functools import wraps
 from flask import request, jsonify, make_response, current_app as app
 
-from models import db
-from models.user import User
-from models.admin import Admin
-from routes.constants import JSON_ERROR_RESPONSE, UNHANDLED_EXCEPTION_RESPONSE
+from api.models import db
+from api.models.user import User
+from api.models.admin import Admin
+from api.routes.constants import JSON_ERROR_RESPONSE, UNHANDLED_EXCEPTION_RESPONSE
 
 
 def requires_token(token_type: str):

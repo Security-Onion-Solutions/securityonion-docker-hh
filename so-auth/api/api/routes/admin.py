@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app as app, jsonify
 
-from models.admin import Admin
-from routes.constants import UNHANDLED_EXCEPTION_RESPONSE
+from api.models.admin import Admin
+from api.routes.constants import UNHANDLED_EXCEPTION_RESPONSE
 
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 

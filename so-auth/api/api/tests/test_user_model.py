@@ -7,10 +7,9 @@ from flask_testing import TestCase
 from flask import current_app
 
 from api import create_app
-from models import db
-from tests import SQLALCHEMY_DATABASE_URI
-
-from models.user import User
+from api.models import db
+from api.tests import SQLALCHEMY_DATABASE_URI
+from api.models.user import User
 
 
 class TestUser(TestCase):
