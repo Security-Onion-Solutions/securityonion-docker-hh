@@ -11,6 +11,7 @@ from time import gmtime, strftime
 
 import requests
 
+
 import ruamel.yaml
 from config import parser
 
@@ -155,7 +156,7 @@ def play_create(issue_id):
                          headers=playbook_headers, verify=False)
 
     return 'success', 200
-    #return json.dumps(payload2)
+    
 
 
 def play_update(issue_id):
