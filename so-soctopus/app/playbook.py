@@ -250,6 +250,7 @@ def sigmac_generate(sigma):
     print(sigma, file=dump)
     dump.close()
 
-    esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
+    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
 
-    return esquery.stdout.strip()
+    es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
+    return es_query
