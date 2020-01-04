@@ -546,6 +546,15 @@ def playbookWebhook(webhook_content):
                     playbook.navigator_update()
     return "success"
 
+def playbookSigmac(sigma):
+    """
+    Process incoming Sigma.
+    
+    """
+    esquery = playbook.sigmac_generate(sigma)
+
+    return esquery
+
 def createStrelkaScan(esid):
   search = getHits(esid)
   for result in search['hits']['hits']:
