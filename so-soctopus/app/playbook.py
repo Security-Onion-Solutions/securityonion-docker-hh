@@ -244,3 +244,12 @@ def play_metadata(issue_id):
         'case_analyzers': play.get('case_analyzers')        
     }
 
+def sigmac_generate(sigma):
+    # Call sigmac tool to generate Elasticsearch config
+    dump = open('es-dump.txt', 'w')
+    print(sigma, file=dump)
+    dump.close()
+
+    esquery = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
+
+    return esquery.stdout.strip()
