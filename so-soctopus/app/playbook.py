@@ -211,10 +211,8 @@ def play_metadata(issue_id):
 
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
 
-    if product == 'osquery':
-        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/securityonion-osquery.yml"], stdout=subprocess.PIPE, encoding='ascii')
-    else:
-        esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, encoding='ascii')
+   
+    esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')
     
     ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
     ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
@@ -250,7 +248,7 @@ def sigmac_generate(sigma):
     print(sigma, file=dump)
     dump.close()
 
-    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-winlogbeat.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
+    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
 
     es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
     return es_query
