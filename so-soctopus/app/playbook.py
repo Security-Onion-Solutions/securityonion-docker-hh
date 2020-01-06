@@ -120,7 +120,12 @@ def play_create(issue_id):
     
     play_id = uuid.uuid4().hex
 
-    payload2 = {"issue": {"subject": play['title'],"project_id": 1,"status":"Draft", "tracker": "Play", "custom_fields": [\
+    # If ElastAlert config = "", set the play status to Disabled (id=7) else set it to Draft (id=1)
+    # Also add a note to the play to make it clear as to why the status is Disabled
+    play_status = "7" if play['raw_elastalert'] == "" else "1"
+    play_notes = "Play status set to Disabled - Sigmac error when generating ElastAlert config." if play['raw_elastalert'] == "" else "Play imported successfully."
+
+    payload2 = {"issue": {"subject": play['title'],"project_id": 1,"status_id":play_status, "tracker": "Play", "custom_fields": [\
     {"id": 6, "name": "Title", "value": play['title']},\
     {"id": 24, "name": "Playbook", "value": play['playbook']},\
     {"id": 15, "name": "ES Query", "value": play['esquery'] },\
@@ -136,8 +141,7 @@ def play_create(issue_id):
     {"id": 21, "name": "Sigma", "value": play['sigma']}\
     ]}}
 
-  
-    # POST/PUT payload to Redmine to create play
+      # POST/PUT payload to Redmine to create play
     url = f"{playbook_url}/issues.json"
     r = requests.post(url, data=json.dumps(payload2),
                       headers=playbook_headers, verify=False)
@@ -145,16 +149,20 @@ def play_create(issue_id):
     if r.status_code == 201:
         payload = '{"issue":{"project_id":1,"tracker":"Play","custom_fields":[{"id":29,"name":"Import Status","value":"Successful - PlayID: ' + play_id[0:9] + '"}]} }'
         url = f"{playbook_url}/issues/{issue_id}.json"
-        r = requests.put(url, data=payload,
+        status_update = requests.put(url, data=payload,
                          headers=playbook_headers, verify=False)
-        print(r)
+        # Update the Play notes
+        payload = {"issue":{"notes":play_notes}}
+        new_issue_id = r.json()
+        url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}.json"
+        r = requests.put(url, data=json.dumps(payload), headers=playbook_headers, verify=False)
     else:
         payload = '{"issue":{"project_id":1,"tracker":"Play","custom_fields":[{"id":29,"name":"Import Status","value":"Not Successful-' + str(
             r.status_code) + '"}]} }'
         url = f"{playbook_url}/issues/{issue_id}.json"
-        r = requests.put(url, data=payload,
+        status_update = requests.put(url, data=payload,
                          headers=playbook_headers, verify=False)
-
+  
     return 'success', 200
     
 
@@ -235,6 +243,7 @@ def play_metadata(issue_id):
         'falsepositives': '_False Positives_\n' + '\n'.join(sigma.get('falsepositives')) if sigma.get('falsepositives') else '_False Positives_\n Unknown',
         'logfields': '\n\n_Interesting Log Fields_\n' + '\n'.join(sigma.get('fields')) if sigma.get('fields') else '',
         'esquery': f'{{{{collapse(View ElastAlert Config)\n<pre><code class="yaml">\n\n{ea_config}\n</code></pre>\n}}}}',
+        'raw_elastalert': ea_config,
         'tasks': sigma.get('tasks'),
         'product': product,
         'sigid': sigma.get('id') if sigma.get('id') else 'none',
