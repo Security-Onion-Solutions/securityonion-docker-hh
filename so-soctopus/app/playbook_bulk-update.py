@@ -103,7 +103,7 @@ for folder in ruleset_categories:
     ruleset_path = f"./sigma/rules/windows/{folder}"
     for filename in Path(ruleset_path).glob('**/*.yml'):
         print (f"\n\n{filename}")
-        with open(filename) as fpi2:
+        with open(filename, encoding="utf-8") as fpi2:
             raw = fpi2.read()
         try:
             repojson = yaml.load(raw)
