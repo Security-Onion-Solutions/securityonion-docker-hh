@@ -15,3 +15,5 @@ SQLAlchemy
 Werkzeug
 pyOpenSSL
 Flask-Limiter
+pylint
+pytest

@@ -3,9 +3,9 @@ import os
 from flask import current_app
 from flask_testing import TestCase
 
-from api import create_app
+from api import create_app, Admin
 from api.models.user import User
-from api.models import db
+from api.models import DB
 from api.tests import SQLALCHEMY_DATABASE_URI
 
 
@@ -22,25 +22,35 @@ class TestUsers(TestCase):
         return app
 
     def setUp(self) -> None:
-        db.create_all()
+        DB.create_all()
+
+        # check if admin entry already exists and if not, add it
+        if not Admin.query.filter_by(created=True).first():
+            admin_instance = Admin()
+            DB.session.add(admin_instance)
+            DB.session.commit()
 
         user = User('test_username', 'test_password')
-        db.session.add(user)
-        db.session.commit()
-        assert user in db.session
+        DB.session.add(user)
+        DB.session.commit()
+        assert user in DB.session
 
         self.valid_jwt_auth = User.encode_token(user.id, user.username)
-        self.valid_jwt_refresh = User.encode_token(user.id, user.username, is_refresh=True)
+        self.valid_jwt_refresh = User.encode_token(
+            user.id, user.username, is_refresh=True)
         self.secret_key = current_app.config.get("SECRET_KEY")
 
     def tearDown(self) -> None:
-        db.session.remove()
-        db.drop_all()
-        os.remove('db.testing.sqlite')
+        DB.session.remove()
+        DB.drop_all()
+        if os.path.exists('db.testing.sqlite'):
+            os.remove('db.testing.sqlite')
 
     @classmethod
     def tearDownClass(cls):
         try:
+            if os.path.exists('db.testing.sqlite'):
+                os.remove('db.testing.sqlite')
             os.remove('secret')
         except FileNotFoundError:  # pragma: no cover
             pass

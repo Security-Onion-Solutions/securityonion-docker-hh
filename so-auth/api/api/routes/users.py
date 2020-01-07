@@ -2,15 +2,15 @@ from re import match
 from flask import Blueprint, request, jsonify, current_app as app
 
 from api.models.user import User
-from api.routes.constants import *
+from api.routes.constants import UNHANDLED_EXCEPTION_RESPONSE, JSON_ERROR_RESPONSE, LOGIN_FAIL_RESPONSE
 from api.routes.utils import save_model, requires_token
 
-blueprint = Blueprint('users', __name__, url_prefix='/users')
+BLUEPRINT = Blueprint('users', __name__, url_prefix='/users')
 
 
 # NOT IMPLEMENTED
 """
-@blueprint.route('/', methods=['GET'], strict_slashes=False)
+@BLUEPRINT.route('/', methods=['GET'], strict_slashes=False)
 @requires_token(token_type='auth')
 def list_users(*_):  # pragma: no cover
     try:
@@ -41,7 +41,7 @@ def list_users(*_):  # pragma: no cover
 """
 
 
-@blueprint.route('/create_user', methods=['POST'])
+@BLUEPRINT.route('/create_user', methods=['POST'])
 @requires_token(token_type='auth')
 def create_user(*_):
     try:
@@ -70,19 +70,20 @@ def create_user(*_):
             except Exception as e:  # pragma: no cover
                 app.logger.error(e)
                 return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
-        else:
-            return jsonify({
-                'status': 'fail',
-                'message': 'User already exists, please log in'
-            }), 401
+
+        return jsonify({
+            'status': 'fail',
+            'message': 'User already exists, please log in'
+        }), 401
 
     except Exception as e:  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 
+
 # NOT IMPLEMENTED
 """
-@blueprint.route('/single', methods=['GET'])
+@BLUEPRINT.route('/single', methods=['GET'])
 @requires_token(token_type='auth')
 def get_single_user(*_):  # pragma: no cover
     try:
@@ -112,12 +113,13 @@ def get_single_user(*_):  # pragma: no cover
 """
 
 
-@blueprint.route('/change_password', methods=['PUT'])
+@BLUEPRINT.route('/change_password', methods=['PUT'])
 def change_password():
     try:
         content: dict = request.get_json(silent=True)
 
-        user: User = User.query.filter_by(username=content.get('username')).first()
+        user: User = User.query.filter_by(
+            username=content.get('username')).first()
         old_password = content.get('old_password')
         if old_password is None:
             return jsonify(JSON_ERROR_RESPONSE), 400
@@ -126,24 +128,24 @@ def change_password():
             user.failed_login_attempts += 1
             save_model(user)
             return jsonify(LOGIN_FAIL_RESPONSE), 401
-        else:
-            new_password = content.get('new_password')
-            if new_password is None:
-                return jsonify(JSON_ERROR_RESPONSE), 400
-            if not match(app.config.get('PASSWORD_REGEX'), new_password):
-                return jsonify({
-                    'status': 'fail',
-                    'message': 'Password must be at least 6 characters'
-                }), 400
-            user.change_password(new_password)
-            save_model(user)
 
-            message: str = f'Password changed for user {user.username}'
-            app.logger.info(message)
+        new_password = content.get('new_password')
+        if new_password is None:
+            return jsonify(JSON_ERROR_RESPONSE), 400
+        if not match(app.config.get('PASSWORD_REGEX'), new_password):
             return jsonify({
-                'status': 'success',
-                'message': message
-            }), 200
+                'status': 'fail',
+                'message': 'Password must be at least 6 characters'
+            }), 400
+        user.change_password(new_password)
+        save_model(user)
+
+        message: str = f'Password changed for user {user.username}'
+        app.logger.info(message)
+        return jsonify({
+            'status': 'success',
+            'message': message
+        }), 200
     except Exception as e:  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
@@ -151,7 +153,7 @@ def change_password():
 
 # NOT IMPLEMENTED
 """"
-@blueprint.route('/change_username', methods=['PUT'])
+@BLUEPRINT.route('/change_username', methods=['PUT'])
 @requires_token(token_type='auth')
 def update_username(user_id):  # pragma: no cover
     try:
@@ -188,7 +190,7 @@ def update_username(user_id):  # pragma: no cover
 
 # NOT IMPLEMENTED
 """
-@blueprint.route('/delete', methods=['DELETE'])
+@BLUEPRINT.route('/delete', methods=['DELETE'])
 @requires_token(token_type='auth')
 def delete_user(user_id):  # pragma: no cover
     try:
@@ -200,8 +202,8 @@ def delete_user(user_id):  # pragma: no cover
                 'message': 'User does not exist'
             }), 400
 
-        db.session.delete(user)
-        db.session.commit()
+        DB.session.delete(user)
+        DB.session.commit()
 
         message: str = f'User {user.username} deleted'
         app.logger.info(message)
@@ -214,4 +216,3 @@ def delete_user(user_id):  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 """
-

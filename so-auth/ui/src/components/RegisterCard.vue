@@ -1,5 +1,13 @@
 <template>
   <a-card>
+    <div
+      style="display: flex; justify-content: center; margin-bottom: 2rem"
+    >
+      <img
+        src="../assets/security_onion_logo.svg"
+        width="80%"
+        alt="Security Onion logo">
+    </div>
     <a-form
       layout="vertical"
       :form="form"
@@ -112,11 +120,12 @@ import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
 import {
-  createUser, handleHtpError, handleHttpResponse, register, sleep,
+  createUser, handleHtpError, register,
 } from '../services/api-service';
 import { resetAlert } from '../services/helper-service';
 import { CHECK_FIRST_RUN } from '../constants/action-types';
 
+require('../assets/security_onion_logo.svg');
 
 export default {
   name: 'RegisterCard',
@@ -146,11 +155,7 @@ export default {
           setTimeout(() => {
             if (this.$route.path === '/register') {
               register(this.form.getFieldValue('username'), this.form.getFieldValue('password2'))
-                .then(async (res) => {
-                  handleHttpResponse(res);
-
-                  await sleep(1000);
-
+                .then(async () => {
                   this.$store.dispatch(CHECK_FIRST_RUN).then(() => this.$router.push({ name: 'login' }));
                 })
                 .catch((error) => {
@@ -159,7 +164,7 @@ export default {
                 });
             } else {
               createUser(this.form.getFieldValue('username'), this.form.getFieldValue('password2'))
-                .then(async (res) => handleHttpResponse(res))
+                .then(() => {})
                 .catch((error) => {
                   handleHtpError(error);
                   this.form.resetFields();

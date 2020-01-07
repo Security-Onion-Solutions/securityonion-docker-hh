@@ -1,13 +1,13 @@
 import os
+from datetime import datetime, timedelta
 
 import jwt
-from datetime import datetime, timedelta
 
 from flask_testing import TestCase
 from flask import current_app
 
-from api import create_app
-from api.models import db
+from api import create_app, Admin
+from api.models import DB
 from api.tests import SQLALCHEMY_DATABASE_URI
 from api.models.user import User
 
@@ -24,20 +24,30 @@ class TestUser(TestCase):
     def setUp(self) -> None:
         user = User('test_username', 'test_password')
 
-        db.create_all()
-        db.session.add(user)
-        db.session.commit()
+        DB.create_all()
+
+        # check if admin entry already exists and if not, add it
+        if not Admin.query.filter_by(created=True).first():
+            admin_instance = Admin()
+            DB.session.add(admin_instance)
+            DB.session.commit()
+
+        DB.session.add(user)
+        DB.session.commit()
 
         self.secret_key = current_app.config.get("SECRET_KEY")
 
     def tearDown(self) -> None:
-        db.session.remove()
-        db.drop_all()
-        os.remove('db.testing.sqlite')
+        DB.session.remove()
+        DB.drop_all()
+        if os.path.exists('db.testing.sqlite'):
+            os.remove('db.testing.sqlite')
 
     @classmethod
     def tearDownClass(cls):
         try:
+            if os.path.exists('db.testing.sqlite'):
+                os.remove('db.testing.sqlite')
             os.remove('secret')
         except FileNotFoundError:  # pragma: no cover
             pass
@@ -86,7 +96,8 @@ class TestUser(TestCase):
         decode_result = User.decode_token(token)
 
         self.assertEqual(401, decode_result.get('error_code'))
-        self.assertEqual('Invalid token, please log in again', decode_result.get('message'))
+        self.assertEqual('Invalid token, please log in again',
+                         decode_result.get('message'))
 
     def test_decode_auth_token_expired(self):
         now = datetime.utcnow()
@@ -109,7 +120,8 @@ class TestUser(TestCase):
         decode_result = User.decode_token(token)
 
         self.assertEqual(307, decode_result.get('error_code'))
-        self.assertEqual('Signature expired, please refresh token', decode_result.get('message'))
+        self.assertEqual('Signature expired, please refresh token',
+                         decode_result.get('message'))
 
     def test_decode_auth_token_inavlid_context(self):
         now = datetime.utcnow()
@@ -132,7 +144,8 @@ class TestUser(TestCase):
         decode_result = User.decode_token(token)
 
         self.assertEqual(401, decode_result.get('error_code'))
-        self.assertEqual('Invalid token, please log in again', decode_result.get('message'))
+        self.assertEqual('Invalid token, please log in again',
+                         decode_result.get('message'))
 
     def test_decode_auth_token_invalid(self):
         token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Njk0MzE1MzAsImlhdCI6MTU2OTQyNzkzMCwidXNlcl9pZCI6M' \
@@ -141,7 +154,8 @@ class TestUser(TestCase):
         decode_result = User.decode_token(token)
 
         self.assertEqual(401, decode_result.get('error_code'))
-        self.assertEqual('Invalid token, please log in again', decode_result.get('message'))
+        self.assertEqual('Invalid token, please log in again',
+                         decode_result.get('message'))
 
     def test_encode_refresh_token(self):
         user = User.query.filter_by(username='test_username').first()
@@ -175,7 +189,8 @@ class TestUser(TestCase):
         decode_result = User.decode_token(token, is_refresh=True)
 
         self.assertEqual(401, decode_result.get('error_code'))
-        self.assertEqual('Signature expired, please log in again', decode_result.get('message'))
+        self.assertEqual('Signature expired, please log in again',
+                         decode_result.get('message'))
 
     def test_decode_refresh_token_inavlid_context(self):
         now = datetime.utcnow()
@@ -198,5 +213,5 @@ class TestUser(TestCase):
         decode_result = User.decode_token(token, is_refresh=True)
 
         self.assertEqual(401, decode_result.get('error_code'))
-        self.assertEqual('Invalid token, please log in again', decode_result.get('message'))
-
+        self.assertEqual('Invalid token, please log in again',
+                         decode_result.get('message'))

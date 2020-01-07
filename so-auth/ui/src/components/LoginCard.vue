@@ -1,5 +1,13 @@
 <template>
   <a-card>
+    <div
+      style="display: flex; justify-content: center; margin-bottom: 2rem"
+    >
+      <img
+        src="../assets/security_onion_logo.svg"
+        width="80%"
+        alt="Security Onion logo">
+    </div>
     <a-form
       layout="vertical"
       :form="form"
@@ -77,16 +85,6 @@
             </a-button>
           </a-form-item>
         </a-col>
-        <!--
-        <a-col :span="12">
-          <div class="login-link">
-            Or
-            <router-link to="/register">
-              register now
-            </router-link>
-          </div>
-        </a-col>
-        -->
       </a-row>
     </a-form>
   </a-card>
@@ -97,10 +95,11 @@ import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
 import {
-  handleHtpError, handleHttpResponse, loginUser, sleep,
+  handleHtpError, handleHttpResponse, loginUser,
 } from '../services/api-service';
 import { resetAlert } from '../services/helper-service';
 
+require('../assets/security_onion_logo.svg');
 
 export default {
   name: 'LoginCard',
@@ -128,13 +127,11 @@ export default {
               this.form.getFieldValue('password'),
               this.form.getFieldValue('remember'),
             )
-              .then(async (res) => {
-                handleHttpResponse(res);
-
-                await sleep(1000);
-
+              .then((res) => {
                 if (res.data.redirect !== '') {
                   window.location = res.data.redirect;
+                } else {
+                  handleHttpResponse(res);
                 }
               })
               .catch((error) => {

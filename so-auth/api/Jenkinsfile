@@ -1,0 +1,68 @@
+pipeline {
+  agent none
+  environment {
+		IMAGE_NAME = "docker.io/soshybridhunter/so-auth-api"
+		IMAGE_VERSION = "HH1.1.4"
+  }
+  stages {
+		stage("Test") { 
+			environment { HOME ="${env.WORKSPACE}" }
+			agent {
+				docker {
+					image "python"
+				}
+			}
+			steps {
+				echo "Running Python unit tests ..."
+				checkout scm
+				dir('api') {
+					sh """
+					pip install --user -r requirements.txt
+					export PATH="$PATH:$HOME/.local/bin"
+					py.test --verbose --junit-xml test-reports/results-python.xml api/tests
+					""" 
+				}
+			}
+			post {
+				always {
+					echo "Python unit tests: ${currentBuild.currentResult}"
+					junit "api/test-reports/*.xml" 
+				}
+			}
+		}
+		stage("Build") {
+			agent any
+			environment { 
+				DOCKER_CONTENT_TRUST = 1
+				DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE = credentials("Docker_Signing_Key") 
+				}
+			steps {
+				echo "Building ${IMAGE_NAME} Docker image ..."
+				dir("api") {
+					script {
+						docker.build("${IMAGE_NAME}:${IMAGE_VERSION}")
+					}
+				}
+			}
+			post {
+				always {
+					echo "API Docker image build: ${currentBuild.currentResult}"
+				}
+			}
+		}
+		stage("Sign & Publish") {
+			agent any
+			environment { DOCKER_CONTENT_TRUST = 1 }
+			when { branch "master" }
+			steps {
+				echo "Publishing ${IMAGE_NAME} Docker image ..."
+				sh "docker trust sign ${IMAGE_NAME}:${IMAGE_VERSION}"
+			}
+			post {
+				always {
+					echo "API Docker image push: ${currentBuild.currentResult}"
+				}
+			}
+		}
+  }
+}

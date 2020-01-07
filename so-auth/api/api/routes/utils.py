@@ -2,7 +2,7 @@ from datetime import datetime
 from functools import wraps
 from flask import request, jsonify, make_response, current_app as app
 
-from api.models import db
+from api.models import DB
 from api.models.user import User
 from api.models.admin import Admin
 from api.routes.constants import JSON_ERROR_RESPONSE, UNHANDLED_EXCEPTION_RESPONSE
@@ -33,14 +33,16 @@ def requires_token(token_type: str):
                         'message': 'Could not read cookie from request',
                         'status': 'fail'
                     }), 401
+
                 check_token_result = __check_token__(token, token_type)
-                if type(check_token_result) == tuple:
+
+                if isinstance(check_token_result, tuple):
                     res = make_response(check_token_result)
                     res.headers['Location'] = f'{app.config["BASE_PATH"]}/auth/renew'
                     return res
-                else:
-                    args = args + (check_token_result.get('id'),)
-                    return f(*args, **kwargs)
+
+                args = args + (check_token_result.get('id'),)
+                return f(*args, **kwargs)
             except Exception as e:  # pragma: no cover
                 app.logger.error(e)
                 return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
@@ -66,8 +68,8 @@ def requires_first_run(f):
                     'status': 'fail',
                     'message': 'This can only be done during initial setup'
                 }), 401
-            else:
-                return f(*args, **kwargs)
+
+            return f(*args, **kwargs)
         except Exception as e:  # pragma: no cover
             app.logger.error(e)
             return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
@@ -88,12 +90,12 @@ def requires_localhost(f):
             rem_addr = request.remote_addr
             if rem_addr == '127.0.0.1':
                 return f(*args, **kwargs)
-            else:
-                return jsonify({
-                    'status': 'fail',
-                    'message': 'This endpoint requires an SSH tunnel in order to be called',
-                    'remote_address': rem_addr,
-                }), 401
+
+            return jsonify({
+                'status': 'fail',
+                'message': 'This endpoint requires an SSH tunnel in order to be called',
+                'remote_address': rem_addr,
+            }), 401
         except Exception as e:  # pragma: no cover
             app.logger.error(e)
             return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
@@ -111,7 +113,9 @@ def __check_token__(token: str, token_type: str):
         token_decode = User.decode_token(token, is_refresh=True)
     else:
         token_decode = User.decode_token(token)
+
     valid_jwt_token = token_decode.get('id', False)
+
     if not valid_jwt_token:
         app.logger.error(f'Received invalid token')
 
@@ -119,23 +123,26 @@ def __check_token__(token: str, token_type: str):
             'status': 'fail',
             'message': token_decode.get('message')
         }), int(token_decode.get('error_code'))
-    else:
-        user = User.query.filter_by(id=token_decode['id']).first()
-        if not user:
-            app.logger.error(f'Token for non-existent user received')
-            return jsonify(JSON_ERROR_RESPONSE), 403
-        username = user.username
-        if not user.logged_in:
-            app.logger.error(f'User {username} tried to use a token without being logged in')
-            return jsonify({
-                'status': 'fail',
-                'message': 'User not logged in, please log in'
-            }), 401
-        else:
-            user.last_contact = datetime.now()
-            return token_decode
+
+    user = User.query.filter_by(id=token_decode['id']).first()
+    if not user:
+        app.logger.error(f'Token for non-existent user received')
+        return jsonify(JSON_ERROR_RESPONSE), 403
+
+    username = user.username
+
+    if not user.logged_in:
+        app.logger.error(
+            f'User {username} tried to use a token without being logged in')
+        return jsonify({
+            'status': 'fail',
+            'message': 'User not logged in, please log in'
+        }), 401
+
+    user.last_contact = datetime.now()
+    return token_decode
 
 
 def save_model(db_model):
-    db.session.add(db_model)
-    db.session.commit()
+    DB.session.add(db_model)
+    DB.session.commit()

@@ -1,12 +1,11 @@
 <template>
   <div>
     <a-alert
-      v-if="visible"
-      :message="alert_message"
+      :message="alert_type_pretty"
+      :description="alert_message"
       :type="alert_type"
       closable
       showIcon
-      banner
       :afterClose="handleClose"
     />
   </div>
@@ -21,14 +20,15 @@ export default {
     return { };
   },
   computed: {
-    visible() {
-      return this.$store.state.alertModule.showAlert;
-    },
     alert_message() {
       return this.$store.state.alertModule.message;
     },
     alert_type() {
       return this.$store.state.alertModule.alertType;
+    },
+    alert_type_pretty() {
+      const string = this.alert_type;
+      return string.charAt(0).toUpperCase() + string.slice(1);
     },
   },
   methods: {
