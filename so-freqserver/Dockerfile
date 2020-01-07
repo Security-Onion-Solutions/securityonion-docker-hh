@@ -2,6 +2,8 @@ FROM centos:7
 
 # Originally developed by Justin Henderson justin@hasecuritysolutions.com
 LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="Freqserver HH1.1.4"
+LABEL description="Freqserver running in Docker container for use with Security Onion"
 
 # Create a common centos update layer
 RUN yum update -y && \
