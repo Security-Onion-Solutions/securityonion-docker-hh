@@ -24,6 +24,4 @@ EXPOSE 20000
 
 STOPSIGNAL SIGTERM
 
-#CMD ping google.com
-
 CMD /usr/bin/python3 /opt/domain_stats/domain_stats.py -ip 0.0.0.0 20000 -a /opt/domain_stats/top-1m.csv --preload 0
