@@ -2,6 +2,8 @@ FROM centos:7
 
 # Originally developed by Justin Henderson justin@hasecuritysolutions.com
 LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="Domainstats HH1.1.4"
+LABEL description="Domainstats running in Docker container for use with Security Onion"
 
 # Create a common centos update layer
 RUN yum update -y && \
