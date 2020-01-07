@@ -2,27 +2,34 @@ FROM centos:7
 
 # Originally developed by Justin Henderson justin@hasecuritysolutions.com
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="freqserver HH1.1.0"
-LABEL description="freqserver running in Docker container for use with Security Onion"
 
-RUN yum update -y && yum -y install epel-release
-RUN yum -y install https://centos7.iuscommunity.org/ius-release-el7.rpm
-RUN yum -y makecache && yum -y install python36u python36u-pip git && pip3.6 install --upgrade pip && yum clean all
-RUN pip install python-whois six
+# Create a common centos update layer
+RUN yum update -y && \
+    yum clean all
 
-RUN cd /opt && git clone https://github.com/MarkBaggett/freq.git
+# Create a common python/git layer
+RUN yum update -y && \
+    yum install -y python3 git && pip3 install six &&  \
+    yum clean all
 
-RUN mkdir /var/log/freq_server
-RUN ln -sf /dev/stderr /var/log/freq_server/freq_server.log
+# Create user
 RUN groupadd --gid 935 freqserver && \
     adduser --uid 935 --gid 935 \
       --home-dir /usr/share/freqserver --no-create-home \
       freqserver
-RUN chown -R freqserver: /opt/freq
+
+# Install and set perms in same layer to save space
+RUN mkdir -p /opt/freq_server && \
+	cd /opt/freq_server && \
+	git clone https://github.com/MarkBaggett/freq.git && \
+	chown -R freqserver: /opt/freq_server && \
+	mkdir /var/log/freq_server && \
+	ln -sf /dev/stderr /var/log/freq_server/freq_server.log
+
 USER freqserver
 
 EXPOSE 10004
 
 STOPSIGNAL SIGTERM
 
-CMD /usr/bin/python3 /opt/freq/freq_server.py -ip 0.0.0.0 10004 /opt/freq/freqtable2018.freq
+CMD /usr/bin/python3 /opt/freq_server/freq/freq_server.py -s 0 -ip 0.0.0.0 10004 /opt/freq_server/freq/freqtable2018.freq
