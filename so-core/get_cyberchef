@@ -1,7 +1,8 @@
 #!/bin/bash
 VERSION="9.11.14"
-mkdir -p files/html/cyberchef && \
-wget https://github.com/gchq/CyberChef/releases/download/v$VERSION/CyberChef_v$VERSION.zip && \
-unzip -o CyberChef_v$VERSION.zip -d files/html/cyberchef && \
-mv files/html/cyberchef/CyberChef_v$VERSION.html files/html/cyberchef/index.html && \
-rm -f CyberChef_v$VERSION.zip
+COREPATH="so-core"
+mkdir -p $COREPATH/files/html/cyberchef && \
+wget -O $COREPATH/CyberChef_v$VERSION.zip https://github.com/gchq/CyberChef/releases/download/v$VERSION/CyberChef_v$VERSION.zip  && \
+unzip -o $COREPATH/CyberChef_v$VERSION.zip -d $COREPATH/files/html/cyberchef && \
+mv $COREPATH/files/html/cyberchef/CyberChef_v$VERSION.html $COREPATH/files/html/cyberchef/index.html && \
+rm -f $COREPATH/CyberChef_v$VERSION.zip
