@@ -1,5 +1,13 @@
 <template>
   <a-card>
+    <div
+      style="display: flex; justify-content: center; margin-bottom: 2rem"
+    >
+      <img
+        src="../assets/security_onion_logo.svg"
+        width="80%"
+       alt="Security Onion logo">
+    </div>
     <a-form
       layout="vertical"
       :form="form"
@@ -134,10 +142,11 @@ import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
 import {
-  changePassword, handleHtpError, handleHttpResponse, sleep,
+  changePassword, handleHtpError,
 } from '../services/api-service';
 import { resetAlert } from '../services/helper-service';
 
+require('../assets/security_onion_logo.svg');
 
 export default {
   name: 'ChangePasswordCard',
@@ -165,13 +174,7 @@ export default {
               this.form.getFieldValue('password0'),
               this.form.getFieldValue('password2'),
             )
-              .then(async (res) => {
-                handleHttpResponse(res);
-
-                await sleep(1000);
-
-                await this.$router.push({ name: 'login' });
-              })
+              .then(() => this.$router.push({ name: 'login' }))
               .catch((error) => {
                 handleHtpError(error);
                 this.form.resetFields();

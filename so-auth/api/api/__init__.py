@@ -1,10 +1,10 @@
+import os
+
 from flask import Flask
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from api.models import db
+from api.models import DB
 from api.models.admin import Admin
 from api.routes import users, auth, admin
 
@@ -19,23 +19,27 @@ def create_app():
 
     # init ORM
     with app.app_context():
-        db.init_app(app)
-        db.create_all()
+        DB.init_app(app)
+        DB.create_all()
+
+        db_uri = str(app.config.get('SQLALCHEMY_DATABASE_UR'))
+        if db_uri.startswith('sqlite:////'):
+            os.chmod(db_uri.replace('sqlite:////', ''), 0o600)
 
         # check if admin entry already exists and if not, add it
         if not Admin.query.filter_by(created=True).first():
             admin_instance = Admin()
-            db.session.add(admin_instance)
-            db.session.commit()
+            DB.session.add(admin_instance)
+            DB.session.commit()
 
     # Request limiter was causing issues with Kibana setup, disabling for now
     # Limiter(app, default_limits=app.config.get('REQUEST_LIMITS'), key_func=get_remote_address)
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=app.config.get('NUM_PROXIES'))
 
-    app.register_blueprint(auth.blueprint)
-    app.register_blueprint(users.blueprint)
-    app.register_blueprint(admin.blueprint)
+    app.register_blueprint(auth.BLUEPRINT)
+    app.register_blueprint(users.BLUEPRINT)
+    app.register_blueprint(admin.BLUEPRINT)
 
     CORS(app)
 
@@ -43,9 +47,7 @@ def create_app():
 
 
 if __name__ == '__main__':
-    so_auth = create_app()
-    so_auth.run()
+    SO_AUTH = create_app()
+    SO_AUTH.run()
 else:
-    gunicorn_app = create_app()
-
-
+    GUNICORN_APP = create_app()

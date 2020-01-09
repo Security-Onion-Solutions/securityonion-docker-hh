@@ -3,10 +3,10 @@ from flask import Blueprint, current_app as app, jsonify
 from api.models.admin import Admin
 from api.routes.constants import UNHANDLED_EXCEPTION_RESPONSE
 
-blueprint = Blueprint('admin', __name__, url_prefix='/admin')
+BLUEPRINT = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-@blueprint.route('/first_run', methods=['POST'])
+@BLUEPRINT.route('/first_run', methods=['POST'])
 def check_first_run():
     try:
         admin_settings: Admin = Admin.query.filter_by(created=True).first()

@@ -8,10 +8,10 @@ from api.models.user import User
 from api.routes.constants import UNHANDLED_EXCEPTION_RESPONSE, LOGIN_FAIL_RESPONSE
 from api.routes.utils import save_model, requires_token, requires_first_run
 
-blueprint = Blueprint('auth', __name__, url_prefix='/auth')
+BLUEPRINT = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@blueprint.route('/', methods=['POST', 'GET', 'PUT'], strict_slashes=False)
+@BLUEPRINT.route('/', methods=['POST', 'GET', 'PUT'], strict_slashes=False)
 @requires_token(token_type='auth')
 def check_auth(user_id):
     user: User = User.query.filter_by(id=user_id).first()
@@ -23,7 +23,7 @@ def check_auth(user_id):
     }), 200
 
 
-@blueprint.route('/register', methods=['POST'])
+@BLUEPRINT.route('/register', methods=['POST'])
 @requires_first_run
 def register_user():
     try:
@@ -46,8 +46,10 @@ def register_user():
                 )
                 save_model(user)
 
-                # Since we successfully created the user, set the first run flag to False
-                admin_settings: Admin = Admin.query.filter_by(created=True).first()
+                # Since we successfully created the user, set the first run
+                # flag to False
+                admin_settings: Admin = Admin.query.filter_by(
+                    created=True).first()
                 admin_settings.first_run = False
                 save_model(admin_settings)
 
@@ -69,11 +71,12 @@ def register_user():
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 
 
-@blueprint.route('/login', methods=['POST'])
+@BLUEPRINT.route('/login', methods=['POST'])
 def login():
     content: dict = request.get_json()
     try:
-        user: User = User.query.filter_by(username=content.get('username')).first()
+        user: User = User.query.filter_by(
+            username=content.get('username')).first()
         if user is None:
             return jsonify(LOGIN_FAIL_RESPONSE), 401
         if not user.check_password(content.get('password')):
@@ -81,40 +84,41 @@ def login():
             user.failed_login_attempts += 1
             save_model(user)
             return jsonify(LOGIN_FAIL_RESPONSE), 401
-        else:
-            auth_token = User.encode_token(user.id, user.username)
-            message: str = f'User {user.username} logged in at {user.last_login}'
-            res_json = {
-                'status': 'success',
-                'message': message,
-                'auth_token': auth_token.decode(),
-                'redirect': request.cookies.get('NSREDIRECT', ''),
-            }
-            if content.get('remember_me', False):
-                refresh_token = User.encode_token(user.id, user.username, is_refresh=True)
-                user.current_refresh_token = refresh_token
-                user.remember_me = True
-                res_json['refresh_token'] = refresh_token.decode()
-            user.logged_in = True
-            user.last_login = datetime.now()
-            user.failed_login_attempts = 0
-            save_model(user)
-            app.logger.info(message)
 
-            res = make_response(jsonify(res_json), 200)
-            res.set_cookie('Auth-Token', res_json['auth_token'])
+        auth_token = User.encode_token(user.id, user.username)
+        message: str = f'User {user.username} logged in at {user.last_login}'
+        res_json = {
+            'status': 'success',
+            'message': message,
+            'auth_token': auth_token.decode(),
+            'redirect': request.cookies.get('NSREDIRECT', ''),
+        }
+        if content.get('remember_me', False):
+            refresh_token = User.encode_token(
+                user.id, user.username, is_refresh=True)
+            user.current_refresh_token = refresh_token
+            user.remember_me = True
+            res_json['refresh_token'] = refresh_token.decode()
+        user.logged_in = True
+        user.last_login = datetime.now()
+        user.failed_login_attempts = 0
+        save_model(user)
+        app.logger.info(message)
 
-            if content.get('remember_me', False):
-                res.set_cookie('Refresh-Token', res_json['refresh_token'])
+        res = make_response(jsonify(res_json), 200)
+        res.set_cookie('Auth-Token', res_json['auth_token'])
 
-            return res
+        if content.get('remember_me', False):
+            res.set_cookie('Refresh-Token', res_json['refresh_token'])
+
+        return res
 
     except Exception as e:  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 
 
-@blueprint.route('/logout', methods=['POST'])
+@BLUEPRINT.route('/logout', methods=['POST'])
 @requires_token(token_type='auth')
 def logout(user_id):
     try:
@@ -134,7 +138,7 @@ def logout(user_id):
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
 
 
-@blueprint.route('/renew', methods=['POST'])
+@BLUEPRINT.route('/renew', methods=['POST'])
 @requires_token(token_type='refresh')
 def renew_auth_token(user_id):
     try:
@@ -158,4 +162,3 @@ def renew_auth_token(user_id):
     except Exception as e:  # pragma: no cover
         app.logger.error(e)
         return jsonify(UNHANDLED_EXCEPTION_RESPONSE), 500
-

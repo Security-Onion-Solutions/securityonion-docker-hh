@@ -1,10 +1,15 @@
 <template>
   <div class="content-container">
-    <div class="center-horizontal">
-      <api-response-alert/>
-    </div>
     <div class="center">
-      <slot></slot>
+      <div class="center-horizontal">
+        <div
+          v-if="visible"
+          class="alert-placement"
+        >
+          <api-response-alert/>
+        </div>
+        <slot ref="messageContainer"></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -15,6 +20,11 @@ import ApiResponseAlert from './ApiResponseAlert.vue';
 export default {
   name: 'ContentContainer',
   components: { ApiResponseAlert },
+  computed: {
+    visible() {
+      return this.$store.state.alertModule.showAlert;
+    },
+  },
 };
 </script>
 
@@ -30,9 +40,14 @@ export default {
     align-items: center;
     justify-content: center;
   }
-  .center-horizontal {
+  .alert-placement {
     position: absolute;
-    z-index: 10;
-    width: 100%;
+    transform: translate(0, -6rem);
+    margin-bottom: 4rem;
+    /*width: 100%;*/
+  }
+  .center-horizontal {
+    display: flex;
+    justify-content: center;
   }
 </style>

@@ -1,9 +1,9 @@
-from api.models import db
+from api.models import DB
 
 
-class Admin(db.Model):
-    created: bool = db.Column(db.Boolean, primary_key=True)
-    first_run: bool = db.Column(db.Boolean)
+class Admin(DB.Model):
+    created: bool = DB.Column(DB.Boolean, primary_key=True)
+    first_run: bool = DB.Column(DB.Boolean)
 
     def __init__(self):
         self.created = True
