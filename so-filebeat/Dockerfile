@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-FROM docker.elastic.co/beats/filebeat:X.Y.Z
+FROM docker.elastic.co/beats/FLAVOR:X.Y.Z
 USER root
 # Add entrypoint wrapper script
 ADD files/docker-entrypoint /usr/local/bin

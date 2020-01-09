@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-FROM docker.elastic.co/elasticsearch/elasticsearch-oss:X.Y.Z
+FROM docker.elastic.co/elasticsearch/FLAVOR:X.Y.Z
 
 LABEL maintainer "Security Onion Solutions, LLC"
 
