@@ -7,6 +7,7 @@ TAG="HH1.1.4"
 FLAVOR="-oss"
 OPTIONS="--no-cache"
 SKIP=0
+PUSH="no"
 
 #########################################
 # Options
@@ -36,13 +37,14 @@ Ex. ./0_build_images.sh -i elasticsearch -t HH1.1.4 -d mynewrepo -y
   -t         Image Tag
   -f         Use Features
   -o         Specify additional options
+  -p         Push and sign
   -y         Skip prompt 
 
 EOF
 }
 
 
-while getopts "hfyd:i:t:" OPTION
+while getopts "hfypd:i:t:" OPTION
 do
     case $OPTION in
             
@@ -62,6 +64,9 @@ do
             ;;
         o)
             OPTIONS=$OPTARG
+            ;;
+        p)
+            PUSH="yes"
             ;;
         t)
             TAG=$OPTARG
@@ -83,6 +88,11 @@ if [ "$SKIP" = 0 ]; then
     echo
 fi
 
+if [ "$PUSH" = "yes" ]; then
+    echo "Tell me your secret:"
+    read -s $KEY
+fi 
+
 # Elastic
 for i in elasticsearch logstash kibana filebeat ; do
    if [ "$BUILD" = $i ] || [ "$BUILD" = "elastic" ] || [ "$BUILD" = "all" ]; then
@@ -91,36 +101,44 @@ for i in elasticsearch logstash kibana filebeat ; do
        sed -i "s|X.Y.Z|$VERSION|g" so-$i/Dockerfile
        docker build $OPTIONS -t $DOCKERHUB/so-$i:$TAGRPRE$TAG so-$i
        mv so-$i/Dockerfile.bak so-$i/Dockerfile
+       if [ "PUSH" = "yes" ];then
+           echo "$KEY" | docker trust sign $DOCKERHUB/so-wazuh:$TAGPRE$TAG
+           docker push $DOCKERHUB/so-wazuh:$TAGPRE$TAG
+       fi
    fi
 done
 
 # TheHive
-for i in cortex thehive thehive-es; do
+for i in thehive thehive-cortex thehive-es; do
     if [ "$BUILD" = $i ] || [ "$BUILD" = "allthehive" ] || [ "$BUILD" = "all" ]; then
         if [ $i = "thehive-es" ]; then
             cp so-$i/Dockerfile so-$i/Dockerfile.bak
-            sed -i "s|FLAVOR|$i${FLAVOR}|g" so-$i/Dockerfile
+            sed -i "s|FLAVOR|elasticsearch${FLAVOR}|g" so-$i/Dockerfile
             sed -i "s|X.Y.Z|$VERSION|g" so-$i/Dockerfile
             docker build $OPTIONS -t $DOCKERHUB/so-$i:$TAGPRE$TAG so-$i
             mv so-$i/Dockerfile.bak so-$i/Dockerfile
         else
             docker build $OPTIONS -t $DOCKERHUB/so-$i:$TAG so-$i/
         fi
+        if [ "PUSH" = "yes" ];then
+           echo "$KEY" | docker trust sign $DOCKERHUB/so-wazuh:$TAGPRE$TAG
+           docker push $DOCKERHUB/so-wazuh:$TAGPRE$TAG
+       fi
     fi
+    
 done
 
 # Single builds
-for i in core curator elastalert domainstats fleet fleet-launcher freqserver grafana idstools influxdb mysql tcpreplay navigator playbook redis steno soctopus telegraf wazuh; do
+for i in core curator elastalert domainstats fleet fleet-launcher freqserver grafana idstools influxdb mysql tcpreplay navigator playbook redis steno soctopus suricata telegraf wazuh zeek; do
     if [ "$BUILD" = $i ] || [ "$BUILD" = "all" ]; then
         if [ $i = "core" ]; then
             ./so-core/get_cyberchef && docker build $OPTIONS -t $DOCKERHUB/so-core:$TAG so-core/
         else  
             docker build $OPTIONS -t $DOCKERHUB/so-$i:$TAG so-$i/
         fi
+        if [ "PUSH" = "yes" ]; then
+           echo "$KEY" | docker trust sign $DOCKERHUB/so-wazuh:$TAGPRE$TAG
+           docker push $DOCKERHUB/so-wazuh:$TAGPRE$TAG
+       fi
     fi
 done
-
-# Need to add Suricata and Bro
-[ "$BUILD" = "suricata" ] || [ "$BUILD" = "all" ] && :
-[ "$BUILD" = "bro" ] || [ "$BUILD" = "all" ] && :
-[ "$BUILD" = "core" ] || [ "$BUILD" = "all" ] && ./so-core/get_cyberchef && docker build $OPTIONS -t $DOCKERHUB/so-core:$TAG so-core/
