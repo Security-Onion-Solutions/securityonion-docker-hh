@@ -8,8 +8,13 @@ import shutil
 import subprocess
 import uuid
 from time import gmtime, strftime
+import sys
+import tempfile
 
 import requests
+
+from ruamel.yaml import YAML
+from ruamel.yaml.compat import StringIO
 
 
 import ruamel.yaml
@@ -261,3 +266,115 @@ def sigmac_generate(sigma):
 
     es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
     return es_query
+
+def sigma_metadata(sigma):
+
+    play = dict()
+
+    #sigma_raw = sigma_json
+    #print(sigma_raw, file=sys.stderr)
+
+    #sigma_yaml = yaml.dump(sigma_json)
+   # print(type(sigma_json), file=sys.stderr)
+    #print(yaml.dump(sigma_json), file=sys.stderr)
+    
+    # Call sigmac tool to generate ElastAlert config
+    temp_file = tempfile.NamedTemporaryFile(mode='w+t')
+    print(sigma, file=temp_file)
+    temp_file.seek(0)
+
+    product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
+
+    esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", temp_file.name, "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')  
+    
+    ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
+    ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
+
+    # Prep ATT&CK Tags
+    tags = re.findall(r"t\d{4}", ''.join(
+        sigma.get('tags'))) if sigma.get('tags') else ''
+    play['tags'] = [element.upper() for element in tags]
+
+    return {
+        'playid': play.get('playid'),
+        'references': '\n'.join(sigma.get('references')) if sigma.get('references') else 'none',
+        'title': sigma.get('title') if sigma.get('title') else 'none',
+        'description': sigma.get('description') if sigma.get('description') else 'none',
+        'level': sigma.get('level') if sigma.get('level') else 'none',
+        'tags': play['tags'],
+        'sigma': f'{{{{collapse(View Sigma)\n<pre><code class="yaml">\n\n{yaml2.dump(sigma)}\n</code></pre>\n}}}}',
+        'author': sigma.get('author') if sigma.get('author') else 'none',
+        'falsepositives': '_False Positives_\n' + '\n'.join(sigma.get('falsepositives')) if sigma.get('falsepositives') else '_False Positives_\n Unknown',
+        'logfields': '\n\n_Interesting Log Fields_\n' + '\n'.join(sigma.get('fields')) if sigma.get('fields') else '',
+        'esquery': f'{{{{collapse(View ElastAlert Config)\n<pre><code class="yaml">\n\n{ea_config}\n</code></pre>\n}}}}',
+        'raw_elastalert': ea_config,
+        'tasks': sigma.get('tasks'),
+        'product': product,
+        'sigid': sigma.get('id') if sigma.get('id') else 'none'      
+    }
+
+
+def play_create2(sigma_dict, playbook="imported"):
+    # Extract out all the relevant metadata from the Sigma YAML
+    play = sigma_metadata(sigma_dict)
+    
+    # Generate a unique ID for the Play
+    play_id = uuid.uuid4().hex
+
+    # If ElastAlert config = "", set the play status to Disabled (id=7) else set it to Draft (id=1)
+    # Also add a note to the play to make it clear as to why the status is Disabled
+    play_status = "7" if play['raw_elastalert'] == "" else "1"
+    play_notes = "Play status set to Disabled - Sigmac error when generating ElastAlert config." if play['raw_elastalert'] == "" else "Play imported successfully."
+
+    # Create the payload
+    payload = {"issue": {"subject": play['title'],"project_id": 1,"status_id":play_status, "tracker": "Play", "custom_fields": [\
+    {"id": 6, "name": "Title", "value": play['title']},\
+    {"id": 24, "name": "Playbook", "value": playbook},\
+    {"id": 15, "name": "ES Query", "value": play['esquery'] },\
+    {"id": 23, "name": "Level", "value": play['level']},\
+    {"id": 25, "name": "Product", "value": play['product']},\
+    {"id": 2, "name": "Description", "value": play['description']},\
+    {"id": 17, "name": "Author", "value":play['author']},\
+    {"id": 16, "name": "References", "value": play['references']},\
+    {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"},\
+    {"id": 28, "name": "PlayID", "value": play_id[0:9]},\
+    {"id": 27, "name": "Tags", "value": play['tags']},\
+    {"id": 30, "name": "Signature ID", "value": play['sigid']},\
+    {"id": 21, "name": "Sigma", "value": play['sigma']}\
+    ]}}
+
+    # POST the payload to Redmine to create the Play (ie Redmine issue)
+    url = f"{playbook_url}/issues.json"
+    r = requests.post(url, data=json.dumps(payload), headers=playbook_headers, verify=False)
+
+    # If Play creation was successful, update the Play notes & return the Play URL
+    # If Play creation was not succesful, return the status code
+    if r.status_code == 201:
+        # Update the Play notes
+        notes_payload = {"issue":{"notes":play_notes}}
+        new_issue_id = r.json()
+        url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}.json"
+        r = requests.put(url, data=json.dumps(notes_payload), headers=playbook_headers, verify=False)
+        # Notate success & Play URL
+        play_creation = 201
+        play_url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}"
+    else:
+        play_creation = r.status_code
+        play_url = "failed"
+  
+    return {
+        'play_creation': play_creation,
+        'play_url': play_url
+    }
+
+class MyYAML(YAML):
+    def dump(self, data, stream=None, **kw):
+        inefficient = False
+        if stream is None:
+            inefficient = True
+            stream = StringIO()
+        YAML.dump(self, data, stream, **kw)
+        if inefficient:
+            return stream.getvalue()
+
+yaml2 = MyYAML() 

@@ -555,6 +555,16 @@ def playbookSigmac(sigma):
 
     return esquery
 
+def playbookCreatePlay(sigma):
+    """
+    Process incoming Sigma Yaml.
+    
+    """
+    play_data = playbook.play_create2(sigma)
+    
+    return jsonify(play_data)
+
+
 def createStrelkaScan(esid):
   search = getHits(esid)
   for result in search['hits']['hits']:
