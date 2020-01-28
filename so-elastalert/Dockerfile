@@ -92,6 +92,8 @@ WORKDIR ${ELASTALERT_HOME}
 # Copy over Elastalert mappings
 COPY ./files/elastalert.json ./files/past_elastalert.json elastalert/es_mappings/6/
 
+COPY ./files/create_index.py elastalert/
+
 # Install Elastalert.
 RUN python3.6 setup.py install; \
 
