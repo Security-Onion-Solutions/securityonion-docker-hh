@@ -13,7 +13,7 @@ RUN yum -y install jemalloc numactl libnl3 libdnet gdb GeoIP python-ipaddress &&
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the Zeek package
-RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/securityonion-zeek-3.0.1.2/securityonion-zeek-3.0.1.2.rpm
+RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/securityonion-zeek-3.0.1.3/securityonion-zeek-3.0.1.3.rpm
 
 VOLUME ["/nsm/zeek/logs", "/nsm/zeek/spool", "/opt/zeek/share/bro", "/opt/zeek/etc/"]
 
