@@ -90,16 +90,23 @@ def elastalert_update(issue_id):
         os.remove(play_file)
 
     try:
-        if play['product'] == 'osquery':
-            shutil.copy('/etc/playbook-rules/osquery.template', play_file)
+
+        if play['level'] == 'low' or play['level'] == 'medium':
+            #Call function to POST alert to ES Index (ie don't generate thehive alert)
+            print ("Post alert to ES Index")
         else:
-            shutil.copy('/etc/playbook-rules/generic.template', play_file)
-        for line in fileinput.input(play_file, inplace=True):
-            line = re.sub(r'-\s''', f"- {play['playbook']}", line.rstrip())
-            line = re.sub(r'tags:.*$', f"tags: ['playbook','{play['playid']}','{play['playbook']}']", line.rstrip())
-            line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
-            line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play['playid']}'\n{ea_config_raw}", line.rstrip())
-            print(line)
+            if play['product'] == 'osquery':
+                shutil.copy('/etc/playbook-rules/osquery.template', play_file)
+            elif play['category'] == 'process_creation' and play['product'] == 'windows':
+                shutil.copy('/etc/playbook-rules/sysmon.template', play_file)
+            else:
+                shutil.copy('/etc/playbook-rules/generic.template', play_file)
+            for line in fileinput.input(play_file, inplace=True):
+                line = re.sub(r'-\s''', f"- {play['playbook']}", line.rstrip())
+                line = re.sub(r'tags:.*$', f"tags: ['playbook','{play['playid']}','{play['playbook']}']", line.rstrip())
+                line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
+                line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play['playid']}'\n{ea_config_raw}", line.rstrip())
+                print(line)
 
     except FileNotFoundError:
         print("ElastAlert Template File not found")
@@ -218,8 +225,8 @@ def play_metadata(issue_id):
     dump.close()
 
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
+    category = sigma['logsource']['category'] if 'category' in sigma['logsource'] else 'none'
 
-   
     esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')
     
     ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
@@ -246,6 +253,7 @@ def play_metadata(issue_id):
         'raw_elastalert': ea_config,
         'tasks': sigma.get('tasks'),
         'product': product,
+        'category': category,
         'sigid': sigma.get('id') if sigma.get('id') else 'none',
         'playbook': play.get('playbook'),
         'case_analyzers': play.get('case_analyzers')        
