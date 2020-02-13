@@ -47,11 +47,9 @@ def navigator_update():
 def thehive_casetemplate_update(issue_id):
     # Get play metadata - specifically the raw Sigma
     play_meta = play_metadata(issue_id)
-    print(play_meta, file=sys.stderr)
 
     # Generate Sigma metadata
     sigma_meta = sigma_metadata(play_meta['sigma_dict'])
-    print(sigma_meta, file=sys.stderr)
     
     #Check to see if there are any tasks - if so, get them formatted
     tasks = []
@@ -95,11 +93,9 @@ def thehive_casetemplate_update(issue_id):
 def elastalert_update(issue_id):
     # Get play metadata - specifically the raw Sigma
     play_meta = play_metadata(issue_id)
-    print(play_meta, file=sys.stderr)
 
     # Generate Sigma metadata
     sigma_meta = sigma_metadata(play_meta['sigma_dict'])
-    print(sigma_meta, file=sys.stderr)
 
     play_file = f"/etc/playbook-rules/{play_meta['playid']}.yaml"
     ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_meta['esquery'])
@@ -135,11 +131,9 @@ def elastalert_disable(issue_id):
 def play_update(issue_id):
     # Get play metadata - specifically the raw Sigma
     play_meta = play_metadata(issue_id)
-    print(play_meta, file=sys.stderr)
-
+ 
     # Generate Sigma metadata
     sigma_meta = sigma_metadata(play_meta['sigma_dict'])
-    print(sigma_meta, file=sys.stderr)
 
     payload = {"issue": {"subject": sigma_meta['title'],"project_id": 1, "tracker": "Play", "custom_fields": [\
     {"id": 6, "name": "Title", "value": sigma_meta['title']},\
@@ -154,7 +148,6 @@ def play_update(issue_id):
 
     url = f"{playbook_url}/issues/{issue_id}.json"
     r = requests.put(url, data=json.dumps(payload), headers=playbook_headers, verify=False)
-    print(r)
 
     return 'success', 200
 
@@ -177,6 +170,8 @@ def play_metadata(issue_id):
             play['playbook'] = item['value']
         elif item['name'] == "Case Analyzers":
             play['case_analyzers'] = item['value']
+        elif item['name'] == "Signature ID":
+            play['sigma_id'] = item['value']
 
     # Cleanup the Sigma data to get it ready for parsing
     sigma_raw = re.sub(
@@ -184,11 +179,13 @@ def play_metadata(issue_id):
     sigma_dict = yaml.load(sigma_raw)
  
     return {
+        'issue_id': issue_id,        
         'playid': play.get('playid'),
         'hiveid': play.get('hiveid'),
         'sigma_dict': sigma_dict,
         'sigma_raw': sigma_raw,
         'sigma_formatted': f'{{{{collapse(View Sigma)\n<pre><code class="yaml">\n\n{sigma_raw}\n</code></pre>\n}}}}',
+        'sigma_id': play.get('sigma_id'),
         'playbook': play.get('playbook'),
         'case_analyzers': play.get('case_analyzers')        
     }
@@ -205,15 +202,7 @@ def sigmac_generate(sigma):
     return es_query
 
 def sigma_metadata(sigma):
-
     play = dict()
-
-    #sigma_raw = sigma_json
-    #print(sigma_raw, file=sys.stderr)
-
-    #sigma_yaml = yaml.dump(sigma_json)
-   # print(type(sigma_json), file=sys.stderr)
-    #print(yaml.dump(sigma_json), file=sys.stderr)
     
     # Call sigmac tool to generate ElastAlert config
     temp_file = tempfile.NamedTemporaryFile(mode='w+t')
@@ -251,7 +240,9 @@ def sigma_metadata(sigma):
     }
 
 
-def play_create(sigma_dict, playbook="imported"):
+def play_create(sigma_dict, playbook="imported", ruleset=""):
+    # Expects Sigma in dict format
+
     # Extract out all the relevant metadata from the Sigma YAML
     play = sigma_metadata(sigma_dict)
     
@@ -277,7 +268,8 @@ def play_create(sigma_dict, playbook="imported"):
     {"id": 28, "name": "PlayID", "value": play_id[0:9]},\
     {"id": 27, "name": "Tags", "value": play['tags']},\
     {"id": 30, "name": "Signature ID", "value": play['sigid']},\
-    {"id": 21, "name": "Sigma", "value": play['sigma']}\
+    {"id": 21, "name": "Sigma", "value": play['sigma']},\
+    {"id": 32, "name": "Category", "value": ruleset}\
     ]}}
 
     # POST the payload to Redmine to create the Play (ie Redmine issue)
