@@ -23,7 +23,10 @@ LABEL maintainer "Security Onion Solutions, LLC"
 USER root
 
 RUN groupmod -g 931 logstash && \
-    usermod -u 931 -g 931 logstash
+    usermod -u 931 -g 931 logstash && \
+    groupadd -g 945 ossec && \
+    usermod -a -G ossec logstash
+
 
 RUN chown --recursive logstash:logstash /usr/share/logstash/ \
     && ln -s /usr/share/logstash /opt/logstash && mkdir /usr/share/logstash/pipeline.so \
