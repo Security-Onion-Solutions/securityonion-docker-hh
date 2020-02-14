@@ -100,22 +100,30 @@ def elastalert_update(issue_id):
     play_file = f"/etc/playbook-rules/{play_meta['playid']}.yaml"
     ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_meta['esquery'])
     if os.path.exists(play_file):
-        os.remove(play_file)
+        os.remove(play_file)  
 
-    try:
-        if sigma_meta['product'] == 'osquery':
-            shutil.copy('/etc/playbook-rules/osquery.template', play_file)
-        else:
-            shutil.copy('/etc/playbook-rules/generic.template', play_file)
+    if sigma_meta['level'] == "medium" or sigma_meta['level'] == "low":
+        shutil.copy('/etc/playbook-rules/es-generic.template', play_file)
         for line in fileinput.input(play_file, inplace=True):
-            line = re.sub(r'-\s''', f"- {play_meta['playbook']}", line.rstrip())
-            line = re.sub(r'tags:.*$', f"tags: ['playbook','{play_meta['playid']}','{play_meta['playbook']}']", line.rstrip())
             line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
-            line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play_meta['playid']}'\n{ea_config_raw}", line.rstrip())
+            line = re.sub(r'play_title:.\"\"', f"play_title: \"{sigma_meta['title']}\"", line.rstrip())
+            line = re.sub(r'sigma_level:.\"\"', f"sigma_level: \"{sigma_meta['level']}\"\n{ea_config_raw}", line.rstrip())
             print(line)
+    else:
+        try:
+            if sigma_meta['product'] == 'osquery':
+                shutil.copy('/etc/playbook-rules/osquery.template', play_file)
+            else:
+                shutil.copy('/etc/playbook-rules/generic.template', play_file)
+            for line in fileinput.input(play_file, inplace=True):
+                line = re.sub(r'-\s''', f"- {play_meta['playbook']}", line.rstrip())
+                line = re.sub(r'tags:.*$', f"tags: ['playbook','{play_meta['playid']}','{play_meta['playbook']}']", line.rstrip())
+                line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
+                line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play_meta['playid']}'\n{ea_config_raw}", line.rstrip())
+                print(line)
 
-    except FileNotFoundError:
-        print("ElastAlert Template File not found")
+        except FileNotFoundError:
+            print("ElastAlert Template File not found")
 
     return 200, "success"
 
