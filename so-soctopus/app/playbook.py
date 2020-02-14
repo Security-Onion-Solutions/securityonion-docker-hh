@@ -8,8 +8,13 @@ import shutil
 import subprocess
 import uuid
 from time import gmtime, strftime
+import sys
+import tempfile
 
 import requests
+
+from ruamel.yaml import YAML
+from ruamel.yaml.compat import StringIO
 
 
 import ruamel.yaml
@@ -40,31 +45,34 @@ def navigator_update():
     nav_layer.close()
                    
 def thehive_casetemplate_update(issue_id):
+    # Get play metadata - specifically the raw Sigma
+    play_meta = play_metadata(issue_id)
 
-    play = play_metadata(issue_id)
+    # Generate Sigma metadata
+    sigma_meta = sigma_metadata(play_meta['sigma_dict'])
     
     #Check to see if there are any tasks - if so, get them formatted
     tasks = []
-    if play.get('tasks'):
+    if sigma_meta.get('tasks'):
         task_order = 0
-        for task_title, task_desc in play.get('tasks').items():
+        for task_title, task_desc in play_meta.get('tasks').items():
             task_order += 1
             tasks.append ({"order":task_order,"title":task_title,"description":task_desc})
     else: tasks = []
 
-    for analyzer in play['case_analyzers']:
+    for analyzer in play_meta['case_analyzers']:
        minimal_name = re.sub(r' - \S*$', '', analyzer)
        tasks.insert(0,{"order":0,"title":f"Analyzer - {minimal_name}","description":minimal_name})
 
     #Build the case template
-    case_template = {"name":play['playid'],"severity":2,"tlp":3,"metrics":{},"customFields":{\
-        "playObjective":{"string":play['description']},\
+    case_template = {"name":play_meta['playid'],"severity":2,"tlp":3,"metrics":{},"customFields":{\
+        "playObjective":{"string":sigma_meta['description']},\
         "playbookLink":{"string": f"{playbook_url}/issues/{issue_id}" }},\
-        "description":play['description'],\
+        "description":sigma_meta['description'],\
         "tasks":tasks}
 
     # Is there a Case Template already created?
-    if play['hiveid']:
+    if play_meta['hiveid']:
         # Case Template exists - let's update it
         url = f"{parser.get('hive', 'hive_url')}/api/case/template/{play['hiveid']}"
         r = requests.patch(url, data=json.dumps(case_template),headers=hive_headers, verify=False).json()
@@ -83,26 +91,39 @@ def thehive_casetemplate_update(issue_id):
     return 200, "success"
 
 def elastalert_update(issue_id):
-    play = play_metadata(issue_id)
-    play_file = f"/etc/playbook-rules/{play['playid']}.yaml"
-    ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", play['esquery'])
+    # Get play metadata - specifically the raw Sigma
+    play_meta = play_metadata(issue_id)
+
+    # Generate Sigma metadata
+    sigma_meta = sigma_metadata(play_meta['sigma_dict'])
+
+    play_file = f"/etc/playbook-rules/{play_meta['playid']}.yaml"
+    ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_meta['esquery'])
     if os.path.exists(play_file):
-        os.remove(play_file)
+        os.remove(play_file)  
 
-    try:
-        if play['product'] == 'osquery':
-            shutil.copy('/etc/playbook-rules/osquery.template', play_file)
-        else:
-            shutil.copy('/etc/playbook-rules/generic.template', play_file)
+    if sigma_meta['level'] == "medium" or sigma_meta['level'] == "low":
+        shutil.copy('/etc/playbook-rules/es-generic.template', play_file)
         for line in fileinput.input(play_file, inplace=True):
-            line = re.sub(r'-\s''', f"- {play['playbook']}", line.rstrip())
-            line = re.sub(r'tags:.*$', f"tags: ['playbook','{play['playid']}','{play['playbook']}']", line.rstrip())
             line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
-            line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play['playid']}'\n{ea_config_raw}", line.rstrip())
+            line = re.sub(r'play_title:.\"\"', f"play_title: \"{sigma_meta['title']}\"", line.rstrip())
+            line = re.sub(r'sigma_level:.\"\"', f"sigma_level: \"{sigma_meta['level']}\"\n{ea_config_raw}", line.rstrip())
             print(line)
+    else:
+        try:
+            if sigma_meta['product'] == 'osquery':
+                shutil.copy('/etc/playbook-rules/osquery.template', play_file)
+            else:
+                shutil.copy('/etc/playbook-rules/generic.template', play_file)
+            for line in fileinput.input(play_file, inplace=True):
+                line = re.sub(r'-\s''', f"- {play_meta['playbook']}", line.rstrip())
+                line = re.sub(r'tags:.*$', f"tags: ['playbook','{play_meta['playid']}','{play_meta['playbook']}']", line.rstrip())
+                line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
+                line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play_meta['playid']}'\n{ea_config_raw}", line.rstrip())
+                print(line)
 
-    except FileNotFoundError:
-        print("ElastAlert Template File not found")
+        except FileNotFoundError:
+            print("ElastAlert Template File not found")
 
     return 200, "success"
 
@@ -115,75 +136,26 @@ def elastalert_disable(issue_id):
     return 200, "success"
 
 
-def play_create(issue_id):
-    play = play_metadata(issue_id)
-    
-    play_id = uuid.uuid4().hex
-
-    # If ElastAlert config = "", set the play status to Disabled (id=7) else set it to Draft (id=1)
-    # Also add a note to the play to make it clear as to why the status is Disabled
-    play_status = "7" if play['raw_elastalert'] == "" else "1"
-    play_notes = "Play status set to Disabled - Sigmac error when generating ElastAlert config." if play['raw_elastalert'] == "" else "Play imported successfully."
-
-    payload2 = {"issue": {"subject": play['title'],"project_id": 1,"status_id":play_status, "tracker": "Play", "custom_fields": [\
-    {"id": 6, "name": "Title", "value": play['title']},\
-    {"id": 24, "name": "Playbook", "value": play['playbook']},\
-    {"id": 15, "name": "ES Query", "value": play['esquery'] },\
-    {"id": 23, "name": "Level", "value": play['level']},\
-    {"id": 25, "name": "Product", "value": play['product']},\
-    {"id": 2, "name": "Description", "value": play['description']},\
-    {"id": 17, "name": "Author", "value":play['author']},\
-    {"id": 16, "name": "References", "value": play['references']},\
-    {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"},\
-    {"id": 28, "name": "PlayID", "value": play_id[0:9]},\
-    {"id": 27, "name": "Tags", "value": play['tags']},\
-    {"id": 30, "name": "Signature ID", "value": play['sigid']},\
-    {"id": 21, "name": "Sigma", "value": play['sigma']}\
-    ]}}
-
-      # POST/PUT payload to Redmine to create play
-    url = f"{playbook_url}/issues.json"
-    r = requests.post(url, data=json.dumps(payload2),
-                      headers=playbook_headers, verify=False)
-
-    if r.status_code == 201:
-        payload = '{"issue":{"project_id":1,"tracker":"Play","custom_fields":[{"id":29,"name":"Import Status","value":"Successful - PlayID: ' + play_id[0:9] + '"}]} }'
-        url = f"{playbook_url}/issues/{issue_id}.json"
-        status_update = requests.put(url, data=payload,
-                         headers=playbook_headers, verify=False)
-        # Update the Play notes
-        payload = {"issue":{"notes":play_notes}}
-        new_issue_id = r.json()
-        url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}.json"
-        r = requests.put(url, data=json.dumps(payload), headers=playbook_headers, verify=False)
-    else:
-        payload = '{"issue":{"project_id":1,"tracker":"Play","custom_fields":[{"id":29,"name":"Import Status","value":"Not Successful-' + str(
-            r.status_code) + '"}]} }'
-        url = f"{playbook_url}/issues/{issue_id}.json"
-        status_update = requests.put(url, data=payload,
-                         headers=playbook_headers, verify=False)
-  
-    return 'success', 200
-    
-
-
 def play_update(issue_id):
-    play = play_metadata(issue_id)
+    # Get play metadata - specifically the raw Sigma
+    play_meta = play_metadata(issue_id)
+ 
+    # Generate Sigma metadata
+    sigma_meta = sigma_metadata(play_meta['sigma_dict'])
 
-    payload = {"issue": {"subject": play['title'],"project_id": 1, "tracker": "Play", "custom_fields": [\
-    {"id": 6, "name": "Title", "value": play['title']},\
-    {"id": 23, "name": "Level", "value": play['level']},\
-    {"id": 15, "name": "ES Query", "value": play['esquery'] },\
-    {"id": 25, "name": "Product", "value": play['product']},\
-    {"id": 2, "name": "Description", "value": play['description']},\
-    {"id": 17, "name": "Author", "value":play['author']},\
-    {"id": 16, "name": "References", "value": play['references']},\
-    {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"},\
-    {"id": 27, "name": "Tags", "value": play['tags']} ]}}
+    payload = {"issue": {"subject": sigma_meta['title'],"project_id": 1, "tracker": "Play", "custom_fields": [\
+    {"id": 6, "name": "Title", "value": sigma_meta['title']},\
+    {"id": 23, "name": "Level", "value": sigma_meta['level']},\
+    {"id": 15, "name": "ES Query", "value": sigma_meta['esquery'] },\
+    {"id": 25, "name": "Product", "value": sigma_meta['product']},\
+    {"id": 2, "name": "Description", "value": sigma_meta['description']},\
+    {"id": 17, "name": "Author", "value":sigma_meta['author']},\
+    {"id": 16, "name": "References", "value": sigma_meta['references']},\
+    {"id": 7, "name": "Analysis", "value": f"{sigma_meta['falsepositives']}{sigma_meta['logfields']}"},\
+    {"id": 27, "name": "Tags", "value": sigma_meta['tags']} ]}}
 
     url = f"{playbook_url}/issues/{issue_id}.json"
     r = requests.put(url, data=json.dumps(payload), headers=playbook_headers, verify=False)
-    print(r)
 
     return 'success', 200
 
@@ -206,47 +178,22 @@ def play_metadata(issue_id):
             play['playbook'] = item['value']
         elif item['name'] == "Case Analyzers":
             play['case_analyzers'] = item['value']
+        elif item['name'] == "Signature ID":
+            play['sigma_id'] = item['value']
 
     # Cleanup the Sigma data to get it ready for parsing
     sigma_raw = re.sub(
         "{{collapse\(View Sigma\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_raw)
-    sigma = yaml.load(sigma_raw)
-
-    # Call sigmac tool to generate ElastAlert config
-    dump = open('dump.txt', 'w')
-    print(sigma, file=dump)
-    dump.close()
-
-    product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
-
-   
-    esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", "dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')
-    
-    ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
-    ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
-    
-    # Prep ATT&CK Tags
-    tags = re.findall(r"t\d{4}", ''.join(
-        sigma.get('tags'))) if sigma.get('tags') else ''
-    play['tags'] = [element.upper() for element in tags]
-
+    sigma_dict = yaml.load(sigma_raw)
+ 
     return {
+        'issue_id': issue_id,        
         'playid': play.get('playid'),
         'hiveid': play.get('hiveid'),
-        'references': '\n'.join(sigma.get('references')) if sigma.get('references') else 'none',
-        'title': sigma.get('title') if sigma.get('title') else 'none',
-        'description': sigma.get('description') if sigma.get('description') else 'none',
-        'level': sigma.get('level') if sigma.get('level') else 'none',
-        'tags': play['tags'],
-        'sigma': f'{{{{collapse(View Sigma)\n<pre><code class="yaml">\n\n{sigma_raw}\n</code></pre>\n}}}}',
-        'author': sigma.get('author') if sigma.get('author') else 'none',
-        'falsepositives': '_False Positives_\n' + '\n'.join(sigma.get('falsepositives')) if sigma.get('falsepositives') else '_False Positives_\n Unknown',
-        'logfields': '\n\n_Interesting Log Fields_\n' + '\n'.join(sigma.get('fields')) if sigma.get('fields') else '',
-        'esquery': f'{{{{collapse(View ElastAlert Config)\n<pre><code class="yaml">\n\n{ea_config}\n</code></pre>\n}}}}',
-        'raw_elastalert': ea_config,
-        'tasks': sigma.get('tasks'),
-        'product': product,
-        'sigid': sigma.get('id') if sigma.get('id') else 'none',
+        'sigma_dict': sigma_dict,
+        'sigma_raw': sigma_raw,
+        'sigma_formatted': f'{{{{collapse(View Sigma)\n<pre><code class="yaml">\n\n{sigma_raw}\n</code></pre>\n}}}}',
+        'sigma_id': play.get('sigma_id'),
         'playbook': play.get('playbook'),
         'case_analyzers': play.get('case_analyzers')        
     }
@@ -261,3 +208,110 @@ def sigmac_generate(sigma):
 
     es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
     return es_query
+
+def sigma_metadata(sigma):
+    play = dict()
+    
+    # Call sigmac tool to generate ElastAlert config
+    temp_file = tempfile.NamedTemporaryFile(mode='w+t')
+    print(sigma, file=temp_file)
+    temp_file.seek(0)
+
+    product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
+
+    esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", temp_file.name, "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')  
+    
+    ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
+    ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
+
+    # Prep ATT&CK Tags
+    tags = re.findall(r"t\d{4}", ''.join(
+        sigma.get('tags'))) if sigma.get('tags') else ''
+    play['tags'] = [element.upper() for element in tags]
+
+    return {
+        'playid': play.get('playid'),
+        'references': '\n'.join(sigma.get('references')) if sigma.get('references') else 'none',
+        'title': sigma.get('title') if sigma.get('title') else 'none',
+        'description': sigma.get('description') if sigma.get('description') else 'none',
+        'level': sigma.get('level') if sigma.get('level') else 'none',
+        'tags': play['tags'],
+        'sigma': f'{{{{collapse(View Sigma)\n<pre><code class="yaml">\n\n{yaml2.dump(sigma)}\n</code></pre>\n}}}}',
+        'author': sigma.get('author') if sigma.get('author') else 'none',
+        'falsepositives': '_False Positives_\n' + '\n'.join(sigma.get('falsepositives')) if sigma.get('falsepositives') else '_False Positives_\n Unknown',
+        'logfields': '\n\n_Interesting Log Fields_\n' + '\n'.join(sigma.get('fields')) if sigma.get('fields') else '',
+        'esquery': f'{{{{collapse(View ElastAlert Config)\n<pre><code class="yaml">\n\n{ea_config}\n</code></pre>\n}}}}',
+        'raw_elastalert': ea_config,
+        'tasks': sigma.get('tasks'),
+        'product': product,
+        'sigid': sigma.get('id') if sigma.get('id') else 'none'      
+    }
+
+
+def play_create(sigma_dict, playbook="imported", ruleset=""):
+    # Expects Sigma in dict format
+
+    # Extract out all the relevant metadata from the Sigma YAML
+    play = sigma_metadata(sigma_dict)
+    
+    # Generate a unique ID for the Play
+    play_id = uuid.uuid4().hex
+
+    # If ElastAlert config = "", set the play status to Disabled (id=7) else set it to Draft (id=1)
+    # Also add a note to the play to make it clear as to why the status is Disabled
+    play_status = "7" if play['raw_elastalert'] == "" else "1"
+    play_notes = "Play status set to Disabled - Sigmac error when generating ElastAlert config." if play['raw_elastalert'] == "" else "Play imported successfully."
+
+    # Create the payload
+    payload = {"issue": {"subject": play['title'],"project_id": 1,"status_id":play_status, "tracker": "Play", "custom_fields": [\
+    {"id": 6, "name": "Title", "value": play['title']},\
+    {"id": 24, "name": "Playbook", "value": playbook},\
+    {"id": 15, "name": "ES Query", "value": play['esquery'] },\
+    {"id": 23, "name": "Level", "value": play['level']},\
+    {"id": 25, "name": "Product", "value": play['product']},\
+    {"id": 2, "name": "Description", "value": play['description']},\
+    {"id": 17, "name": "Author", "value":play['author']},\
+    {"id": 16, "name": "References", "value": play['references']},\
+    {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"},\
+    {"id": 28, "name": "PlayID", "value": play_id[0:9]},\
+    {"id": 27, "name": "Tags", "value": play['tags']},\
+    {"id": 30, "name": "Signature ID", "value": play['sigid']},\
+    {"id": 21, "name": "Sigma", "value": play['sigma']},\
+    {"id": 32, "name": "Category", "value": ruleset}\
+    ]}}
+
+    # POST the payload to Redmine to create the Play (ie Redmine issue)
+    url = f"{playbook_url}/issues.json"
+    r = requests.post(url, data=json.dumps(payload), headers=playbook_headers, verify=False)
+
+    # If Play creation was successful, update the Play notes & return the Play URL
+    # If Play creation was not succesful, return the status code
+    if r.status_code == 201:
+        # Update the Play notes
+        notes_payload = {"issue":{"notes":play_notes}}
+        new_issue_id = r.json()
+        url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}.json"
+        r = requests.put(url, data=json.dumps(notes_payload), headers=playbook_headers, verify=False)
+        # Notate success & Play URL
+        play_creation = 201
+        play_url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}"
+    else:
+        play_creation = r.status_code
+        play_url = "failed"
+  
+    return {
+        'play_creation': play_creation,
+        'play_url': play_url
+    }
+
+class YAMLPB(YAML):
+    def dump(self, data, stream=None, **kw):
+        inefficient = False
+        if stream is None:
+            inefficient = True
+            stream = StringIO()
+        YAML.dump(self, data, stream, **kw)
+        if inefficient:
+            return stream.getvalue()
+
+yaml2 = YAMLPB() 

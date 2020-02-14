@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert, processHiveReq, getHiveStatus, playbookSigmac
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert, processHiveReq, getHiveStatus, playbookSigmac, playbookCreatePlay
 from config import parser, filename
 import logging
 import json
@@ -67,6 +67,11 @@ def sendPlaybook():
 def sendSigma():
     sigma = request.get_json()
     return playbookSigmac(sigma)
+
+@app.route("/playbook/play", methods=['POST'])
+def sendSigmaYaml():
+    sigma_yaml = request.get_json()
+    return playbookCreatePlay(sigma_yaml)
 
 @app.route("/es/showresult/<esid>")
 def sendESQuery(esid):
