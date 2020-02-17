@@ -10,6 +10,6 @@ pymisp==2.4.103
 requests==2.21.0
 rt==1.0.11
 ruamel.yaml==0.16.5
-sigmatools==0.12.1
+sigmatools==0.15.0
 thehive4py==1.6.0
 Werkzeug==0.15.3
