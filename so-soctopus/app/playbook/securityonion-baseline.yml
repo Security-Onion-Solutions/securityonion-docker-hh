@@ -78,7 +78,7 @@ fieldmappings:
     ObjectType: event_data.ObjectType
     ObjectValueName: event_data.ObjectValueName
     ParentCommandLine: event_data.ParentCommandLine
-    ParentImage: event_data.ParentImage
+    ParentImage: parent_image_path
     Path: event_data.Path
     PipeName: event_data.PipeName
     ProcessName: event_data.ProcessName

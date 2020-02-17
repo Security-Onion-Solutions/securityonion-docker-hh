@@ -204,7 +204,7 @@ def sigmac_generate(sigma):
     print(sigma, file=dump)
     dump.close()
 
-    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", "-O", "keyword_field=", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
+    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
 
     es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
     return es_query
@@ -219,7 +219,7 @@ def sigma_metadata(sigma):
 
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
 
-    esquery = subprocess.run(["sigmac","-t", "elastalert", "-O", "keyword_field=", temp_file.name, "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')  
+    esquery = subprocess.run(["sigmac","-t", "elastalert", temp_file.name, "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, encoding='ascii')  
     
     ea_config = re.sub(r'alert:\n.*filter:\n','filter:\n', esquery.stdout.strip(),flags=re.S)
     ea_config = re.sub(r'name:\s\S*', f"name: {sigma.get('title')}", ea_config)
@@ -243,7 +243,7 @@ def sigma_metadata(sigma):
         'esquery': f'{{{{collapse(View ElastAlert Config)\n<pre><code class="yaml">\n\n{ea_config}\n</code></pre>\n}}}}',
         'raw_elastalert': ea_config,
         'tasks': sigma.get('tasks'),
-        'product': product,
+        'product': product.lower(),
         'sigid': sigma.get('id') if sigma.get('id') else 'none'      
     }
 
@@ -296,6 +296,7 @@ def play_create(sigma_dict, playbook="imported", ruleset=""):
         play_creation = 201
         play_url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}"
     else:
+        print("Play Creation Error - " + r.text, file=sys.stderr)
         play_creation = r.status_code
         play_url = "failed"
   
