@@ -47,9 +47,9 @@ def navigator_update():
 def thehive_casetemplate_update(issue_id):
     # Get play metadata - specifically the raw Sigma
     play_meta = play_metadata(issue_id)
-
+ 
     # Generate Sigma metadata
-    sigma_meta = sigma_metadata(play_meta['sigma_dict'])
+    sigma_meta = sigma_metadata(play_meta['sigma_raw'], play_meta['sigma_dict'])
     
     #Check to see if there are any tasks - if so, get them formatted
     tasks = []
@@ -74,7 +74,7 @@ def thehive_casetemplate_update(issue_id):
     # Is there a Case Template already created?
     if play_meta['hiveid']:
         # Case Template exists - let's update it
-        url = f"{parser.get('hive', 'hive_url')}/api/case/template/{play['hiveid']}"
+        url = f"{parser.get('hive', 'hive_url')}/api/case/template/{play_meta['hiveid']}"
         r = requests.patch(url, data=json.dumps(case_template),headers=hive_headers, verify=False).json()
 
     else:
@@ -93,9 +93,9 @@ def thehive_casetemplate_update(issue_id):
 def elastalert_update(issue_id):
     # Get play metadata - specifically the raw Sigma
     play_meta = play_metadata(issue_id)
-
+ 
     # Generate Sigma metadata
-    sigma_meta = sigma_metadata(play_meta['sigma_dict'])
+    sigma_meta = sigma_metadata(play_meta['sigma_raw'], play_meta['sigma_dict'])
 
     play_file = f"/etc/playbook-rules/{play_meta['playid']}.yaml"
     ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_meta['esquery'])
@@ -141,7 +141,7 @@ def play_update(issue_id):
     play_meta = play_metadata(issue_id)
  
     # Generate Sigma metadata
-    sigma_meta = sigma_metadata(play_meta['sigma_dict'])
+    sigma_meta = sigma_metadata(play_meta['sigma_raw'], play_meta['sigma_dict'])
 
     payload = {"issue": {"subject": sigma_meta['title'],"project_id": 1, "tracker": "Play", "custom_fields": [\
     {"id": 6, "name": "Title", "value": sigma_meta['title']},\
@@ -209,12 +209,12 @@ def sigmac_generate(sigma):
     es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
     return es_query
 
-def sigma_metadata(sigma):
+def sigma_metadata(sigma_raw, sigma):
     play = dict()
     
     # Call sigmac tool to generate ElastAlert config
     temp_file = tempfile.NamedTemporaryFile(mode='w+t')
-    print(sigma, file=temp_file)
+    print(sigma_raw, file=temp_file)
     temp_file.seek(0)
 
     product = sigma['logsource']['product'] if 'product' in sigma['logsource'] else 'none'
@@ -248,11 +248,11 @@ def sigma_metadata(sigma):
     }
 
 
-def play_create(sigma_dict, playbook="imported", ruleset=""):
+def play_create(sigma_raw, sigma_dict, playbook="imported", ruleset=""):
     # Expects Sigma in dict format
 
     # Extract out all the relevant metadata from the Sigma YAML
-    play = sigma_metadata(sigma_dict)
+    play = sigma_metadata(sigma_raw, sigma_dict)
     
     # Generate a unique ID for the Play
     play_id = uuid.uuid4().hex
