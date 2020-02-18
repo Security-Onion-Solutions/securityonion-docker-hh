@@ -65,8 +65,8 @@ def sendPlaybook():
 
 @app.route("/playbook/sigmac", methods=['POST'])
 def sendSigma():
-    sigma = request.get_json()
-    return playbookSigmac(sigma)
+    raw = request.get_data(as_text=True)
+    return playbookSigmac(raw)
 
 @app.route("/playbook/play", methods=['POST'])
 def sendSigmaYaml():

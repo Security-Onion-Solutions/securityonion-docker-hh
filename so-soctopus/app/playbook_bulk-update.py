@@ -63,7 +63,7 @@ def update_play(raw_sigma, repo_sigma, ruleset):
     else:
         print('No Current Play - Create New Play in PB')
         play_status = "new"
-        creation_status = playbook.play_create(repo_sigma,"community",ruleset)
+        creation_status = playbook.play_create(raw_sigma, repo_sigma,"community",ruleset)
         print (creation_status)
 
     return play_status
@@ -121,7 +121,7 @@ for folder in ruleset_categories:
         try:
             repo_sigma = yaml.load(raw)
             if folder == 'process_creation':
-                folder = 'proc'
+                folder = 'proc' 
             play_status = update_play(raw, repo_sigma, f"win-{folder}")
             print(play_status)
             if play_status == "updated":
