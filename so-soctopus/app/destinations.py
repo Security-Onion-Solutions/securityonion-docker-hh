@@ -555,12 +555,12 @@ def playbookSigmac(sigma):
 
     return esquery
 
-def playbookCreatePlay(sigma):
+def playbookCreatePlay(sigma_raw, sigma_dict):
     """
     Process incoming Sigma Yaml.
     
     """
-    play_data = playbook.play_create(sigma)
+    play_data = playbook.play_create(sigma_raw, sigma_dict)
     
     return jsonify(play_data)
 

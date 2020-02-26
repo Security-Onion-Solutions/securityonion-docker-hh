@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
 from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert, processHiveReq, getHiveStatus, playbookSigmac, playbookCreatePlay
 from config import parser, filename
+import ruamel.yaml
 import logging
 import json
 import sys
@@ -12,6 +13,8 @@ sys.getfilesystemencoding = lambda: 'UTF-8'
 app = Flask(__name__)
 Bootstrap(app)
 app.config['SECRET_KEY'] = 'thisismysecret'
+
+yaml = ruamel.yaml.YAML(typ='safe')
 
 #logging.basicConfig(filename=filename, level=logging.DEBUG)
 
@@ -70,8 +73,9 @@ def sendSigma():
 
 @app.route("/playbook/play", methods=['POST'])
 def sendSigmaYaml():
-    sigma_yaml = request.get_json()
-    return playbookCreatePlay(sigma_yaml)
+    sigma_raw = request.get_data(as_text=True)
+    sigma_dict = yaml.load(sigma_raw)
+    return playbookCreatePlay(sigma_raw, sigma_dict)
 
 @app.route("/es/showresult/<esid>")
 def sendESQuery(esid):
