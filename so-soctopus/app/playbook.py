@@ -55,7 +55,7 @@ def thehive_casetemplate_update(issue_id):
     tasks = []
     if sigma_meta.get('tasks'):
         task_order = 0
-        for task_title, task_desc in play_meta.get('tasks').items():
+        for task_title, task_desc in sigma_meta.get('tasks').items():
             task_order += 1
             tasks.append ({"order":task_order,"title":task_title,"description":task_desc})
     else: tasks = []
@@ -200,11 +200,11 @@ def play_metadata(issue_id):
 
 def sigmac_generate(sigma):
     # Call sigmac tool to generate Elasticsearch config
-    dump = open('es-dump.txt', 'w')
-    print(sigma, file=dump)
-    dump.close()
+    temp_file = tempfile.NamedTemporaryFile(mode='w+t')
+    print(sigma, file=temp_file)
+    temp_file.seek(0)
 
-    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", "es-dump.txt", "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
+    sigmac_output = subprocess.run(["sigmac","-t", "es-qs", temp_file.name, "-c", "playbook/sysmon.yml", "-c", "playbook/securityonion-network.yml", "-c", "playbook/securityonion-baseline.yml"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='ascii')
 
     es_query = sigmac_output.stdout.strip() + sigmac_output.stderr.strip()
     return es_query
