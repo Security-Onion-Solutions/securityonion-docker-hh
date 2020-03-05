@@ -8,11 +8,14 @@ import ruamel.yaml
 import logging
 import json
 import sys
+import random
+import string
+
 sys.getfilesystemencoding = lambda: 'UTF-8'
 
 app = Flask(__name__)
 Bootstrap(app)
-app.config['SECRET_KEY'] = 'thisismysecret'
+app.secret="".join([random.choice(string.printable) for i in range(500)])
 
 yaml = ruamel.yaml.YAML(typ='safe')
 
