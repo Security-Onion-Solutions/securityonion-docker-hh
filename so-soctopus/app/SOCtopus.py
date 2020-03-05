@@ -15,7 +15,7 @@ sys.getfilesystemencoding = lambda: 'UTF-8'
 
 app = Flask(__name__)
 Bootstrap(app)
-app.secret="".join([random.choice(string.printable) for i in range(500)])
+app.secret_key="".join([random.choice(string.printable) for i in range(500)])
 
 yaml = ruamel.yaml.YAML(typ='safe')
 
