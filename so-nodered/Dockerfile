@@ -67,7 +67,7 @@ COPY --from=build /usr/src/node-red/prod_node_modules ./node_modules
 # Chown, install devtools & Clean up
 RUN chown -R node-red:node-red /usr/src/node-red && \
     /tmp/install_devtools.sh && \
-    rm /tmp/*
+    rm -r /tmp/*
 
 USER node-red
 
@@ -88,4 +88,4 @@ EXPOSE 1880
 # Add a healthcheck (default every 30 secs)
 # HEALTHCHECK CMD curl http://localhost:1880/ || exit 1
 
-ENTRYPOINT ["npm", "start", "--", "--userDir", "/data"
+ENTRYPOINT ["npm", "start", "--", "--userDir", "/data"]
