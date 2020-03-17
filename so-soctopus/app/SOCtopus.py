@@ -2,16 +2,22 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
-from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert, processHiveReq, getHiveStatus, playbookSigmac
+from destinations import createHiveAlert, createMISPEvent, createSlackAlert, createFIREvent, createGRRFlow, createRTIRIncident, createStrelkaScan, showESResult,  playbookWebhook, eventModifyFields, eventUpdateFields, sendHiveAlert, processHiveReq, getHiveStatus, playbookSigmac, playbookCreatePlay
 from config import parser, filename
+import ruamel.yaml
 import logging
 import json
 import sys
+import random
+import string
+
 sys.getfilesystemencoding = lambda: 'UTF-8'
 
 app = Flask(__name__)
 Bootstrap(app)
-app.config['SECRET_KEY'] = 'thisismysecret'
+app.secret_key="".join([random.choice(string.printable) for i in range(500)])
+
+yaml = ruamel.yaml.YAML(typ='safe')
 
 #logging.basicConfig(filename=filename, level=logging.DEBUG)
 
@@ -65,8 +71,14 @@ def sendPlaybook():
 
 @app.route("/playbook/sigmac", methods=['POST'])
 def sendSigma():
-    sigma = request.get_json()
-    return playbookSigmac(sigma)
+    raw = request.get_data(as_text=True)
+    return playbookSigmac(raw)
+
+@app.route("/playbook/play", methods=['POST'])
+def sendSigmaYaml():
+    sigma_raw = request.get_data(as_text=True)
+    sigma_dict = yaml.load(sigma_raw)
+    return playbookCreatePlay(sigma_raw, sigma_dict)
 
 @app.route("/es/showresult/<esid>")
 def sendESQuery(esid):

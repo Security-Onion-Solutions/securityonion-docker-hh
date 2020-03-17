@@ -25,7 +25,9 @@ RUN chmod 755 /usr/local/bin/docker-entrypoint
 
 # Provide a non-root user.
 RUN groupadd --gid 939 socore && \
-    useradd -M --uid 939 --gid 939 --home /usr/share/filebeat socore
+    useradd -M --uid 939 --gid 939 --home /usr/share/filebeat socore && \
+    groupadd -g 945 ossec && \
+    usermod -a -G ossec socore
 
 WORKDIR /usr/share/filebeat
 RUN chown -R root:socore . && \

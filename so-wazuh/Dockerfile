@@ -5,6 +5,8 @@ LABEL maintainer "Security Onion Solutions, LLC"
 LABEL version="Wazuh Manager HH1.2.1"
 LABEL description="Wazuh Manager and API running in Docker container for use with Security Onion"
 
+ENV WAZUH_VERSION="3.10.2-1"
+
 RUN yum update -y
 
 # Install pre-reqs
@@ -25,14 +27,14 @@ RUN /repos.bash
 #RUN rpm -i https://packages.wazuh.com/yum/el/7/x86_64/wazuh-manager-2.0.1-1.el7.x86_64.rpm
 
 # Install wazuh-manager
-RUN yum install -y wazuh-manager
+RUN yum install -y wazuh-manager-$WAZUH_VERSION
 
 # Install nodejs and wazuh-api
 RUN curl -sL https://rpm.nodesource.com/setup_8.x | bash -
 RUN yum install -y nodejs
 
 #RUN rpm -i https://packages.wazuh.com/yum/el/7/x86_64/wazuh-api-2.0.1-1.el7.x86_64.rpm
-RUN yum install -y wazuh-api
+RUN yum install -y wazuh-api-$WAZUH_VERSION
 
 # Add OSSEC config
 ADD config/securityonion_rules.xml /var/ossec/ruleset/rules/securityonion_rules.xml

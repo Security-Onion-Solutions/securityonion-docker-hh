@@ -510,9 +510,9 @@ def playbookWebhook(webhook_content):
     issue_id = webhook_content['payload']['issue']['id']
     issue_status_name = webhook_content['payload']['issue']['status']['name']
 
-    if action == 'opened' and issue_tracker_name == 'Sigma Import':
-        playbook.play_create(str(issue_id))
-    elif action == 'updated' and issue_tracker_name == 'Play':
+    #if action == 'opened' and issue_tracker_name == 'Sigma Import':
+    #    playbook.play_create(str(issue_id))
+    if action == 'updated' and issue_tracker_name == 'Play':
         journal_details = webhook_content['payload']['journal']['details']
         detection_updated = False
         for item in journal_details:
@@ -554,6 +554,16 @@ def playbookSigmac(sigma):
     esquery = playbook.sigmac_generate(sigma)
 
     return esquery
+
+def playbookCreatePlay(sigma_raw, sigma_dict):
+    """
+    Process incoming Sigma Yaml.
+    
+    """
+    play_data = playbook.play_create(sigma_raw, sigma_dict)
+    
+    return jsonify(play_data)
+
 
 def createStrelkaScan(esid):
   search = getHits(esid)

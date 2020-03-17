@@ -4,7 +4,7 @@ LABEL version="Telegraf 1.10.1 HH1.2.1"
 LABEL description="Telegraf running in Docker container for use with Security Onion"
 
 RUN echo 'hosts: files dns' >> /etc/nsswitch.conf
-RUN apk add --no-cache iputils ca-certificates net-snmp-tools procps lm_sensors redis && \
+RUN apk add --no-cache iputils ca-certificates net-snmp-tools procps lm_sensors redis curl jq && \
     update-ca-certificates
 
 ENV TELEGRAF_VERSION 1.10.1

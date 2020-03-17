@@ -4,7 +4,7 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
     echo "This program needs root privileges.  Please try again using sudo."
     exit
 fi
-tag="HH1.1.4"
+tag="HH1.1.5"
 cwd=$(pwd)
 prefix="so-strelka-"
 repo="soshybridhunter"
