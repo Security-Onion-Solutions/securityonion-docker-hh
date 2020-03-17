@@ -1,19 +1,19 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Zeek 3.0.1"
-LABEL description="Zeek 3.0.1 running in a docker with AF_Packet 1.4 for use with Security Onion."
+LABEL version="Zeek 3.0.3 HH1.2.1"
+LABEL description="Zeek 3.0.3 running in a docker with AF_Packet 1.4 for use with Security Onion."
 
 RUN yum update -y && \
     yum clean all
 
 # Install epel
 RUN yum -y install epel-release bash libpcap iproute && yum clean all
-RUN yum -y install jemalloc numactl libnl3 libdnet gdb GeoIP python-ipaddress && \
+RUN yum -y install jemalloc numactl libnl3 libdnet gdb GeoIP python-ipaddress python3 && \
     yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the Zeek package
-RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/securityonion-zeek-3.0.1.0/securityonion-zeek-3.0.1.0.rpm
+RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/securityonion-zeek-3.0.3.0/securityonion-zeek-3.0.3.0.rpm
 
 VOLUME ["/nsm/zeek/logs", "/nsm/zeek/spool", "/opt/zeek/share/bro", "/opt/zeek/etc/"]
 
@@ -29,5 +29,6 @@ RUN chown -R 937:937 /opt/zeek && \
 # Copy over the entry script.
 COPY files/zeek.sh /usr/local/sbin/zeek.sh
 RUN chmod +x /usr/local/sbin/zeek.sh
+RUN ln -fs /usr/bin/python3 /usr/bin/python
 
 ENTRYPOINT ["/usr/local/sbin/zeek.sh"]

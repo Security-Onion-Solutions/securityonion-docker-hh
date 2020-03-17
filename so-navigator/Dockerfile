@@ -1,6 +1,7 @@
 # Build stage
 
 FROM node:alpine 
+LABEL version="HH1.2.1"
 
 WORKDIR /nav-app/
 

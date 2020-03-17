@@ -1,5 +1,6 @@
 FROM python:latest
 LABEL maintainer="william.wernert@securityonionsolutions.com"
+LABEL version="HH1.2.1"
 
 ENV REFRESH_TOKEN_TIMEOUT=30
 ENV TOKEN_TIMEOUT=60

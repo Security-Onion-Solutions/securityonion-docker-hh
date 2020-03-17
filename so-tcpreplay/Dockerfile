@@ -16,7 +16,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version "so-tcpreplay v0.1"
+LABEL version "so-tcpreplay v0.1 HH1.2.1"
 LABEL description="Replay PCAPs to sniffing interface(s)"
 
 # Setup our utilities

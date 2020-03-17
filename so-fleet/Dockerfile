@@ -1,6 +1,6 @@
 FROM alpine
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Fleet 2.4.0 HH1.1.3"
+LABEL version="Fleet 2.4.0 HH1.2.1"
 LABEL description="Fleet running in Docker container for use with Security Onion"
 
 RUN apk --update add ca-certificates unzip curl
