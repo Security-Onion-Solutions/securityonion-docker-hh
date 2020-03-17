@@ -2,7 +2,7 @@
 
 /usr/local/bin/kibana-docker &
 
-KIBANA_VERSION=6.5.2
+KIBANA_VERSION=7.6.1
 MAX_WAIT=60
 
 # Check to see if Kibana is available
