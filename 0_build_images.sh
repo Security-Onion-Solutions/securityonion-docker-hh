@@ -1,9 +1,9 @@
 #!/bin/bash
 
-VERSION=6.8.6
+VERSION=7.6.1
 DOCKERHUB="soshybridhunter"
 TAGPRE=""
-TAG="HH1.1.4"
+TAG="HH1.2.1"
 FLAVOR="-oss"
 OPTIONS="--no-cache"
 SKIP=0
