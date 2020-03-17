@@ -15,7 +15,7 @@
 FROM oraclelinux:7-slim
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="MySQL Server HH1.1.0"
+LABEL version="MySQL Server HH1.2.1"
 LABEL description="MySQL Server running in Docker container for use with Security Onion"
 
 ARG MYSQL_SERVER_PACKAGE=mysql-community-server-minimal-5.7.24

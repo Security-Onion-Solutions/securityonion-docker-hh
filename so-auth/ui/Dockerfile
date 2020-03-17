@@ -1,5 +1,6 @@
 FROM node:latest AS build-stage
 LABEL maintainer="william.wernert@securityonionsolutions.com"
+LABEL version="HH1.2.1"
 
 RUN mkdir -p /app
 WORKDIR /app

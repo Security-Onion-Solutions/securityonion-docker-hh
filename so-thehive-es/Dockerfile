@@ -20,6 +20,8 @@
 FROM docker.elastic.co/elasticsearch/FLAVOR:X.Y.Z
 
 LABEL maintainer "Security Onion Solutions, LLC"
+LABEL version="HH1.2.1"
+
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 

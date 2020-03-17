@@ -2,7 +2,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Wazuh Manager HH1.1.3"
+LABEL version="Wazuh Manager HH1.2.1"
 LABEL description="Wazuh Manager and API running in Docker container for use with Security Onion"
 
 ENV WAZUH_VERSION="3.10.2-1"

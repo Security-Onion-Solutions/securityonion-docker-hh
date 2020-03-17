@@ -16,7 +16,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version "so-tcpreplay v0.1"
+LABEL version "so-tcpreplay v0.1 HH1.2.1"
 LABEL description="Replay PCAPs to sniffing interface(s)"
 
 # Copy over tcpreplay - using v4.2.6 instead of 4.3.x because of known bugs: https://github.com/appneta/tcpreplay/issues/557

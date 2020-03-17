@@ -1,5 +1,8 @@
 FROM ubuntu:latest
 
+LABEL version="HH1.2.1"
+
+
 WORKDIR /var/launcher
 COPY launcher /var/launcher 
 
