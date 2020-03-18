@@ -29,7 +29,7 @@ wait_step=0
 # Let's sleep some more and let Kibana come all the way up.
 sleep 30
 # Apply Kibana config
-echo
+#echo
 echo "Applying Kibana config..."
 curl -s -XPOST http://localhost:5601/api/saved_objects/config/$KIBANA_VERSION?overwrite=true  \
     -H "Content-Type: application/json" \
@@ -38,17 +38,17 @@ curl -s -XPOST http://localhost:5601/api/saved_objects/config/$KIBANA_VERSION?ov
 echo
 
 # Apply Kibana template
-  echo
-  echo "Applying Kibana template..."
-  curl -s -XPUT http://$ELASTICSEARCH_HOST:9200/_template/kibana \
-       -H 'Content-Type: application/json' \
-       -d'{"index_patterns" : ".kibana", "settings": { "number_of_shards" : 1, "number_of_replicas" : 0 }, "mappings" : { "search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}}'
-  echo
+#  echo
+#  echo "Applying Kibana template..."
+#  curl -s -XPUT http://$ELASTICSEARCH_HOST:9200/_template/kibana \
+#       -H 'Content-Type: application/json' \
+#       -d'{"index_patterns" : ".kibana", "settings": { "number_of_shards" : 1, "number_of_replicas" : 0 }, "mappings" : { "search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}}'
+#  echo
 
-  curl -s -XPUT "$ELASTICSEARCH_HOST:9200/.kibana/_settings" \
-       -H 'Content-Type: application/json' \
-       -d'{"index" : {"number_of_replicas" : 0}}'
-  echo
+#  curl -s -XPUT "$ELASTICSEARCH_HOST:9200/.kibana/_settings" \
+#       -H 'Content-Type: application/json' \
+#       -d'{"index" : {"number_of_replicas" : 0}}'
+#  echo
 
 # Apply all the dashboards
 # Load dashboards, visualizations, index pattern(s), etc.
