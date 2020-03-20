@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#/usr/local/bin/kibana-docker &
+/usr/local/bin/kibana-docker &
 
 #KIBANA_VERSION=7.6.1
 #MAX_WAIT=60
