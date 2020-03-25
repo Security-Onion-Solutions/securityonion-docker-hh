@@ -1,3 +1,5 @@
+urllib3==1.24.3
+certifi==2019.11.28
 elasticsearch==6.3.1
 flask-bootstrap>=3.3.7.0
 Flask==1.0.2
