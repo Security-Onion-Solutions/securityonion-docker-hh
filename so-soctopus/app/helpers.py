@@ -12,17 +12,26 @@ es_pass = parser.get('es', "es_pass", fallback="")
 es_verifycert = parser.getboolean('es', 'es_verifycert', fallback=False)
 
 if es_user and es_pass:
-    es = Elasticsearch(esserver,
-                       http_auth=(es_user, es_pass),
-                       verify_certs=es_verifycert,
-                       ca_certs=certifi.where(),
-                       connection_class=RequestsHttpConnection)
+    if es_verifycert:
+        es = Elasticsearch(esserver,
+                           http_auth=(es_user, es_pass),
+                           verify_certs=es_verifycert,
+                           ca_certs=certifi.where(),
+                           connection_class=RequestsHttpConnection)
+    else:
+        es = Elasticsearch(esserver,
+                           http_auth=(es_user, es_pass),
+                           connection_class=RequestsHttpConnection)
 
 else:
-    es = Elasticsearch(esserver,
-                       verify_certs=es_verifycert,
-                       ca_certs=certifi.where(),
-                       connection_class=RequestsHttpConnection)
+    if es_verifycert:
+        es = Elasticsearch(esserver,
+                           verify_certs=es_verifycert,
+                           ca_certs=certifi.where(),
+                           connection_class=RequestsHttpConnection)
+    else:
+        es = Elasticsearch(esserver,
+                           connection_class=RequestsHttpConnection)
 
 # Core functions that are helpers
 def getHits(esid):

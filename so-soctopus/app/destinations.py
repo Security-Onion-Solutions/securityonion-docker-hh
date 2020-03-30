@@ -270,9 +270,7 @@ def createMISPEvent(esid):
         info = description
 
         def init(url, key):
-            # FIXME: Document what 'json' string is being used for
-            # FIXME: label misp_verifycert as ssl parameter
-            return PyMISP(url, key, misp_verifycert, 'json', debug=True)
+            return PyMISP(url, key, ssl=misp_verifycert, debug=True)
 
         misp = init(misp_url, misp_key)
 
