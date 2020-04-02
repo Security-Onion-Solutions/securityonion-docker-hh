@@ -19,7 +19,7 @@ RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/
 RUN mkdir -p /opt/sensoroni 
 
 # Copy the Binary in
-COPY /opt/build/docker/sensoroni-binary/sensoroni /opt/sensoroni
+COPY /opt/build/docker/sensoroni-binary/sensoroni /opt/sensoroni/
 RUN chmod +x /opt/sensoroni/sensoroni
 
 # setcap
