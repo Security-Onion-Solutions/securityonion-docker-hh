@@ -8,9 +8,7 @@ from grr_api_client import api
 from grr import listProcessFlow, checkFlowStatus, downloadFlowResults
 from requests.auth import HTTPBasicAuth
 from flask import redirect, render_template, jsonify
-from flask_wtf import FlaskForm
 from forms import DefaultForm
-from wtforms import StringField
 from config import parser, es_index
 import playbook
 import json
@@ -39,38 +37,38 @@ def hiveInit():
 def createHiveAlert(esid):
     search = getHits(esid)
     # Hive Stuff
-    # es_url = parser.get('es', 'es_url')
     hive_url = parser.get('hive', 'hive_url')
     hive_api = hiveInit()
     tlp = int(parser.get('hive', 'hive_tlp'))
-    for result in search['hits']['hits']:
-
+    for item in search['hits']['hits']:
         # Get initial details
-        message = result['_source']['message']
-        es_id = result['_id']
+        result = item['_source']
+        message = result['message']
+        es_id = item['_id']
         description = str(message)
         sourceRef = str(uuid.uuid4())[0:6]
         tags = ["SecurityOnion"]
         artifacts = []
-        id = None
-        host = str(result['_index']).split(":")[0]
-        index = str(result['_index']).split(":")[1]
-        event_type = result['_source']['event_type']
+        event = result['event']
+        src = srcport = dst = dstport = None
 
-        if 'source_ip' in result['_source']:
-            src = str(result['_source']['source_ip'])
-        if 'destination_ip' in result['_source']:
-            dst = str(result['_source']['destination_ip'])
-        if 'source_port' in result['_source']:
-            srcport = str(result['_source']['source_port'])
-        if 'destination_port' in result['_source']:
-            dstport = str(result['_source']['destination_port'])
+        if 'source' in result:
+            if 'ip' in result['source']:
+                src = str(result['source']['ip'])
+            if 'port' in result['source']:
+                srcport = str(result['source']['port'])
+        if 'destination' in result:
+            if 'ip' in result['destination']:
+                dst = str(result['destination']['ip'])
+            if 'port' in result['destination']:
+                dstport = str(result['destination']['port'])
+
         # NIDS Alerts
-        if 'ids' in event_type:
-            alert = result['_source']['alert']
-            sid = str(result['_source']['sid'])
-            category = result['_source']['category']
-            sensor = result['_source']['sensor_name']
+        if event['module'] == 'ids':
+            alert = result['rule']['name']
+            sid = str(result['rule']['signature_id'])
+            category = result['rule']['category']
+            sensor = result['observer']['name']
             masterip = str(es_url.split("//")[1].split(":")[0])
             tags.append("nids")
             tags.append(category)
@@ -82,8 +80,9 @@ def createHiveAlert(esid):
             artifacts.append(AlertArtifact(dataType='ip', data=dst))
             artifacts.append(AlertArtifact(dataType='other', data=sensor))
             description = "`NIDS Dashboard:` \n\n <https://" + masterip + f"/kibana/app/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:{es_index}',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert + "\n\n `PCAP:` " + "https://" + masterip + "/kibana/app//sensoroni/securityonion/joblookup?redirectUrl=/sensoroni/&esid=" + es_id
-        # Bro logs
-        elif 'bro' in event_type:
+
+        # Zeek logs
+        elif event['module'] == 'zeek':
             _map_key_type = {
                 "conn": "Connection",
                 "dhcp": "DHCP",
@@ -113,42 +112,42 @@ def createHiveAlert(esid):
                 "x509": "X509"
             }
 
-            bro_tag = event_type.strip('bro_')
-            bro_tag_title = _map_key_type.get(bro_tag)
-            title = str('New Bro ' + bro_tag_title + ' record!')
+            zeek_tag = event['dataset']
+            zeek_tag_title = _map_key_type.get(zeek_tag)
+            title = str('New Zeek ' + zeek_tag_title + ' record!')
 
-            if 'source_ip' in result['_source']:
+            if src:
                 artifacts.append(AlertArtifact(dataType='ip', data=src))
-            if 'destination_ip' in result['_source']:
+            if dst:
                 artifacts.append(AlertArtifact(dataType='ip', data=dst))
-            if 'sensor_name' in result['_source']:
-                sensor = str(result['_source']['sensor_name'])
+            if result.get('observer', {}).get('name'):
+                sensor = str(result['observer']['name'])
                 artifacts.append(AlertArtifact(dataType='other', data=sensor))
-            if 'uid' in result['_source']:
-                uid = str(result['_source']['uid'])
-                title = str('New Bro ' + bro_tag_title + ' record! - ' + uid)
+            if result.get('log', {}).get('id', {}).get('uid'):
+                uid = str(result['log']['id']['uid'])
+                title = str('New Zeek ' + zeek_tag_title + ' record! - ' + uid)
                 artifacts.append(AlertArtifact(dataType='other', data=uid))
-            if 'fuid' in result['_source']:
-                fuid = str(result['_source']['fuid'])
-                title = str('New Bro ' + bro_tag_title + ' record! - ' + fuid)
+            if result.get('log', {}).get('id', {}).get('fuid'):
+                fuid = str(result['log']['id']['fuid'])
+                title = str('New Zeek ' + zeek_tag_title + ' record! - ' + fuid)
                 artifacts.append(AlertArtifact(dataType='other', data=fuid))
-            if 'id' in result['_source']:
-                fuid = str(result['_source']['id'])
-                title = str('New Bro ' + bro_tag_title + ' record! - ' + fuid)
+            if result.get('log', {}).get('id', {}).get('id'):
+                fuid = str(result['log']['id']['id'])
+                title = str('New Zeek ' + zeek_tag_title + ' record! - ' + fuid)
                 artifacts.append(AlertArtifact(dataType='other', data=fuid))
 
-            tags.append('bro')
-            tags.append(bro_tag)
+            tags.append('zeek')
+            tags.append(zeek_tag)
 
         # Wazuh/OSSEC logs
-        elif 'ossec' in event_type:
-            agent_name = result['_source']['agent']['name']
-            if 'description' in result['_source']:
-                ossec_desc = result['_source']['description']
+        elif event['module'] == 'ossec':
+            agent_name = result['agent']['name']
+            if 'description' in result:
+                ossec_desc = result['rule']['description']
             else:
-                ossec_desc = result['_source']['full_log']
-            if 'ip' in result['_source']['agent']:
-                agent_ip = result['_source']['agent']['ip']
+                ossec_desc = result['log']['full']
+            if 'ip' in result['agent']:
+                agent_ip = result['agent']['ip']
                 artifacts.append(AlertArtifact(dataType='ip', data=agent_ip))
                 artifacts.append(AlertArtifact(dataType='other', data=agent_name))
             else:
@@ -157,51 +156,53 @@ def createHiveAlert(esid):
             title = ossec_desc
             tags.append("wazuh")
 
-        elif 'sysmon' in event_type:
-            if 'ossec' in result['_source']['tags']:
-                agent_name = result['_source']['agent']['name']
-                agent_ip = result['_source']['agent']['ip']
-                ossec_desc = result['_source']['full_log']
+        # Sysmon logs
+        elif event['module'] == 'sysmon':
+            if 'ossec' in result['tags']:
+                agent_name = result['agent']['name']
+                agent_ip = result['agent']['ip']
                 artifacts.append(AlertArtifact(dataType='ip', data=agent_ip))
                 artifacts.append(AlertArtifact(dataType='other', data=agent_name))
                 tags.append("wazuh")
-            elif 'beat' in result['_source']['tags']:
-                agent_name = str(result['_source']['beat']['hostname'])
-                if 'beat_host' in result['_source']:
+            elif 'beat' in result['tags']:
+                agent_name = str(result['agent']['hostname'])
+                if result.get('agent'):
                     try:
-                        os_name = str(result['_source']['beat_host']['os']['name'])
+                        os_name = str(result['agent']['os']['name'])
                         artifacts.append(AlertArtifact(dataType='other', data=os_name))
                     except:
                         pass
                     try:
-                        beat_name = str(result['_source']['beat_host']['name'])
+                        beat_name = str(result['agent']['name'])
                         artifacts.append(AlertArtifact(dataType='other', data=beat_name))
                     except:
                         pass
-                if 'source_hostname' in result['_source']:
-                    source_hostname = str(result['_source']['source_hostname'])
-                    artifacts.append(AlertArtifact(dataType='fqdn', data=source_hostname))
-                if 'source_ip' in result['_source']:
-                    source_ip = str(result['_source']['source_ip'])
+                if result.get('source', {}).get('hostname'):
+                        source_hostname = result['source']['hostname']
+                        artifacts.append(AlertArtifact(dataType='fqdn', data=source_hostname))
+                if result.get('source', {}).get('ip'):
+                    source_ip = str(result['source']['ip'])
                     artifacts.append(AlertArtifact(dataType='ip', data=source_ip))
-                if 'destination_ip' in result['_source']:
-                    destination_ip = str(result['_source']['destination_ip'])
+                if result.get('destination', {}).get('ip'):
+                    destination_ip = str(result['destination']['ip'])
                     artifacts.append(AlertArtifact(dataType='ip', data=destination_ip))
-                if 'image_path' in result['_source']:
-                    image_path = str(result['_source']['image_path'])
-                    artifacts.append(AlertArtifact(dataType='filename', data=image_path))
-                if 'Hashes' in result['_source']['event_data']:
-                    hashes = result['_source']['event_data']['Hashes']
-                    for hash in hashes.split(','):
-                        if hash.startswith('MD5') or hash.startswith('SHA256'):
-                            artifacts.append(AlertArtifact(dataType='hash', data=hash.split('=')[1]))
-                tags.append("beats")
+                # FIXME: find what "image_path" has been changed to
+                # if 'image_path' in result:
+                #     image_path = str(result['image_path'])
+                #     artifacts.append(AlertArtifact(dataType='filename', data=image_path))
+                # FIXME: find what "Hashes" has been changed to
+                # if 'Hashes' in result['data']['data']:
+                #     hashes = result['event']['data']['Hashes']
+                #     for hash in hashes.split(','):
+                #         if hash.startswith('MD5') or hash.startswith('SHA256'):
+                #             artifacts.append(AlertArtifact(dataType='hash', data=hash.split('=')[1]))
+                tags.append("agent")
             else:
                 agent_name = ''
             title = "New Sysmon Event! - " + agent_name
 
         else:
-            title = "New " + event_type + " Event From Security Onion"
+            title = f'New {event["module"]}_{event["dataset"]} Event From Security Onion'
         form = DefaultForm()
         artifact_string = jsonpickle.encode(artifacts)
         return render_template('hive.html', title=title, tlp=tlp, tags=tags, description=description,
@@ -217,7 +218,6 @@ def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
     description = description.strip('"')
     artifacts = json.loads(artifact_string)
 
-    # print(newtags)
     # Build alert
     hivealert = Alert(
         title=title,
@@ -235,15 +235,6 @@ def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
     if response.status_code == 201:
         print(json.dumps(response.json(), indent=4, sort_keys=True))
         print('')
-        id = response.json()['id']
-
-        # If running standalone / eval tell ES that we sent the alert
-        # es_type = 'doc'
-        # es_index = index
-        # es_headers = {'Content-Type' : 'application/json'}
-        # es_data = '{"script" : {"source": "ctx._source.tags.add(params.tag)","lang": "painless","params" : {"tag" : "Sent to TheHive"}}}'
-        # update_es_event = requests.post(es_url + '/' + es_index + '/' + es_type + '/' + esid +  '/_update', headers=es_headers, data=es_data)
-        # print(update_es_event.content)
 
     else:
         print('ko: {}/{}'.format(response.status_code, response.text))
@@ -277,14 +268,14 @@ def createMISPEvent(esid):
         event = misp.new_event(distrib, threat, analysis, info)
         event_id = str(event['Event']['id'])
 
-        if 'source_ip' in result:
+        if result.get('source', {}).get('ip'):
             data_type = "ip-src"
-            source_ip = result['source_ip']
+            source_ip = result['source']['ip']
             misp.add_named_attribute(event_id, data_type, source_ip)
 
-        if 'destination_ip' in result:
+        if result.get('destination', {}).get('ip'):
             data_type = "ip-dst"
-            destination_ip = result['destination_ip']
+            destination_ip = result['destination']['ip']
             misp.add_named_attribute(event_id, data_type, destination_ip)
 
     # Redirect to MISP instance    
@@ -305,11 +296,11 @@ def createGRRFlow(esid, flow_name):
 
     base64string = '%s:%s' % (grr_user, grr_pass)
     base64string = base64.b64encode(bytes(base64string, "utf-8"))
-    authheader = "Basic %s" % base64string
+    auth_header = "Basic %s" % base64string
     index_response = requests.get(grr_url, auth=HTTPBasicAuth(grr_user, grr_pass))
     csrf_token = index_response.cookies.get("csrftoken")
     headers = {
-        "Authorization": authheader,
+        "Authorization": auth_header,
         "x-csrftoken": csrf_token,
         "x-requested-with": "XMLHttpRequest"
     }
@@ -320,14 +311,12 @@ def createGRRFlow(esid, flow_name):
     for result in search['hits']['hits']:
         result = result['_source']
         message = result['message']
-        description = str(message)
-        info = description
 
-        if 'source_ip' in result:
-            source_ip = result['source_ip']
+        if result.get('source', {}).get('ip'):
+            source_ip = result['source']['ip']
 
-        if 'destination_ip' in result:
-            destination_ip = result['destination_ip']
+        if result.get('destination', {}).get('ip'):
+            destination_ip = result['destination']['ip']
 
         for ip in source_ip, destination_ip:
             search_result = grrapi.SearchClients(ip)
@@ -338,7 +327,6 @@ def createGRRFlow(esid, flow_name):
                 client_id = client.client_id
                 client_last_seen_at = client.data.last_seen_at
                 grr_result[client_id] = client_last_seen_at
-                # flow_name = "ListProcesses"
                 if client_id is None:
                     pass
 
@@ -351,13 +339,12 @@ def createGRRFlow(esid, flow_name):
                 # Keep checking to see if complete
                 while status != "terminated":
                     time.sleep(15)
-                    print("Flow not yet completed..watiing 15 secs before attempting to check status again...")
+                    print("Flow not yet completed..waiting 15 secs before attempting to check status again...")
                     status = checkFlowStatus(client_id, grr_url, flow_id, headers, cookies, grr_user, grr_pass)
 
                 # If terminated, run the download
                 if status == "terminated":
                     downloadFlowResults(client_id, grr_url, flow_id, headers, cookies, grr_user, grr_pass)
-                # print("Done!")
 
                 # Run flow via API client
                 # flow_obj = grrapi.Client(client_id)
@@ -367,12 +354,11 @@ def createGRRFlow(esid, flow_name):
                 sourceRef = str(uuid.uuid4())[0:6]
                 tags = ["SecurityOnion", "GRR"]
                 artifacts = []
-                id = None
                 filepath = "/tmp/soctopus/" + client_id + ".zip"
                 artifacts.append(AlertArtifact(dataType='file', data=str(filepath)))
 
                 # Build alert
-                hivealert = Alert(
+                hive_alert = Alert(
                     title=title,
                     tlp=tlp,
                     tags=tags,
@@ -384,7 +370,7 @@ def createGRRFlow(esid, flow_name):
                 )
 
                 # Send it off
-                response = hive_api.create_alert(hivealert)
+                response = hive_api.create_alert(hive_alert)
 
             if client_id:
                 # Redirect to GRR instance
@@ -407,8 +393,8 @@ def createRTIRIncident(esid):
         result = result['_source']
         message = result['message']
         description = str(message)
-        event_type = result['event_type']
-        rtir_subject = 'New ' + event_type + ' event from Security Onion!'
+        event = result['event']
+        rtir_subject = f'New {event["module"]}_{event["dataset"]} Event From Security Onion'
         rtir_text = description
         rtir_rt = rt.Rt(rtir_url + '/' + rtir_api, rtir_user, rtir_pass, verify_cert=verify_cert)
         rtir_rt.login()
@@ -459,10 +445,10 @@ def createFIREvent(esid):
     for result in search['hits']['hits']:
         result = result['_source']
         message = result['message']
-        event_type = result['event_type']
+        event = result['event']
         description = str(message)
 
-        subject = str('New ' + event_type + ' event from Security Onion!')
+        subject = f'New {event["module"]}_{event["dataset"]} Event From Security Onion'
 
         headers = {
             'Authorization': 'Token ' + fir_token,
@@ -496,8 +482,6 @@ def playbookWebhook(webhook_content):
     issue_id = webhook_content['payload']['issue']['id']
     issue_status_name = webhook_content['payload']['issue']['status']['name']
 
-    # if action == 'opened' and issue_tracker_name == 'Sigma Import':
-    #    playbook.play_create(str(issue_id))
     if action == 'updated' and issue_tracker_name == 'Play':
         journal_details = webhook_content['payload']['journal']['details']
         detection_updated = False
@@ -557,15 +541,13 @@ def createStrelkaScan(esid):
     search = getHits(esid)
     for result in search['hits']['hits']:
         result = result['_source']
-        message = result['message']
-        event_type = result['event_type']
         extracted_file = result['extracted']
-        conn_id = result['uid'][0]
+        conn_id = result['log']['id']['uid'][0]
         sensorsearch = getConn(conn_id)
 
         for result in sensorsearch['hits']['hits']:
             result = result['_source']
-            sensor = result['sensor_name'].rsplit('-', 1)[0]
+            sensor = result['observer']['name'].rsplit('-', 1)[0]
             strelka_scan_drop = "echo " + sensor + "," + extracted_file + " >>  /tmp/soctopus/strelkaq.log"
             os.system(strelka_scan_drop)
 
@@ -577,14 +559,8 @@ def showESResult(esid):
     for result in search['hits']['hits']:
         esindex = result['_index']
         result = result['_source']
-        # print(result)
 
     return render_template("result.html", result=result, esindex=esindex)
-
-
-class DefaultForm(FlaskForm):
-    esindex = StringField('esindex')
-    esid = StringField('esid')
 
 
 def eventModifyFields(esid):
@@ -605,7 +581,7 @@ def eventUpdateFields(esindex, esid, tags):
 def processHiveReq(webhook_content):
     api = hiveInit()
     event_details = getHiveStatus(webhook_content)
-    event_id = event_details.split(' ')[0]
+    # event_id = event_details.split(' ')[0]
     event_status = event_details.split(' ')[1]
     auto_analyze_alerts = parser.get('cortex', 'auto_analyze_alerts')
 
@@ -617,27 +593,15 @@ def processHiveReq(webhook_content):
             observables = webhook_content['object']['artifacts']
             analyzeAlertObservables(alert_id, observables)
 
-    # Check to see if new case creation
-    # if event_status == "case_creation":
-    #    try:
-    #        observables = api.get_case_observables(case_id).json()
-    #    except:
-    #        pass
-    #    else:
-    #        analyzeCaseObservables(observables)
-
     # Check to see if we are creating a new task
     if event_status == "case_task_creation":
         headers = {
             'Authorization': 'Bearer ' + hive_key
         }
-        task = webhook_content
         task_id = webhook_content['objectId']
         task_status = "InProgress"
-        task_group = webhook_content['object']['group']
         task_case = webhook_content['object']['_parent']
         task_title = webhook_content['object']['title']
-        # task_desc = webhook_content['object']['description']
 
         # Check the task to see if it matches our conventionm for auto-analyze tasks (via Playbook, etc)
         if "Analyzer" in task_title:
@@ -646,8 +610,8 @@ def processHiveReq(webhook_content):
             supported_analyzers = parser.get('cortex', 'supported_analyzers').split(",")
             if analyzer_minimal in supported_analyzers:
                 # Start task
-                response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers,
-                                          data={'status': task_status}, verify=hive_verifycert)
+                requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers,
+                               data={'status': task_status}, verify=hive_verifycert)
                 # Get observables related to case
                 observables = api.get_case_observables(task_case).json()
                 for analyzer in enabled_analyzers:
@@ -667,24 +631,19 @@ def processHiveReq(webhook_content):
                 }
                 task_log = "Automation - Ran " + analyzer_minimal + " analyzer."
                 data = {'message': task_log}
-                response = requests.post(hive_url + '/api/case/task/' + task_id + '/log', headers=headers,
-                                         data=json.dumps(data), verify=hive_verifycert)
+                requests.post(hive_url + '/api/case/task/' + task_id + '/log', headers=headers,
+                              data=json.dumps(data), verify=hive_verifycert)
 
                 # Close task
                 task_status = "Completed"
-                response = requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers,
-                                          data={'status': task_status}, verify=hive_verifycert)
+                requests.patch(hive_url + '/api/case/task/' + task_id, headers=headers,
+                               data={'status': task_status}, verify=hive_verifycert)
 
     sys.stdout.flush()
 
     return "success"
 
 
-# def postAlertObservables(analyzer_results):
-#   for result in analyzer_results:
-#       print(result)
-#       sys.stdout.flush()
-#   return "OK"
 def analyzeAlertObservables(alert_id, observables):
     """
     Analyze TheHive observables
@@ -735,8 +694,8 @@ def analyzeAlertObservables(alert_id, observables):
                             'Content-Type': 'application/json'
                         }
                         data = json.dumps(customFields)
-                        addcustomfields = requests.patch(hive_url + '/api/alert/' + alert_id, headers=headers,
-                                                         data=data, verify=hive_verifycert)
+                        requests.patch(hive_url + '/api/alert/' + alert_id, headers=headers,
+                                       data=data, verify=hive_verifycert)
                     else:
                         pass
     return "OK"
@@ -750,10 +709,10 @@ def getHiveStatus(webhook_content):
     operation = webhook_content['operation']
     object_type = webhook_content['objectType']
     object = webhook_content['object']
-    id = object['id']
+    content_id = object['id']
     status = str(object_type).lower() + "_" + str(operation).lower()
     sys.stdout.flush()
-    return '{} {}'.format(id, status)
+    return '{} {}'.format(content_id, status)
 
 
 def getCortexAnalyzers():

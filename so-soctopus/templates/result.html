@@ -1,14 +1,14 @@
 {% extends "bootstrap/base.html" %}
 {% block content %}
-<html>
+<html lang="en">
   <head>
     <title>ES Result</title>
-{% for key in result %}
-   {% if '@version' not in key %} 
-   <input type="checkbox" name="{{ key }}" value="{{ result[key] }}"/> <b>{{ key }}</b>:   {{ result[key] }} <br>
-   {% endif %}
-{% endfor %} 
-{{ esindex }}
+    {% for key in result %}
+        {% if '@version' not in key %}
+        <input type="checkbox" name="{{ key }}" value="{{ result[key] }}"/> <b>{{ key }}</b>:   {{ result[key] }} <br>
+        {% endif %}
+    {% endfor %}
+    {{ esindex }}
   </head>
 </html>
 {% endblock %}

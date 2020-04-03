@@ -15,23 +15,19 @@ if es_user and es_pass:
     if es_verifycert:
         es = Elasticsearch(esserver,
                            http_auth=(es_user, es_pass),
-                           verify_certs=es_verifycert,
-                           ca_certs=certifi.where(),
-                           connection_class=RequestsHttpConnection)
+                           verify_certs=True,
+                           ca_certs=certifi.where())
     else:
         es = Elasticsearch(esserver,
-                           http_auth=(es_user, es_pass),
-                           connection_class=RequestsHttpConnection)
+                           http_auth=(es_user, es_pass))
 
 else:
     if es_verifycert:
         es = Elasticsearch(esserver,
-                           verify_certs=es_verifycert,
-                           ca_certs=certifi.where(),
-                           connection_class=RequestsHttpConnection)
+                           verify_certs=True,
+                           ca_certs=certifi.where())
     else:
-        es = Elasticsearch(esserver,
-                           connection_class=RequestsHttpConnection)
+        es = Elasticsearch(esserver)
 
 # Core functions that are helpers
 def getHits(esid):
@@ -46,7 +42,6 @@ def getHits(esid):
 def getConn(conn_id):
     connsearch = es.search(index=f"*:{es_index}", doc_type="doc", body={
         "query": {"bool": {"must": [{"match": {"event_type": "bro_conn"}}, {"match": {"uid": conn_id}}]}}})
-    # search = (index="*:logstash-bro*", doc_type="doc", body={"query": {"bool": {"must": [ {"terms": { "uid" : "test" }}, { "terms" :{ "event_type" : "bro_conn" } } ] } } } )
     hits = connsearch['hits']['total']
     if hits > 0:
         return connsearch
@@ -55,7 +50,5 @@ def getConn(conn_id):
 def doUpdate(esindex, esid, tags):
     # Connect to Elastic and get information about the connection.
     localindex = esindex.split(":")[1]
-    # source_to_update = '{"doc"{ "tags":["blue"]}}'
     update = es.update(index=localindex, doc_type="_doc", id=esid, body={"doc": {"tags": tags}}, refresh=True)
-    # update = es.update(index=esindex, doc_type="_doc", id=esid, body={"doc":{ "tags":["green"]}})
     return update

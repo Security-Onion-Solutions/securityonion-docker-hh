@@ -1,6 +1,6 @@
 urllib3>=1.25,<1.26
 certifi>=2019.11
-elasticsearch>=6,<7
+elasticsearch>=7.0.0,<8.0.0
 flask-bootstrap>=3.3.7.0
 Flask>=1.1,<1.2
 Flask-WTF>=0.14,<0.15

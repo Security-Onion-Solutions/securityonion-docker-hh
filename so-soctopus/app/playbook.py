@@ -283,26 +283,26 @@ def play_create(sigma_raw, sigma_dict, playbook="imported", ruleset=""):
     # If ElastAlert config = "", set the play status to Disabled (id=7) else set it to Draft (id=1)
     # Also add a note to the play to make it clear as to why the status is Disabled
     play_status = "7" if play['raw_elastalert'] == "" else "1"
-    play_notes = "Play status set to Disabled - Sigmac error when generating ElastAlert config." if play[
-                                                                                                        'raw_elastalert'] == "" else "Play imported successfully."
+    play_notes = "Play status set to Disabled - Sigmac error when generating ElastAlert config." \
+        if play['raw_elastalert'] == "" else "Play imported successfully."
 
     # Create the payload
     payload = {"issue": {"subject": play['title'], "project_id": 1, "status_id": play_status, "tracker": "Play",
-                         "custom_fields": [ \
-                             {"id": 6, "name": "Title", "value": play['title']}, \
-                             {"id": 24, "name": "Playbook", "value": playbook}, \
-                             {"id": 15, "name": "ES Query", "value": play['esquery']}, \
-                             {"id": 23, "name": "Level", "value": play['level']}, \
-                             {"id": 25, "name": "Product", "value": play['product']}, \
-                             {"id": 2, "name": "Description", "value": play['description']}, \
-                             {"id": 17, "name": "Author", "value": play['author']}, \
-                             {"id": 16, "name": "References", "value": play['references']}, \
-                             {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"}, \
-                             {"id": 28, "name": "PlayID", "value": play_id[0:9]}, \
-                             {"id": 27, "name": "Tags", "value": play['tags']}, \
-                             {"id": 30, "name": "Signature ID", "value": play['sigid']}, \
-                             {"id": 21, "name": "Sigma", "value": play['sigma']}, \
-                             {"id": 32, "name": "Category", "value": ruleset} \
+                         "custom_fields": [
+                             {"id": 6, "name": "Title", "value": play['title']},
+                             {"id": 24, "name": "Playbook", "value": playbook},
+                             {"id": 15, "name": "ES Query", "value": play['esquery']},
+                             {"id": 23, "name": "Level", "value": play['level']},
+                             {"id": 25, "name": "Product", "value": play['product']},
+                             {"id": 2, "name": "Description", "value": play['description']},
+                             {"id": 17, "name": "Author", "value": play['author']},
+                             {"id": 16, "name": "References", "value": play['references']},
+                             {"id": 7, "name": "Analysis", "value": f"{play['falsepositives']}{play['logfields']}"},
+                             {"id": 28, "name": "PlayID", "value": play_id[0:9]},
+                             {"id": 27, "name": "Tags", "value": play['tags']},
+                             {"id": 30, "name": "Signature ID", "value": play['sigid']},
+                             {"id": 21, "name": "Sigma", "value": play['sigma']},
+                             {"id": 32, "name": "Category", "value": ruleset}
                              ]}}
 
     # POST the payload to Redmine to create the Play (ie Redmine issue)
@@ -310,7 +310,6 @@ def play_create(sigma_raw, sigma_dict, playbook="imported", ruleset=""):
     r = requests.post(url, data=json.dumps(payload), headers=playbook_headers, verify=playbook_verifycert)
 
     # If Play creation was successful, update the Play notes & return the Play URL
-    # If Play creation was not succesful, return the status code
     if r.status_code == 201:
         # Update the Play notes
         notes_payload = {"issue": {"notes": play_notes}}
@@ -320,6 +319,7 @@ def play_create(sigma_raw, sigma_dict, playbook="imported", ruleset=""):
         # Notate success & Play URL
         play_creation = 201
         play_url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}"
+    # If Play creation was not successful, return the status code
     else:
         print("Play Creation Error - " + r.text, file=sys.stderr)
         play_creation = r.status_code
