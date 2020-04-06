@@ -35,7 +35,7 @@ def getHits(esid):
     search = es.search(index=f"*:{es_index}*", doc_type="doc",
                        body={"query": {"bool": {"must": {"match": {'_id': esid}}}}})
     hits = search['hits']['total']
-    if hits > 0:
+    if hits['value'] > 0:
         return search
 
 
@@ -43,7 +43,7 @@ def getConn(conn_id):
     connsearch = es.search(index=f"*:{es_index}", doc_type="doc", body={
         "query": {"bool": {"must": [{"match": {"event_type": "bro_conn"}}, {"match": {"uid": conn_id}}]}}})
     hits = connsearch['hits']['total']
-    if hits > 0:
+    if hits['value'] > 0:
         return connsearch
 
 
