@@ -29,7 +29,6 @@ hive_url = parser.get('hive', 'hive_url')
 hive_key = parser.get('hive', 'hive_key')
 hive_verifycert = parser.getboolean('hive', 'hive_verifycert', fallback=False)
 
-
 def hiveInit():
     return TheHiveApi(hive_url, hive_key, cert=hive_verifycert)
 
@@ -79,7 +78,7 @@ def createHiveAlert(esid):
             artifacts.append(AlertArtifact(dataType='ip', data=src))
             artifacts.append(AlertArtifact(dataType='ip', data=dst))
             artifacts.append(AlertArtifact(dataType='other', data=sensor))
-            description = "`NIDS Dashboard:` \n\n <https://" + masterip + f"/kibana/app/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:{es_index}',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert + "\n\n `PCAP:` " + "https://" + masterip + "/kibana/app//sensoroni/securityonion/joblookup?redirectUrl=/sensoroni/&esid=" + es_id
+            description = "`NIDS Dashboard:` \n\n <https://" + masterip + f"/kibana/so-soctopus/kibana#/dashboard/ed6f7e20-e060-11e9-8f0c-2ddbf5ed9290?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),index:'*:{es_index}',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'sid:" + sid + "')),sort:!('@timestamp',desc))> \n\n `IPs: `" + src + ":" + srcport + "-->" + dst + ":" + dstport + "\n\n `Signature:`" + alert + "\n\n `PCAP:` " + "https://" + masterip + "/kibana/so-soctopus//sensoroni/securityonion/joblookup?redirectUrl=/sensoroni/&esid=" + es_id
 
         # Zeek logs
         elif event['module'] == 'zeek':

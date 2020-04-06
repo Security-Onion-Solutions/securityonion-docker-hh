@@ -8,6 +8,7 @@ esserver = parser.get('es', 'es_url')
 es_user = parser.get('es', 'es_user', fallback="")
 es_pass = parser.get('es', "es_pass", fallback="")
 es_verifycert = parser.getboolean('es', 'es_verifycert', fallback=False)
+
 search_index = f'*:{es_index}'
 
 

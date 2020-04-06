@@ -1,6 +1,6 @@
- FROM centos:7
+FROM centos:7
 
-LABEL maintainer "Security Onion Solutions, LLC"
+LABEL maintainer="Security Onion Solutions, LLC"
 LABEL version="SOCtopus v0.1 HH1.2.1"
 LABEL description="API for automating SOC-related functions"
 
@@ -12,12 +12,10 @@ RUN mkdir -p /SOCtopus
 RUN mkdir -p /SOCtopus/templates
 RUN mkdir -p /SOCtopus/playbook
 RUN mkdir -p /var/log/SOCtopus
-ADD ./requirements.txt SOCtopus/
-ADD ./app/*.py /SOCtopus/
-ADD ./app/*.conf /SOCtopus/
-ADD ./app/playbook/* /SOCtopus/playbook/
-ADD ./templates/* /SOCtopus/templates/
 WORKDIR /SOCtopus
+COPY ./requirements.txt /SOCtopus/
 RUN pip3 install -r requirements.txt
+
+COPY ./so-soctopus /SOCtopus
 ENTRYPOINT ["python3", "SOCtopus.py"]
 
