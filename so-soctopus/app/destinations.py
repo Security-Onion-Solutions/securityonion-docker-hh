@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from helpers import getHits, getConn, doUpdate
+from helpers import get_hits, get_conn, do_update
 from thehive4py.api import TheHiveApi
 from thehive4py.models import Alert, AlertArtifact
 from pymisp import PyMISP
@@ -35,7 +35,7 @@ def hiveInit():
 
 
 def createHiveAlert(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     # Hive Stuff
     hive_url = parser.get('hive', 'hive_url')
     hive_api = hiveInit()
@@ -245,7 +245,7 @@ def sendHiveAlert(title, tlp, tags, description, sourceRef, artifact_string):
 
 
 def createMISPEvent(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     # MISP Stuff
     misp_url = parser.get('misp', 'misp_url')
     misp_key = parser.get('misp', 'misp_key')
@@ -283,7 +283,7 @@ def createMISPEvent(esid):
 
 
 def createGRRFlow(esid, flow_name):
-    search = getHits(esid)
+    search = get_hits(esid)
 
     tlp = int(parser.get('hive', 'hive_tlp'))
     hive_api = hiveInit()
@@ -380,7 +380,7 @@ def createGRRFlow(esid, flow_name):
 
 
 def createRTIRIncident(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     rtir_url = parser.get('rtir', 'rtir_url')
     rtir_api = parser.get('rtir', 'rtir_api')
     rtir_user = parser.get('rtir', 'rtir_user')
@@ -406,7 +406,7 @@ def createRTIRIncident(esid):
 
 
 def createSlackAlert(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     slack_url = parser.get('slack', 'slack_url')
     webhook_url = parser.get('slack', 'slack_webhook')
     for result in search['hits']['hits']:
@@ -430,7 +430,7 @@ def createSlackAlert(esid):
 
 
 def createFIREvent(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     fir_api = '/api/incidents'
     fir_url = parser.get('fir', 'fir_url')
     fir_token = parser.get('fir', 'fir_token')
@@ -538,12 +538,12 @@ def playbookCreatePlay(sigma_raw, sigma_dict):
 
 
 def createStrelkaScan(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     for result in search['hits']['hits']:
         result = result['_source']
         extracted_file = result['extracted']
         conn_id = result['log']['id']['uid'][0]
-        sensorsearch = getConn(conn_id)
+        sensorsearch = get_conn(conn_id)
 
         for result in sensorsearch['hits']['hits']:
             result = result['_source']
@@ -555,7 +555,7 @@ def createStrelkaScan(esid):
 
 
 def showESResult(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     for result in search['hits']['hits']:
         esindex = result['_index']
         result = result['_source']
@@ -564,7 +564,7 @@ def showESResult(esid):
 
 
 def eventModifyFields(esid):
-    search = getHits(esid)
+    search = get_hits(esid)
     for result in search['hits']['hits']:
         esindex = result['_index']
         result = result['_source']
@@ -574,7 +574,7 @@ def eventModifyFields(esid):
 
 
 def eventUpdateFields(esindex, esid, tags):
-    doUpdate(esindex, esid, tags)
+    do_update(esindex, esid, tags)
     return showESResult(esid)
 
 
