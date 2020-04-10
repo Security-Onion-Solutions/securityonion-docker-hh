@@ -29,6 +29,7 @@ hive_headers = {'Authorization': f"Bearer {parser.get('hive', 'hive_key')}", 'Ac
 
 playbook_verifycert = parser.getboolean('playbook', 'playbook_verifycert', fallback=False)
 
+
 def navigator_update():
     # Get play data from Redmine
     url = f"{playbook_url}/issues.json?status_id=3"
@@ -76,30 +77,36 @@ def thehive_casetemplate_update(issue_id):
         tasks.insert(0, {"order": 0, "title": f"Analyzer - {minimal_name}", "description": minimal_name})
 
     # Build the case template
-    case_template = {"name": play_meta['playid'], "severity": 2, "tlp": 3, "metrics": {}, "customFields": { \
-        "playObjective": {"string": sigma_meta['description']}, \
-        "playbookLink": {"string": f"{playbook_url}/issues/{issue_id}"}}, \
-                     "description": sigma_meta['description'], \
+    case_template = {"name": play_meta['playid'], "severity": 2, "tlp": 3, "metrics": {}, "customFields": {
+        "playObjective": {"string": sigma_meta['description']},
+        "playbookLink": {"string": f"{playbook_url}/issues/{issue_id}"}},
+                     "description": sigma_meta['description'],
                      "tasks": tasks}
 
     # Is there a Case Template already created?
     if play_meta['hiveid']:
         # Case Template exists - let's update it
         url = f"{parser.get('hive', 'hive_url')}/api/case/template/{play_meta['hiveid']}"
-        requests.patch(url, data=json.dumps(case_template), headers=hive_headers,
+        requests.patch(url, json=case_template, headers=hive_headers,
                        verify=parser.getboolean('hive', 'hive_verifycert', fallback=False)).json()
 
     else:
         # Case Template does not exist - let's create it
         url = f"{parser.get('hive', 'hive_url')}/api/case/template"
-        r = requests.post(url, data=json.dumps(case_template), headers=hive_headers,
+        r = requests.post(url, json=case_template, headers=hive_headers,
                           verify=parser.getboolean('hive', 'hive_verifycert', fallback=False)).json()
 
         # Update Play (on Redmine) with Template ID
         url = f"{playbook_url}/issues/{issue_id}.json"
-        data = '{"issue":{"custom_fields":[{"id":8,"value":"' + r['id'] + '"}]}}'
-        requests.put(url, data=data, headers=playbook_headers, verify=playbook_verifycert)
+        data = {
+            "issue":
+            {
+                "custom_fields": [{"id": 8, "value": "' + r['id'] + '"}]
+            }
+        }
+        requests.put(url, json=data, headers=playbook_headers, verify=playbook_verifycert)
 
+    # FIXME: Only return success if the request returns success
     return 200, "success"
 
 
@@ -111,7 +118,7 @@ def elastalert_update(issue_id):
     sigma_meta = sigma_metadata(play_meta['sigma_raw'], play_meta['sigma_dict'])
 
     play_file = f"/etc/playbook-rules/{play_meta['playid']}.yaml"
-    ea_config_raw = re.sub("{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "",
+    ea_config_raw = re.sub(r"{{collapse\(View ElastAlert Config\)|<pre><code class=\"yaml\">|</code></pre>|}}", "",
                            sigma_meta['esquery'])
     if os.path.exists(play_file):
         os.remove(play_file)
@@ -119,7 +126,7 @@ def elastalert_update(issue_id):
     if sigma_meta['level'] == "medium" or sigma_meta['level'] == "low":
         shutil.copy('/etc/playbook-rules/es-generic.template', play_file)
         for line in fileinput.input(play_file, inplace=True):
-            line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
+            line = re.sub(r'/6000', f"/{issue_id}", line.rstrip())
             line = re.sub(r'play_title:.\"\"', f"play_title: \"{sigma_meta['title']}\"", line.rstrip())
             line = re.sub(r'sigma_level:.\"\"', f"sigma_level: \"{sigma_meta['level']}\"\n{ea_config_raw}",
                           line.rstrip())
@@ -134,7 +141,7 @@ def elastalert_update(issue_id):
                 line = re.sub(r'-\s''', f"- {play_meta['playbook']}", line.rstrip())
                 line = re.sub(r'tags:.*$', f"tags: ['playbook','{play_meta['playid']}','{play_meta['playbook']}']",
                               line.rstrip())
-                line = re.sub(r'\/6000', f"/{issue_id}", line.rstrip())
+                line = re.sub(r'/6000', f"/{issue_id}", line.rstrip())
                 line = re.sub(r'caseTemplate:.*', f"caseTemplate: '{play_meta['playid']}'\n{ea_config_raw}",
                               line.rstrip())
                 print(line)
@@ -160,58 +167,50 @@ def play_update(issue_id):
     # Generate Sigma metadata
     sigma_meta = sigma_metadata(play_meta['sigma_raw'], play_meta['sigma_dict'])
 
-    payload = {"issue": {"subject": sigma_meta['title'], "project_id": 1, "tracker": "Play", "custom_fields": [ \
-        {"id": 6, "name": "Title", "value": sigma_meta['title']}, \
-        {"id": 23, "name": "Level", "value": sigma_meta['level']}, \
-        {"id": 15, "name": "ES Query", "value": sigma_meta['esquery']}, \
-        {"id": 25, "name": "Product", "value": sigma_meta['product']}, \
-        {"id": 2, "name": "Description", "value": sigma_meta['description']}, \
-        {"id": 17, "name": "Author", "value": sigma_meta['author']}, \
-        {"id": 16, "name": "References", "value": sigma_meta['references']}, \
-        {"id": 7, "name": "Analysis", "value": f"{sigma_meta['falsepositives']}{sigma_meta['logfields']}"}, \
+    payload = {"issue": {"subject": sigma_meta['title'], "project_id": 1, "tracker": "Play", "custom_fields": [
+        {"id": 6, "name": "Title", "value": sigma_meta['title']},
+        {"id": 23, "name": "Level", "value": sigma_meta['level']},
+        {"id": 15, "name": "ES Query", "value": sigma_meta['esquery']},
+        {"id": 25, "name": "Product", "value": sigma_meta['product']},
+        {"id": 2, "name": "Description", "value": sigma_meta['description']},
+        {"id": 17, "name": "Author", "value": sigma_meta['author']},
+        {"id": 16, "name": "References", "value": sigma_meta['references']},
+        {"id": 7, "name": "Analysis", "value": f"{sigma_meta['falsepositives']}{sigma_meta['logfields']}"},
         {"id": 27, "name": "Tags", "value": sigma_meta['tags']}]}}
 
     url = f"{playbook_url}/issues/{issue_id}.json"
     r = requests.put(url, data=json.dumps(payload), headers=playbook_headers, verify=playbook_verifycert)
 
+    # FIXME: Only return success if the request returns success
     return 'success', 200
 
 
 def play_metadata(issue_id):
-    play = dict()
     url = f"{playbook_url}/issues/{issue_id}.json"
 
-    r = requests.get(url, headers=playbook_headers, verify=playbook_verifycert).json()
+    res_json = requests.get(url, headers=playbook_headers, verify=playbook_verifycert).json()
 
-    for item in r['issue']['custom_fields']:
-        if item['name'] == "Sigma":
-            sigma_raw = item['value']
-        elif item['name'] == "HiveID":
-            play['hiveid'] = item['value']
-        elif item['name'] == "PlayID":
-            play['playid'] = item['value']
-        elif item['name'] == "Playbook":
-            play['playbook'] = item['value']
-        elif item['name'] == "Case Analyzers":
-            play['case_analyzers'] = item['value']
-        elif item['name'] == "Signature ID":
-            play['sigma_id'] = item['value']
+    field_dict = {}
+    custom_fields = res_json.get('issue', {}).get('custom_fields', [])
+    for item in custom_fields:
+        field_dict.update({item.get('name'): item.get('value')})
 
-    # Cleanup the Sigma data to get it ready for parsing
     sigma_raw = re.sub(
-        "{{collapse\(View Sigma\)|<pre><code class=\"yaml\">|</code></pre>|}}", "", sigma_raw)
-    sigma_dict = yaml.load(sigma_raw)
+        r'{{collapse\(View Sigma\)|<pre><code class=\"yaml\">|</code></pre>|}}',
+        "",
+        field_dict.get('Sigma')
+    )
 
     return {
         'issue_id': issue_id,
-        'playid': play.get('playid'),
-        'hiveid': play.get('hiveid'),
-        'sigma_dict': sigma_dict,
+        'playid': field_dict.get('PlayID'),
+        'hiveid': field_dict.get('HiveID'),
+        'sigma_dict': yaml.load(sigma_raw),
+        'sigma_formatted': field_dict.get('Sigma'),
         'sigma_raw': sigma_raw,
-        'sigma_formatted': f'{{{{collapse(View Sigma)\n<pre><code class="yaml">\n\n{sigma_raw}\n</code></pre>\n}}}}',
-        'sigma_id': play.get('sigma_id'),
-        'playbook': play.get('playbook'),
-        'case_analyzers': play.get('case_analyzers')
+        'sigma_id': field_dict.get('Signature ID'),
+        'playbook': field_dict.get('Playbook'),
+        'case_analyzers': field_dict.get('Case Analyzers')
     }
 
 
@@ -307,7 +306,7 @@ def play_create(sigma_raw, sigma_dict, playbook="imported", ruleset=""):
 
     # POST the payload to Redmine to create the Play (ie Redmine issue)
     url = f"{playbook_url}/issues.json"
-    r = requests.post(url, data=json.dumps(payload), headers=playbook_headers, verify=playbook_verifycert)
+    r = requests.post(url, json=payload, headers=playbook_headers, verify=playbook_verifycert)
 
     # If Play creation was successful, update the Play notes & return the Play URL
     if r.status_code == 201:
@@ -315,7 +314,7 @@ def play_create(sigma_raw, sigma_dict, playbook="imported", ruleset=""):
         notes_payload = {"issue": {"notes": play_notes}}
         new_issue_id = r.json()
         url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}.json"
-        r = requests.put(url, data=json.dumps(notes_payload), headers=playbook_headers, verify=playbook_verifycert)
+        r = requests.put(url, json=notes_payload, headers=playbook_headers, verify=playbook_verifycert)
         # Notate success & Play URL
         play_creation = 201
         play_url = f"{playbook_url}/issues/{new_issue_id['issue']['id']}"
