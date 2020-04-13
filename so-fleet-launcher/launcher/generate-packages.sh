@@ -41,7 +41,7 @@ then
     #autoupdate disabled - do not add autoupdate flags to flag file
     :
 else
-    printf "\nautoupdate\nupdate_channel stable\n" >> src/config/launcher-msi.flags
+    #printf "\nautoupdate\nupdate_channel stable\n" >> src/config/launcher-msi.flags
     printf "\nautoupdate\nupdate_channel stable\n" >> src/config/launcher.flags
 fi
 
