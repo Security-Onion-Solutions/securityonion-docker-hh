@@ -24,10 +24,10 @@ sed -i 's@ninja@'"$2"'@' /var/launcher/src/config/launcher.flags
 #If roots.pem exists, add flag & copy over it over to src
 if [ -s /var/launcher/launcher.crt ] 
 then
-    printf "%s\n" "root_pem C:\Program Files\Kolide\Launcher-so-launcher\conf\roots.pem" >> src/config/launcher-msi.flags
+    printf "%s\n\n" "root_pem C:\Program Files\Kolide\Launcher-so-launcher\conf\roots.pem" >> src/config/launcher-msi.flags
     cp /var/launcher/launcher.crt msi/fil9DF688E35240EB6774DE8ECCC9A54A59
     
-    printf "root_pem /etc/launcher/roots.pem\n" >> src/config/launcher.flags
+    printf "\nroot_pem /etc/launcher/roots.pem" >> src/config/launcher.flags
     cp /var/launcher/launcher.crt /etc/so-launcher/roots.pem
 else
     #deb & MSI packaging will likely fail without this
