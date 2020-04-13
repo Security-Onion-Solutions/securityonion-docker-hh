@@ -5,10 +5,10 @@ title: SO configs
 logsources:
   osquery:
     product: osquery
-    index: logstash-osquery-*
+    index: so-osquery-*
   windows:
     product: windows
-    index: logstash-beats-*
+    index: so-*
   windows-application:
     product: windows
     service: application
@@ -34,9 +34,10 @@ logsources:
     service: driver-framework
     conditions:
       source: 'Microsoft-Windows-DriverFrameworks-UserMode/Operational'
-defaultindex: logstash-*
+defaultindex: so-*
 fieldmappings:
-    EventID: event_id
+    EventID: event.code
+    log_name: event.dataset
     AccessMask: event_data.AccessMask
     AccountName: event_data.AccountName
     AllowedToDelegateTo: event_data.AllowedToDelegateTo
@@ -45,11 +46,11 @@ fieldmappings:
     AuthenticationPackageName: event_data.AuthenticationPackageName
     CallingProcessName: event_data.CallingProcessName
     CallTrace: event_data.CallTrace
-    CommandLine: event_data.CommandLine
+    CommandLine: process.command_line
     Company: event_data.Company
     ComputerName: event_data.ComputerName
-    CurrentDirectory: event_data.CurrentDirectory
-    Description: event_data.Description
+    CurrentDirectory: process.working_directory"
+    Description: process.pe.description
     DestinationHostname: event_data.DestinationHostname
     DestinationIp: destination_ip
     DestinationIsIpv6: event_data.DestinationIsIpv6
@@ -65,7 +66,7 @@ fieldmappings:
     Hashes: event_data.Hashes
     HiveName: event_data.HiveName
     HostVersion: event_data.HostVersion
-    Image: image_path
+    Image: process.executable
     ImageLoaded: event_data.ImageLoaded
     ImagePath: event_data.ImagePath
     Imphash: event_data.Imphash
@@ -77,8 +78,8 @@ fieldmappings:
     ObjectName: event_data.ObjectName
     ObjectType: event_data.ObjectType
     ObjectValueName: event_data.ObjectValueName
-    ParentCommandLine: event_data.ParentCommandLine
-    ParentImage: parent_image_path
+    ParentCommandLine: process.parent.command_line
+    ParentImage: process.parent.executable
     Path: event_data.Path
     PipeName: event_data.PipeName
     ProcessName: event_data.ProcessName
@@ -99,13 +100,13 @@ fieldmappings:
     TicketOptions: event_data.TicketOptions
     User: event_data.User
     WorkstationName: event_data.WorkstationName
-    Product: event_data.Product
+    Product: process.pe.product
     GroupSid: event_data.GroupSid    
     RelativeTargetName: event_data.RelativeTargetName
     qid: osquery.columns.qid
-    hostname: osquery.hostname
-    counter: osquery.counter
+    hostname: osquery.result.hostname
+    counter: osquery.result.counter
     column_name: osquery.columns.name
-    query_name: osquery.name
-    username: osquery.columns.username
-    uid: osquery.columns.uid
+    query_name: osquery.result.name
+    username: user.name
+    uid: user.uid
