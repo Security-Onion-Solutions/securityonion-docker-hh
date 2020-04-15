@@ -27,7 +27,7 @@ then
     printf "%s\n\n" "root_pem C:\Program Files\Kolide\Launcher-so-launcher\conf\roots.pem" >> src/config/launcher-msi.flags
     cp /var/launcher/launcher.crt msi/fil9DF688E35240EB6774DE8ECCC9A54A59
     
-    printf "\nroot_pem /etc/launcher/roots.pem" >> src/config/launcher.flags
+    printf "\nroot_pem /etc/so-launcher/roots.pem" >> src/config/launcher.flags
     cp /var/launcher/launcher.crt /etc/so-launcher/roots.pem
 else
     #deb & MSI packaging will likely fail without this
