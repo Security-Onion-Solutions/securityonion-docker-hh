@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM docker.elastic.co/logstash/FLAVOR:X.Y.Z
+FROM docker.elastic.co/logstash/FLAVOR:7.6.1
 
 LABEL maintainer "Security Onion Solutions, LLC"
 

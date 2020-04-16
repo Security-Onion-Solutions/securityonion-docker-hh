@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-FROM docker.elastic.co/elasticsearch/FLAVOR:X.Y.Z
+FROM docker.elastic.co/elasticsearch/FLAVOR:7.6.1
 
 RUN groupmod -g 930 elasticsearch && \
     usermod -u 930 -g 930 elasticsearch

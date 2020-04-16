@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-FROM docker.elastic.co/kibana/FLAVOR:X.Y.Z
+FROM docker.elastic.co/kibana/FLAVOR:7.6.1
 
 USER root
 RUN groupmod -g 932 kibana && \
