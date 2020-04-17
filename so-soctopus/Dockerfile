@@ -1,7 +1,6 @@
 FROM centos:7
 
 LABEL maintainer="Security Onion Solutions, LLC"
-LABEL version="SOCtopus v0.1 HH1.2.1"
 LABEL description="API for automating SOC-related functions"
 
 RUN yum update -y && yum -y install epel-release

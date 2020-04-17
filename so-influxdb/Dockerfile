@@ -1,6 +1,5 @@
 FROM alpine:3.7
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="InfluxDB 1.7.5 HH1.2.1"
 LABEL description="InfluxDB running in Docker container for use with Security Onion"
 
 RUN echo 'hosts: files dns' >> /etc/nsswitch.conf

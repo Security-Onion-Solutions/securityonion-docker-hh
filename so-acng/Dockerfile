@@ -1,7 +1,6 @@
 FROM ubuntu:bionic-20180526
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="apt-cacher-ng HH1.2.1"
 LABEL description="apt-cacher running in Docker container for use with Security Onion"
 
 ENV APT_CACHER_NG_VERSION=3.1 \

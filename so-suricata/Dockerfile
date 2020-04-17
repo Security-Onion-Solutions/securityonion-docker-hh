@@ -1,7 +1,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Suricata 4.1.6 HH1.2.1"
 LABEL description="Suricata 4.1.6 running in a docker for use with Security Onion."
 
 RUN yum update -y && \
