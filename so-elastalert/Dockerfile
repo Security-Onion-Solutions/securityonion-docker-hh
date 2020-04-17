@@ -3,8 +3,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="HH1.2.1"
-
 
 # Create a common centos update layer
 RUN yum update -y && \

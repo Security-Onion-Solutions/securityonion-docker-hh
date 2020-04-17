@@ -17,11 +17,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-FROM docker.elastic.co/elasticsearch/elasticsearch:6.8.7
+FROM docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="HH1.2.1"
-
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 

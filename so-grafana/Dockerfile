@@ -1,6 +1,5 @@
 FROM debian:stretch-slim
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Grafana 6.0.2 HH1.2.1"
 LABEL description="Grafana running in Docker container for use with Security Onion"
 
 ARG GRAFANA_URL="https://dl.grafana.com/oss/release/grafana-6.6.2.linux-amd64.tar.gz"

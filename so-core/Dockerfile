@@ -16,7 +16,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="SO Core HH1.2.1"
 LABEL description="Security Onion Core Functions Docker"
 
 RUN yum update -y && yum -y install rsync epel-release

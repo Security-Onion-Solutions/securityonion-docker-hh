@@ -1,7 +1,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Cortex HH1.2.1"
 LABEL description="Cortex Docker container for use with Security Onion"
 RUN yum update -y
 RUN yum install -y https://dl.bintray.com/thehive-project/rpm-stable/cortex-3.0.1-1.noarch.rpm 

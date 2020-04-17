@@ -5,9 +5,6 @@ ARG YARA_VERSION=3.11.0
 ARG YARA_PYTHON_VERSION=3.11.0
 
 # Copy Strelka files
-COPY ./src/python/ /strelka/
-COPY ./build/python/backend/requirements.txt /strelka/requirements.txt
-COPY ./build/python/backend/setup.py /strelka/setup.py
 
 # Update packages
 RUN apt-get -qq update && \
@@ -20,6 +17,7 @@ RUN apt-get -qq update && \
     git \
     libtool \
     make \
+    swig \
     python3-dev \
     python3-pip \
     python3-wheel \
@@ -35,9 +33,20 @@ RUN apt-get -qq update && \
     tesseract-ocr \
     unrar \
     upx \
-    jq && \
+    jq
+
+# Download strelka
+RUN mkdir /tmp/strelka && \
+    git clone https://github.com/target/strelka /tmp/strelka
+
+# Prepare backend for python build
+RUN mkdir /stelka && \
+    cp -fr /tmp/strelka/src/python /strelka/ && \
+    cp -fr /tmp/strelka/build/python/backend/requirements.txt /strelka/ && \
+    cp -fr /tmp/strelka/build/python/backend/setup.py /strelka/
+
 # Install Python packages
-    pip3 install -r /strelka/requirements.txt && \
+RUN pip3 install -r /strelka/requirements.txt && \
     pip3 install --index-url https://lief-project.github.io/packages --trusted-host lief.quarkslab.com lief && \
 # Install YARA
     cd /tmp/ && \

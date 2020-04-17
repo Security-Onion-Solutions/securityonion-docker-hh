@@ -15,8 +15,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ARG FLAVOR
+ARG VERSION
 
-FROM docker.elastic.co/logstash/FLAVOR:7.6.1
+FROM docker.elastic.co/logstash/$FLAVOR:$VERSION
 
 LABEL maintainer "Security Onion Solutions, LLC"
 

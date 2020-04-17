@@ -1,13 +1,10 @@
 FROM golang AS build
 LABEL maintainer "Security Onion Solutions, LLC"
 
-COPY ./src/go/ /go/src/github.com/target/strelka/src/go/
-RUN cd /go/src/github.com/target/strelka/src/go/cmd/strelka-frontend/ && \
-    go get . && \
-    CGO_ENABLED=0 go build -o /tmp/strelka-frontend .
+RUN CGO_ENABLED=0 go get github.com/target/strelka/src/go/cmd/strelka-frontend
 
 FROM alpine
-COPY --from=build /tmp/strelka-frontend /usr/local/bin/strelka-frontend
+COPY --from=build /go/bin/strelka-frontend /usr/local/bin/
 RUN addgroup -g 939 strelka && \
     adduser -u 939 -G strelka strelka --disabled-password \
     -h /etc/strelka --no-create-home strelka && \

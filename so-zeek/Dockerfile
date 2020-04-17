@@ -1,8 +1,7 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Zeek 3.0.3 HH1.2.1"
-LABEL description="Zeek 3.0.3 running in a docker with AF_Packet 1.4 for use with Security Onion."
+LABEL description="Zeek running in a docker with AF_Packet 1.4 for use with Security Onion."
 
 RUN yum update -y && \
     yum clean all
