@@ -15,10 +15,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-ARG FLAVOR
-ARG VERSION
-
-FROM docker.elastic.co/beats/$FLAVOR:$VERSION
+FROM docker.elastic.co/beats/filebeat-oss:7.6.1
 USER root
 # Add entrypoint wrapper script
 ADD files/docker-entrypoint /usr/local/bin
