@@ -16,7 +16,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="IDSTools HH1.1.0"
 LABEL description="IDSTools for downloading rules"
 
 RUN yum update -y && \

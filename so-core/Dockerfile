@@ -16,7 +16,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="SO Core HH1.1.0"
 LABEL description="Security Onion Core Functions Docker"
 
 RUN yum update -y && yum -y install rsync epel-release
@@ -26,7 +25,7 @@ RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 RUN mkdir -p /opt/socore/html
 
 COPY files/startso.sh /opt/socore/
-COPY files/html/* /opt/socore/html/
+COPY files/html/ /opt/socore/html/
 
 RUN chmod +x /opt/socore/startso.sh
 

@@ -1,7 +1,8 @@
 FROM ubuntu:latest
 
 WORKDIR /var/launcher
-COPY launcher /var/launcher 
+COPY launcher /var/launcher
+COPY launcher/src/tools/* /usr/local/bin/  
 
 #Install the packages we need
 RUN apt-get update && \
@@ -14,6 +15,7 @@ RUN apt-get update && \
     build-essential \
     cpio \
     binutils \
+    cpio \
     cabextract \
     rpm && \
 \

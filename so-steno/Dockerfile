@@ -1,7 +1,6 @@
 FROM centos:7
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Google Stenographer HH1.1.3"
 LABEL description="Google Stenographer running in a docker for use with Security Onion."
 
 RUN yum update -y && \
@@ -16,10 +15,11 @@ RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
 
 # Install the steno package
 RUN rpm -i https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/stenographer_20180316/stenographer-0-1.20180316git57b88aa.el7.centos.x86_64.rpm
-RUN mkdir -p /opt/sensoroni && cd /opt/sensoroni \
-&& curl -OL https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/sensoroni0.2.0b/sensoroni \
-&& curl -OL https://github.com/Security-Onion-Solutions/securityonion-docker-rpm/releases/download/sensoroni0.2.0b/version.json \
-&& chmod +x /opt/sensoroni/sensoroni
+RUN mkdir -p /opt/sensoroni 
+
+# Copy the Binary in
+COPY files/sensoroni /opt/sensoroni/
+RUN chmod +x /opt/sensoroni/sensoroni
 
 # setcap
 RUN setcap 'CAP_NET_RAW+ep CAP_NET_ADMIN+ep CAP_IPC_LOCK+ep CAP_SETGID+ep' /usr/bin/stenotype

@@ -1,1 +1,0 @@
-export const CHECK_FIRST_RUN = 'CHECK_FIRST_RUN';

@@ -1,7 +1,6 @@
 FROM redmine:4-passenger
 
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Playbook HH1.1.3"
 LABEL description="Playbook running in Docker container for use with Security Onion"
 
 WORKDIR /usr/src/redmine

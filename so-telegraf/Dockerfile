@@ -1,10 +1,9 @@
 FROM alpine:3.6
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Telegraf 1.10.1 HH1.1.0"
 LABEL description="Telegraf running in Docker container for use with Security Onion"
 
 RUN echo 'hosts: files dns' >> /etc/nsswitch.conf
-RUN apk add --no-cache iputils ca-certificates net-snmp-tools procps lm_sensors redis && \
+RUN apk add --no-cache iputils ca-certificates net-snmp-tools procps lm_sensors redis curl jq && \
     update-ca-certificates
 
 ENV TELEGRAF_VERSION 1.10.1

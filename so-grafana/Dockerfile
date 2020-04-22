@@ -1,9 +1,8 @@
 FROM debian:stretch-slim
 LABEL maintainer "Security Onion Solutions, LLC"
-LABEL version="Grafana 6.0.2 HH1.1.0"
 LABEL description="Grafana running in Docker container for use with Security Onion"
 
-ARG GRAFANA_URL="https://s3-us-west-2.amazonaws.com/grafana-releases/master/grafana-latest.linux-x64.tar.gz"
+ARG GRAFANA_URL="https://dl.grafana.com/oss/release/grafana-6.6.2.linux-amd64.tar.gz"
 ARG GF_UID="939"
 ARG GF_GID="939"
 ARG GF_INSTALL_PLUGIN="mtanda-histogram-panel,grafana-piechart-panel,grafana-clock-panel,grafana-simple-json-datasource,ryantxu-ajax-panel,michaeldmoore-multistat-panel"
