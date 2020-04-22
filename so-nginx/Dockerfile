@@ -26,7 +26,5 @@ RUN mkdir -p /opt/socore/html/cyberchef && \
     mv /opt/socore/html/cyberchef/CyberChef_v$VERSION.html /opt/socore/html/cyberchef/index.html && \
     rm -f /tmp/CyberChef.zip
 
-RUN setcap cap_net_bind_service=ep /usr/sbin/nginx
-
 EXPOSE 80
 EXPOSE 443
