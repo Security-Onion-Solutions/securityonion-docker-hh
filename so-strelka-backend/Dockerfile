@@ -40,8 +40,8 @@ RUN mkdir /tmp/strelka && \
     git clone https://github.com/target/strelka /tmp/strelka
 
 # Prepare backend for python build
-RUN mkdir /stelka && \
-    cp -fr /tmp/strelka/src/python /strelka/ && \
+RUN mkdir /strelka && \
+    cp -fr /tmp/strelka/src/python/* /strelka/ && \
     cp -fr /tmp/strelka/build/python/backend/requirements.txt /strelka/ && \
     cp -fr /tmp/strelka/build/python/backend/setup.py /strelka/
 
