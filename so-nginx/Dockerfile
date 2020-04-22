@@ -13,29 +13,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM centos:7
+FROM nginx:1.17-alpine
 
 LABEL maintainer "Security Onion Solutions, LLC"
 LABEL description="Security Onion Core Functions Docker"
 
-RUN yum update -y && yum -y install rsync epel-release
-RUN yum -y install nginx
-RUN yum -y erase epel-release && yum clean all && rm -rf /var/cache/yum
+ARG VERSION=9.11.14
 
-RUN mkdir -p /opt/socore/html
+RUN mkdir -p /opt/socore/html/cyberchef && \
+    wget -O /tmp/CyberChef.zip https://github.com/gchq/CyberChef/releases/download/v$VERSION/CyberChef_v$VERSION.zip  && \
+    unzip -o /tmp/CyberChef.zip -d /opt/socore/html/cyberchef && \
+    mv /opt/socore/html/cyberchef/CyberChef_v$VERSION.html /opt/socore/html/cyberchef/index.html && \
+    rm -f /tmp/CyberChef.zip
 
-COPY files/startso.sh /opt/socore/
-COPY files/html/ /opt/socore/html/
-
-RUN chmod +x /opt/socore/startso.sh
-
-# Create socore user.
-RUN groupadd --gid 939 socore && \
-    adduser --uid 939 --gid 939 \
-    --home-dir /opt/so --no-create-home socore
 RUN setcap cap_net_bind_service=ep /usr/sbin/nginx
 
 EXPOSE 80
 EXPOSE 443
-
-ENTRYPOINT ["/opt/socore/startso.sh"]
